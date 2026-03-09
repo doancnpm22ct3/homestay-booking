@@ -49,6 +49,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'Email hoặc mật khẩu không chính xác!'], 401);
         }
 
+        // KIỂM TRA XEM TÀI KHOẢN CÓ BỊ ADMIN KHÓA KHÔNG
+        if ($user->status === 'blocked') {
+            return response()->json(['message' => 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin!'], 403);
+        }
+
         // Tạo mã Token (vé thông hành) cho khách
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -58,6 +63,18 @@ class AuthController extends Controller
             'user' => $user
         ]);
     }
+    // HÀM KIỂM TRA TRẠNG THÁI NGẦM
+    public function checkStatus(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        
+        // Nếu không tìm thấy user hoặc user đã bị khóa
+        if (!$user || $user->status === 'blocked') {
+            return response()->json(['message' => 'Bị khóa'], 401);
+        }
+        
+        return response()->json(['message' => 'An toàn']);
+    }
     // HÀM CẬP NHẬT PROFILE
     public function updateProfile(Request $request)
     {
@@ -66,20 +83,26 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        // Tìm khách hàng dựa vào Email
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
             return response()->json(['message' => 'Không tìm thấy người dùng!'], 404);
         }
 
-        // Cập nhật tên mới và lưu lại
+        // Kiểm tra nếu tài khoản bị khóa
+        if ($user->status === 'blocked') {
+            return response()->json([
+                'message' => 'Tài khoản của bạn đã bị khóa!'
+            ], 401);
+        }
+
+        // Cập nhật tên
         $user->name = $request->name;
         $user->save();
 
         return response()->json([
             'message' => 'Cập nhật tên thành công!',
-            'user' => $user // Trả về thông tin mới để Vue cập nhật màn hình
+            'user' => $user
         ]);
     }
 }
