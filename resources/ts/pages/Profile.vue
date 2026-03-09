@@ -1,22 +1,26 @@
 <template>
   <div class="bg-gray-50 min-h-screen pb-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div v-if="user" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       
-      <!-- Profile Header -->
-      <div class="flex items-center gap-6 mb-12">
-        <div class="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-3xl shadow-sm border border-emerald-200">
-          D
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div class="flex items-center gap-6">
+          <div class="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-3xl shadow-sm border border-emerald-200">
+            {{ user.name.charAt(0).toUpperCase() }}
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ user.name }}</h1>
+            <p class="text-gray-600 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              Thành viên hệ thống
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900 mb-2">Death Pool</h1>
-          <p class="text-gray-600 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            Đà Nẵng, Việt Nam
-          </p>
-        </div>
+
+        <button @click="handleLogout" class="text-red-600 font-medium px-6 py-2 border border-red-200 rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors w-max">
+          Đăng xuất tài khoản
+        </button>
       </div>
 
-      <!-- Tabs -->
       <div class="border-b border-gray-200 mb-8">
         <nav class="-mb-px flex space-x-8">
           <button
@@ -55,8 +59,8 @@
         </nav>
       </div>
 
-      <!-- Tab Content -->
       <div class="mt-8">
+        
         <div v-if="activeTab === 'saved'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <RoomCard
             v-for="(room, index) in savedRooms"
@@ -94,41 +98,121 @@
         </div>
 
         <div v-if="activeTab === 'account'" class="max-w-2xl bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-          <form class="space-y-6">
+          <form class="space-y-6" @submit.prevent="updateProfile">
             <div>
               <label for="fullname" class="block text-sm font-medium text-gray-700 mb-1">Họ và Tên</label>
-              <input type="text" id="fullname" value="Death Pool" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50" />
+              <input type="text" id="fullname" v-model="editForm.name" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50" />
             </div>
             <div>
               <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input type="email" id="email" value="deathpool@example.com" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50" />
+              <input type="email" id="email" v-model="editForm.email" readonly class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed" title="Email không thể thay đổi" />
             </div>
             <div>
               <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Số Điện Thoại</label>
-              <input type="tel" id="phone" value="0123456789" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50" />
+              <input type="tel" id="phone" v-model="editForm.phone" readonly class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed" title="Số điện thoại không thể thay đổi" />
             </div>
-            <div>
-              <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Mật Khẩu</label>
-              <input type="password" id="password" value="********" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50" />
-            </div>
+            
             <div class="pt-4">
-              <button type="button" class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-medium transition-colors">
-                Chỉnh sửa
+              <button type="button" @click="updateProfile" class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-medium transition-colors">
+                Cập nhật thông tin
               </button>
             </div>
           </form>
         </div>
+
       </div>
+    </div>
+
+    <div v-else class="min-h-screen flex items-center justify-center">
+      <p class="text-gray-500 text-lg">Đang tải thông tin...</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import RoomCard from '../components/RoomCard.vue';
 
-const activeTab = ref('saved');
+const router = useRouter();
 
+// Biến lưu thông tin user thật
+const user = ref<any>(null);
+
+// Form để khách có thể sửa thông tin
+const editForm = ref({
+  name: '',
+  email: '',
+  phone: ''
+});
+
+const activeTab = ref('account'); // Mở sẵn tab Tài khoản cho khách dễ thấy
+
+// KHI TRANG VỪA TẢI LÊN
+onMounted(() => {
+  const userInfo = localStorage.getItem('user_info');
+  
+  if (userInfo) {
+    // Nếu có đăng nhập -> Đổ dữ liệu vào biến user và form
+    user.value = JSON.parse(userInfo);
+    editForm.value.name = user.value.name;
+    editForm.value.email = user.value.email;
+    editForm.value.phone = user.value.phone || '';
+  } else {
+    // Nếu chưa đăng nhập -> Đuổi về trang Đăng nhập
+    router.push('/login');
+  }
+});
+
+// Hàm xử lý khi bấm nút Đăng xuất
+const handleLogout = () => {
+  if(confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_info');
+    window.location.href = '/'; // Reset toàn bộ và về Trang chủ
+  }
+};
+
+// Hàm xử lý tạm khi bấm Cập nhật thông tin
+const updateProfile = async () => {
+  if (!editForm.value.name.trim()) {
+    alert('Tên không được để trống!');
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/profile/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        email: editForm.value.email, // Dùng email để làm chìa khóa tìm đúng người
+        name: editForm.value.name    // Gửi tên mới xuống để lưu
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert('Cập nhật tên thành công!');
+      
+      // Cập nhật lại thông tin mới vào bộ nhớ trình duyệt
+      localStorage.setItem('user_info', JSON.stringify(data.user));
+      user.value = data.user;
+      
+      // Tải lại trang để Header cập nhật tên mới
+      window.location.reload();
+    } else {
+      alert('Lỗi: ' + data.message);
+    }
+  } catch (error) {
+    console.error('Lỗi kết nối:', error);
+    alert('Không thể kết nối đến máy chủ!');
+  }
+};
+// DỮ LIỆU MẪU CỦA BẠN CHO TAB ĐÃ LƯU & LỊCH SỬ
 const savedRooms = Array(6).fill({
   title: 'Phòng Mơ Màng, Số 10 Núi Thành',
   location: 'Quận Cẩm Lệ, TP. Đà Nẵng',

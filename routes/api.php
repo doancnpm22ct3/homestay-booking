@@ -8,10 +8,13 @@ Route::post('/rooms', [RoomController::class, 'store']);// Lấy danh sách
 Route::get('/rooms', [RoomController::class, 'index']);// Thêm phòng
 Route::get('/rooms/{id}', [RoomController::class, 'show']);// Lấy chi tiết 1 phòng theo ID
 Route::put('/rooms/{id}', [RoomController::class, 'update']);// Lệnh cập nhật phòng
+Route::post('/profile/update', [App\Http\Controllers\Api\AuthController::class, 'updateProfile']);
 // --- QUẢN LÝ TIỆN NGHI ---
 Route::get('/amenities', [App\Http\Controllers\Api\RoomController::class, 'getAmenities']); // Lấy danh sách
 Route::post('/amenities', [App\Http\Controllers\Api\RoomController::class, 'storeAmenity']); // Thêm mới
 Route::delete('/amenities/{id}', [App\Http\Controllers\Api\RoomController::class, 'deleteAmenity']); // Xóa vĩnh viễn
+Route::post('/register', [App\Http\Controllers\Api\AuthController::class, 'register']);
+Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
