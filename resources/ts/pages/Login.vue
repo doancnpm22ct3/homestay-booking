@@ -119,7 +119,7 @@ import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { Eye, EyeOff, Loader2 } from 'lucide-vue-next';
-import { useAuth } from '@/composables/useAuth';
+import { useAuth } from '../composables/useAuth';
 
 const router = useRouter();
 const { fetchUser } = useAuth();

@@ -26,7 +26,7 @@
 
           <!-- Đã đăng nhập -->
           <template v-else>
-            <div class="relative" @click.outside="dropdownOpen = false">
+            <div class="relative" ref="dropdownRef">
               <button
                 class="flex items-center gap-2 text-gray-700 hover:text-emerald-700 font-medium transition-colors"
                 @click="dropdownOpen = !dropdownOpen"
@@ -76,14 +76,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { Menu, ChevronDown, User, LogOut } from 'lucide-vue-next';
-import { useAuth } from '@/composables/useAuth';
+import { useAuth } from '../composables/useAuth';
 
 const router = useRouter();
 const { user, isLoggedIn, authLoading, logout } = useAuth();
 const dropdownOpen = ref(false);
+const dropdownRef = ref<HTMLElement | null>(null);
+
+// Đóng dropdown khi click bên ngoài
+function handleClickOutside(event: MouseEvent) {
+  if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
+    dropdownOpen.value = false;
+  }
+}
+
+onMounted(() => document.addEventListener('click', handleClickOutside));
+onUnmounted(() => document.removeEventListener('click', handleClickOutside));
 
 async function handleLogout() {
   dropdownOpen.value = false;
