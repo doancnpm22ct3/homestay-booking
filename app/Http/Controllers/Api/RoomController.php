@@ -110,6 +110,24 @@ class RoomController extends Controller
         $amenities = DB::table('amenities')->get();
         return response()->json($amenities);
     }
+    // HÀM THỐNG KÊ SỐ LƯỢNG PHÒNG CHO ADMIN
+    public function stats()
+    {
+        // Đếm tổng tất cả các phòng
+        $total = \App\Models\Room::count();
+        
+        // Đếm theo từng trạng thái (Bạn có thể đổi chữ 'available', 'occupied'... cho khớp với Database của bạn)
+        $available = \App\Models\Room::where('status', 'available')->count(); // Phòng trống
+        $deposited = \App\Models\Room::where('status', 'deposited')->count(); // Đã đặt cọc
+        $occupied = \App\Models\Room::where('status', 'occupied')->count();   // Đang sử dụng
+
+        return response()->json([
+            'total' => $total,
+            'available' => $available,
+            'deposited' => $deposited,
+            'occupied' => $occupied
+        ]);
+    }
     public function store(Request $request)
     {
         try {

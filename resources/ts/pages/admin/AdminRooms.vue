@@ -10,6 +10,47 @@
       </router-link>
     </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-blue-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-2xl">
+          🏢
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-500 mb-1">Tổng số phòng</p>
+          <h3 class="text-3xl font-bold text-gray-900">{{ stats.total }}</h3>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-emerald-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div class="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-2xl">
+          ✨
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-500 mb-1">Phòng trống</p>
+          <h3 class="text-3xl font-bold text-gray-900">{{ stats.available }}</h3>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-amber-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div class="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 font-bold text-2xl">
+          💳
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-500 mb-1">Đã đặt cọc</p>
+          <h3 class="text-3xl font-bold text-gray-900">{{ stats.deposited }}</h3>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-purple-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div class="w-14 h-14 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 font-bold text-2xl">
+          🔑
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-500 mb-1">Đang sử dụng</p>
+          <h3 class="text-3xl font-bold text-gray-900">{{ stats.occupied }}</h3>
+        </div>
+      </div>
+    </div>
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <table class="w-full text-left border-collapse">
         <thead>
@@ -29,7 +70,7 @@
             </td>
             <td class="p-4 font-medium text-gray-900">{{ room.title }}</td>
             <td class="p-4 text-gray-600">{{ room.type === 'house' ? 'Nguyên căn' : 'Phòng riêng' }}</td>
-            <td class="p-4 text-emerald-600 font-semibold">{{ room.price.toLocaleString() }}đ</td>
+            <td class="p-4 text-emerald-600 font-semibold">{{ Number(room.price).toLocaleString('vi-VN') }} VNĐ</td>
             <td class="p-4">
               <span v-if="room.status === 'available'" class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-medium">Trống / Sẵn sàng</span>
               <span v-else-if="room.status === 'booked'" class="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-xs font-medium">Đã đặt cọc</span>
@@ -61,23 +102,44 @@ import { Plus, Edit, Trash2 } from 'lucide-vue-next';
 
 const router = useRouter();
 
-// Khởi tạo mảng rỗng để chứa dữ liệu thật
+// Khởi tạo mảng chứa dữ liệu danh sách phòng
 const rooms = ref<any[]>([]);
 
-// Hàm lấy dữ liệu từ Backend khi trang vừa load lên
+// Khởi tạo mảng chứa dữ liệu thống kê
+const stats = ref({
+  total: 0,
+  available: 0,
+  deposited: 0,
+  occupied: 0
+});
+
+// Hàm lấy dữ liệu danh sách phòng
 const fetchRooms = async () => {
   try {
     const response = await fetch('/api/rooms');
     const data = await response.json();
-    rooms.value = data; // Đổ dữ liệu thật vào biến rooms
+    rooms.value = data;
   } catch (error) {
     console.error('Lỗi khi tải danh sách phòng:', error);
   }
 };
 
-// Tự động chạy hàm fetchRooms khi mở trang
+// Hàm lấy dữ liệu thống kê
+const fetchStats = async () => {
+  try {
+    const response = await fetch('/api/admin/rooms/stats');
+    if (response.ok) {
+      stats.value = await response.json();
+    }
+  } catch (error) {
+    console.error('Lỗi khi lấy dữ liệu thống kê:', error);
+  }
+};
+
+// Tự động chạy cả 2 hàm khi mở trang
 onMounted(() => {
   fetchRooms();
+  fetchStats();
 });
 
 const editRoom = (id: number) => {
@@ -86,8 +148,9 @@ const editRoom = (id: number) => {
 
 const deleteRoom = (id: number) => {
   if (confirm('Bạn có chắc chắn muốn xóa phòng này?')) {
-    // (Tạm thời xóa trên giao diện, sau này viết API xóa thật sau)
+    // Tạm thời xóa trên giao diện
     rooms.value = rooms.value.filter(r => r.id !== id);
+    // (Ghi chú: Cần phải viết thêm code gọi API xóa trong DB nếu muốn xóa thật sự)
   }
 };
 </script>

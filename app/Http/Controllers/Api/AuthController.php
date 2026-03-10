@@ -73,7 +73,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'Bị khóa'], 401);
         }
         
-        return response()->json(['message' => 'An toàn']);
+        // TRẢ VỀ THÊM THÔNG TIN USER MỚI NHẤT ĐỂ VUE ĐỐI CHIẾU
+        return response()->json([
+            'message' => 'An toàn',
+            'user' => $user
+        ]);
     }
     // HÀM CẬP NHẬT PROFILE
     public function updateProfile(Request $request)

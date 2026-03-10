@@ -11,6 +11,7 @@ Route::get('/rooms/{id}', [RoomController::class, 'show']);// Lấy chi tiết 1
 Route::put('/rooms/{id}', [RoomController::class, 'update']);// Lệnh cập nhật phòng
 Route::post('/profile/update', [App\Http\Controllers\Api\AuthController::class, 'updateProfile']);
 Route::post('/check-status', [App\Http\Controllers\Api\AuthController::class, 'checkStatus']);
+Route::get('/admin/rooms/stats', [App\Http\Controllers\Api\RoomController::class, 'stats']);
 // --- QUẢN LÝ TIỆN NGHI ---
 Route::get('/amenities', [App\Http\Controllers\Api\RoomController::class, 'getAmenities']); // Lấy danh sách
 Route::post('/amenities', [App\Http\Controllers\Api\RoomController::class, 'storeAmenity']); // Thêm mới

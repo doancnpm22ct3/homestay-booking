@@ -62,16 +62,29 @@ router.beforeEach((to, from, next) => {
     user = JSON.parse(userInfo);
     
     // LÍNH TUẦN TRA NGẦM: Hỏi server xem tài khoản có đang bị khóa không
+    // LÍNH TUẦN TRA NGẦM: Hỏi server xem có bị khóa hay đổi quyền không
     fetch('/api/check-status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: user.email })
-    }).then(res => {
-      if (res.status === 401) { // Nếu Server báo lỗi 401 (Bị khóa)
+    }).then(async (res) => {
+      if (res.status === 401) { 
+        // 1. Bị khóa -> Tước thẻ, đá ra Login
         localStorage.removeItem('auth_token');
         localStorage.removeItem('user_info');
-        alert('Cảnh báo: Tài khoản của bạn đã bị Admin khóa vĩnh viễn!');
-        window.location.href = '/login'; // Đá văng ra chuồng gà
+        alert('Cảnh báo: Tài khoản của bạn đã bị khóa vĩnh viễn!');
+        window.location.href = '/login'; 
+      } else if (res.ok) {
+        // 2. An toàn -> Rút thông tin mới nhất từ Server về
+        const data = await res.json();
+        
+        // Kẻ hở ở đây: Nếu chức vụ bị Admin đổi (VD: admin bị giáng chức thành customer)
+        if (data.user && data.user.role !== user.role) {
+          // Cập nhật lại thẻ bài mới vào bộ nhớ
+          localStorage.setItem('user_info', JSON.stringify(data.user));
+          alert('Quyền truy cập của bạn vừa bị thay đổi. Hệ thống sẽ tải lại!');
+          window.location.reload(); // Ép tải lại trang để ông Bảo vệ Router gõ đầu!
+        }
       }
     }).catch(() => {});
   }
