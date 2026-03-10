@@ -94,6 +94,7 @@
             :type="room.type"
             :price="room.price"
             :imageUrl="room.imageUrl"
+            :status="room.status"
           />
         </div>
         <div class="mt-8 text-center sm:hidden">
@@ -217,7 +218,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { Search, MapPin, Calendar, Users, Home as HomeIcon, Star } from 'lucide-vue-next';
 import RoomCard from '../components/RoomCard.vue';
@@ -233,54 +234,29 @@ const handleSearch = () => {
   router.push('/listing');
 };
 
-const popularRooms = [
-  {
-    id: '1',
-    title: 'Phòng Mơ Màng, Số 10 Núi Thành',
-    location: 'Quận Cẩm Lệ, TP. Đà Nẵng',
-    type: 'Phòng',
-    price: '120.000đ',
-    imageUrl: 'https://picsum.photos/seed/room1/800/600',
-  },
-  {
-    id: '2',
-    title: 'Phòng Mơ Màng, Số 10 Núi Thành',
-    location: 'Quận Cẩm Lệ, TP. Đà Nẵng',
-    type: 'Phòng',
-    price: '120.000đ',
-    imageUrl: 'https://picsum.photos/seed/room2/800/600',
-  },
-  {
-    id: '3',
-    title: 'Phòng Mơ Màng, Số 10 Núi Thành',
-    location: 'Quận Cẩm Lệ, TP. Đà Nẵng',
-    type: 'Phòng',
-    price: '120.000đ',
-    imageUrl: 'https://picsum.photos/seed/room3/800/600',
-  },
-  {
-    id: '4',
-    title: 'Phòng Mơ Màng, Số 10 Núi Thành',
-    location: 'Quận Cẩm Lệ, TP. Đà Nẵng',
-    type: 'Phòng',
-    price: '120.000đ',
-    imageUrl: 'https://picsum.photos/seed/room4/800/600',
-  },
-  {
-    id: '5',
-    title: 'Phòng Mơ Màng, Số 10 Núi Thành',
-    location: 'Quận Cẩm Lệ, TP. Đà Nẵng',
-    type: 'Phòng',
-    price: '120.000đ',
-    imageUrl: 'https://picsum.photos/seed/room5/800/600',
-  },
-  {
-    id: '6',
-    title: 'Phòng Mơ Màng, Số 10 Núi Thành',
-    location: 'Quận Cẩm Lệ, TP. Đà Nẵng',
-    type: 'Phòng',
-    price: '120.000đ',
-    imageUrl: 'https://picsum.photos/seed/room6/800/600',
-  },
-];
+// Khởi tạo mảng rỗng chứa dữ liệu thật
+const popularRooms = ref<any[]>([]);
+
+// Gọi API lấy dữ liệu khi trang vừa mở
+onMounted(async () => {
+  try {
+    const response = await fetch('/api/rooms');
+    const data = await response.json();
+    const visibleRooms = data.filter((room: any) => room.is_visible == 1);
+    
+    // Xử lý dữ liệu để khớp với component RoomCard
+    popularRooms.value = data.map((room: any) => ({
+      id: String(room.id),
+      title: room.title,
+      location: room.location,
+      type: room.type === 'house' ? 'Nguyên căn' : 'Phòng riêng',
+      price: room.price.toLocaleString() + 'đ', // Định dạng tiền tệ
+      imageUrl: room.image, // Lấy ảnh từ backend
+      status: room.status
+    })).slice(0, 6); // Chỉ lấy 6 phòng mới nhất hiện ra trang chủ cho đẹp
+    
+  } catch (error) {
+    console.error('Lỗi khi tải dữ liệu trang chủ:', error);
+  }
+});
 </script>
