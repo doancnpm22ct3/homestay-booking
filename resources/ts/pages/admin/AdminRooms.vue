@@ -10,44 +10,44 @@
       </router-link>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-blue-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-        <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-2xl">
-          🏢
-        </div>
-        <div>
-          <p class="text-sm font-medium text-gray-500 mb-1">Tổng số phòng</p>
-          <h3 class="text-3xl font-bold text-gray-900">{{ stats.total }}</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-blue-100 flex items-center gap-3 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-xl shrink-0">🏢</div>
+        <div class="overflow-hidden">
+          <p class="text-xs font-medium text-gray-500 mb-1 truncate">Tổng số phòng</p>
+          <h3 class="text-2xl font-bold text-gray-900">{{ stats.total }}</h3>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-emerald-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-        <div class="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-2xl">
-          ✨
-        </div>
-        <div>
-          <p class="text-sm font-medium text-gray-500 mb-1">Phòng trống</p>
-          <h3 class="text-3xl font-bold text-gray-900">{{ stats.available }}</h3>
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-emerald-100 flex items-center gap-3 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-xl shrink-0">✨</div>
+        <div class="overflow-hidden">
+          <p class="text-xs font-medium text-gray-500 mb-1 truncate">Phòng trống</p>
+          <h3 class="text-2xl font-bold text-gray-900">{{ stats.available }}</h3>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-amber-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-        <div class="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 font-bold text-2xl">
-          💳
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-amber-100 flex items-center gap-3 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 font-bold text-xl shrink-0">💳</div>
+        <div class="overflow-hidden">
+          <p class="text-xs font-medium text-gray-500 mb-1 truncate">Đã đặt cọc</p>
+          <h3 class="text-2xl font-bold text-gray-900">{{ stats.deposited }}</h3>
         </div>
-        <div>
-          <p class="text-sm font-medium text-gray-500 mb-1">Đã đặt cọc</p>
-          <h3 class="text-3xl font-bold text-gray-900">{{ stats.deposited }}</h3>
+      </div>
+      
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-red-100 flex items-center gap-3 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-600 font-bold text-xl shrink-0">🛠️</div>
+        <div class="overflow-hidden">
+          <p class="text-xs font-medium text-gray-500 mb-1 truncate">Dọn dẹp/Bảo trì</p>
+          <h3 class="text-2xl font-bold text-gray-900">{{ stats.maintenance }}</h3>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-purple-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-        <div class="w-14 h-14 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 font-bold text-2xl">
-          🔑
-        </div>
-        <div>
-          <p class="text-sm font-medium text-gray-500 mb-1">Đang sử dụng</p>
-          <h3 class="text-3xl font-bold text-gray-900">{{ stats.occupied }}</h3>
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-purple-100 flex items-center gap-3 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 font-bold text-xl shrink-0">🔑</div>
+        <div class="overflow-hidden">
+          <p class="text-xs font-medium text-gray-500 mb-1 truncate">Đang sử dụng</p>
+          <h3 class="text-2xl font-bold text-gray-900">{{ stats.occupied }}</h3>
         </div>
       </div>
     </div>
@@ -110,7 +110,8 @@ const stats = ref({
   total: 0,
   available: 0,
   deposited: 0,
-  occupied: 0
+  occupied: 0,
+  maintenance: 0
 });
 
 // Hàm lấy dữ liệu danh sách phòng
@@ -146,11 +147,37 @@ const editRoom = (id: number) => {
   router.push(`/admin/rooms/edit/${id}`);
 };
 
-const deleteRoom = (id: number) => {
-  if (confirm('Bạn có chắc chắn muốn xóa phòng này?')) {
-    // Tạm thời xóa trên giao diện
-    rooms.value = rooms.value.filter(r => r.id !== id);
-    // (Ghi chú: Cần phải viết thêm code gọi API xóa trong DB nếu muốn xóa thật sự)
+// HÀM XÓA PHÒNG THẬT SỰ TỪ DATABASE
+const deleteRoom = async (id: number) => {
+  if (confirm('Bạn có chắc chắn muốn xóa phòng này vĩnh viễn không? Hành động này không thể hoàn tác!')) {
+    try {
+      // Gọi API gửi lệnh DELETE lên Server
+      const response = await fetch(`/api/admin/rooms/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          // Gửi kèm vé thông hành (Token) để chứng minh là Admin
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      });
+
+      if (response.ok) {
+        // 1. Xóa phòng đó khỏi danh sách trên màn hình
+        rooms.value = rooms.value.filter(r => r.id !== id);
+        
+        // 2. Gọi lại hàm đếm thống kê để mấy con số ở trên nhảy lại cho đúng
+        fetchStats(); 
+        
+        alert('Đã xóa phòng thành công!');
+      } else {
+        const data = await response.json();
+        alert('Lỗi: ' + (data.message || 'Không thể xóa phòng này!'));
+      }
+    } catch (error) {
+      console.error('Lỗi khi xóa phòng:', error);
+      alert('Lỗi kết nối đến máy chủ!');
+    }
   }
 };
 </script>
