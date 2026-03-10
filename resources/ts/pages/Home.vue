@@ -94,7 +94,7 @@
             :type="room.type"
             :price="room.price"
             :imageUrl="room.imageUrl"
-            :status="room.status"
+            :status="room.status" 
           />
         </div>
         <div class="mt-8 text-center sm:hidden">
@@ -242,18 +242,24 @@ onMounted(async () => {
   try {
     const response = await fetch('/api/rooms');
     const data = await response.json();
-    const visibleRooms = data.filter((room: any) => room.is_visible == 1);
     
-    // Xử lý dữ liệu để khớp với component RoomCard
-    popularRooms.value = data.map((room: any) => ({
+    // BƯỚC 1: Lọc ra những phòng ĐANG HIỂN THỊ (is_visible == 1) hoặc trống/đang dùng
+    const visibleRooms = data.filter((room: any) => room.status !== 'hidden'); 
+    // (Ghi chú: Sếp tự điều chỉnh điều kiện lọc theo đúng DB của sếp nhé, ví dụ room.is_visible == 1)
+
+    // BƯỚC 2: Xử lý dữ liệu từ mảng ĐÃ LỌC (visibleRooms) thay vì mảng gốc (data)
+    popularRooms.value = visibleRooms.map((room: any) => ({
       id: String(room.id),
       title: room.title,
       location: room.location,
       type: room.type === 'house' ? 'Nguyên căn' : 'Phòng riêng',
-      price: room.price.toLocaleString() + 'đ', // Định dạng tiền tệ
-      imageUrl: room.image, // Lấy ảnh từ backend
+      
+      // FIX GIÁ TIỀN CHUẨN VIỆT NAM Ở ĐÂY NÈ SẾP:
+      price: Number(room.price).toLocaleString('vi-VN') + ' VNĐ', 
+      
+      imageUrl: room.image, 
       status: room.status
-    })).slice(0, 6); // Chỉ lấy 6 phòng mới nhất hiện ra trang chủ cho đẹp
+    })).slice(0, 6); // Lấy 6 phòng mới nhất
     
   } catch (error) {
     console.error('Lỗi khi tải dữ liệu trang chủ:', error);
