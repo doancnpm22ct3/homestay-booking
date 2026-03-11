@@ -76,7 +76,6 @@ const handleRegister = async () => {
     return;
   }
 
-  // Chặn đăng ký nếu mật khẩu dưới 6 ký tự
   if (form.value.password.length < 6) {
     alert('Lỗi: Mật khẩu phải có ít nhất 6 ký tự!');
     return;
@@ -99,34 +98,22 @@ const handleRegister = async () => {
 
     const data = await response.json();
 
-    // Dịch lỗi của Laravel sang tiếng Việt
-// NẾU CÓ LỖI TỪ LARAVEL GỬI LÊN
     if (!response.ok) {
+      // ĐỌC THẲNG LỖI TỪ LARAVEL GỬI LÊN (Không đoán mò nữa)
       if (data.errors) {
-        // Lấy TÊN CỘT bị lỗi đầu tiên (email, phone, hoặc password)
-        const firstErrorKey = Object.keys(data.errors)[0];
         let errorMessage = '';
-
-        // Dịch chính xác 100% theo tên cột
-        if (firstErrorKey === 'email') {
-          errorMessage = 'Email này đã được sử dụng. Vui lòng dùng Email khác!';
-        } else if (firstErrorKey === 'phone') {
-          errorMessage = 'Số điện thoại này đã được sử dụng. Vui lòng dùng số khác!';
-        } else if (firstErrorKey === 'password') {
-          errorMessage = 'Mật khẩu chưa đủ an toàn (ít nhất 6 ký tự)!';
-        } else {
-          // Nếu có lỗi lạ khác thì in thẳng ra
-          errorMessage = data.errors[firstErrorKey][0]; 
+        // Duyệt qua tất cả các lỗi và gộp lại thành 1 thông báo
+        for (const field in data.errors) {
+          errorMessage += '❌ ' + data.errors[field][0] + '\n';
         }
-
-        alert('Lỗi: ' + errorMessage);
+        alert('Vui lòng kiểm tra lại thông tin:\n\n' + errorMessage);
       } else {
         alert(data.message || 'Lỗi: Không thể đăng ký tài khoản!');
       }
       return;
     }
 
-    alert('Đăng ký thành công! Mời bạn đăng nhập.');
+    alert('🎉 Đăng ký thành công! Mời bạn đăng nhập.');
     router.push('/login');
 
   } catch (error) {

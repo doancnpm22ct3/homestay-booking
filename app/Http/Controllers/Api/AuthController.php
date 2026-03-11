@@ -13,11 +13,20 @@ class AuthController extends Controller
     // HÀM ĐĂNG KÝ
     public function register(Request $request)
     {
+        // Thêm "Bộ lọc thép" Regex và tùy chỉnh câu báo lỗi bằng tiếng Việt
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'required|string|max:20|unique:users',
+            // Mảng validate cho Email: Bắt buộc đuôi @gmail.com
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/i'],
+            // Mảng validate cho SĐT: Bắt buộc đầu số VN (03, 05, 07, 08, 09) và đúng 10 số
+            'phone' => ['required', 'string', 'unique:users', 'regex:/^(0|\+84)[3|5|7|8|9][0-9]{8}$/'],
             'password' => 'required|string|min:6',
+        ], [
+            // Tùy chỉnh câu chửi cho mượt mà nếu nhập sai
+            'email.regex' => 'Hệ thống hiện chỉ hỗ trợ đăng ký bằng đuôi @gmail.com!',
+            'phone.regex' => 'Số điện thoại không hợp lệ (Phải là số Việt Nam, VD: 09..., 03... và đủ 10 số)!',
+            'email.unique' => 'Email này đã có người sử dụng!',
+            'phone.unique' => 'Số điện thoại này đã có người sử dụng!',
         ]);
 
         if ($validator->fails()) {
@@ -29,6 +38,8 @@ class AuthController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
+            'role' => 'customer', // Mặc định là khách
+            'status' => 'active'  // Mặc định là hoạt động
         ]);
 
         return response()->json(['message' => 'Đăng ký thành công!'], 201);
@@ -38,8 +49,11 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
+            // Chặn ngay từ cửa nếu cố tình đăng nhập bằng mail khác
+            'email' => ['required', 'email', 'regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/i'],
             'password' => 'required',
+        ], [
+            'email.regex' => 'Chỉ hỗ trợ đăng nhập bằng tài khoản @gmail.com!'
         ]);
 
         $user = User::where('email', $request->email)->first();

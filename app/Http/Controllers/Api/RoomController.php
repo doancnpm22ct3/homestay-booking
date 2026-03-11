@@ -111,22 +111,40 @@ class RoomController extends Controller
         return response()->json($amenities);
     }
     // HÀM THỐNG KÊ SỐ LƯỢNG PHÒNG CHO ADMIN
+// HÀM THỐNG KÊ SỐ LƯỢNG PHÒNG CHO ADMIN
     public function stats()
     {
         // Đếm tổng tất cả các phòng
         $total = \App\Models\Room::count();
         
-        // Đếm theo từng trạng thái (Bạn có thể đổi chữ 'available', 'occupied'... cho khớp với Database của bạn)
+        // ĐẾM ĐÚNG TỪ KHÓA TRONG DATABASE CỦA BẠN NÈ:
         $available = \App\Models\Room::where('status', 'available')->count(); // Phòng trống
-        $deposited = \App\Models\Room::where('status', 'deposited')->count(); // Đã đặt cọc
-        $occupied = \App\Models\Room::where('status', 'occupied')->count();   // Đang sử dụng
+        $deposited = \App\Models\Room::where('status', 'booked')->count();    // Đã đặt cọc (chữ 'booked')
+        $occupied = \App\Models\Room::where('status', 'in_use')->count();     // Đang sử dụng (chữ 'in_use')
+        $maintenance = \App\Models\Room::where('status', 'maintenance')->count();
 
+        // Trả về cho Vue hiển thị
         return response()->json([
             'total' => $total,
             'available' => $available,
             'deposited' => $deposited,
-            'occupied' => $occupied
+            'occupied' => $occupied,
+            'maintenance' => $maintenance
         ]);
+    }
+    // HÀM XÓA PHÒNG
+    public function destroy($id)
+    {
+        $room = \App\Models\Room::find($id);
+        
+        if (!$room) {
+            return response()->json(['message' => 'Không tìm thấy phòng này!'], 404);
+        }
+
+        // Xóa phòng khỏi Database
+        $room->delete();
+
+        return response()->json(['message' => 'Xóa phòng thành công!']);
     }
     public function store(Request $request)
     {
