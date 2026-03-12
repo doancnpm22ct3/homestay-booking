@@ -108,18 +108,21 @@ router.beforeEach((to, from, next) => {
 // --- BẮT ĐẦU: LÍNH GÁC NGẦM BẮT LỖI 401 ---
 const originalFetch = window.fetch;
 window.fetch = async (...args) => {
+  // Soi xem khách đang gọi API nào
+  const url = typeof args[0] === 'string' ? args[0] : (args[0] && args[0].url ? args[0].url : '');
+  
   const response = await originalFetch(...args);
   
-  // Nếu Server Laravel chửi 401 (Nghĩa là Token đã bị Admin đốt, hoặc bị khóa)
-  if (response.status === 401) {
-    // 1. Tước thẻ, xóa sạch thông tin trong máy
+  // CHỈ bắt lỗi 401 NẾU đường dẫn KHÔNG phải là đang Đăng nhập
+  if (response.status === 401 && !url.includes('login')) {
+    // 1. Tước thẻ, xóa sạch thông tin
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_info');
     
-    // 2. Chửi thẳng mặt
+    // 2. Hiện cảnh báo
     alert('Tài khoản của bạn đã bị Admin khóa! Buộc phải đăng xuất ngay lập tức.');
     
-    // 3. Đá văng ra chuồng gà (Trang Login)
+    // 3. Đá văng ra trang Login
     window.location.href = '/login';
   }
   
