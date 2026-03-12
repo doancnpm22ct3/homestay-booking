@@ -16,18 +16,38 @@
             </button>
           </div>
 
-          <div class="flex-1 w-full relative group">
-            <img
-              src="https://picsum.photos/seed/homestay/800/600"
-              alt="Homestay Image"
-              class="w-full h-[400px] object-cover rounded-tl-[100px] rounded-br-[100px] shadow-xl"
-            />
-            <button class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md text-white p-2 rounded-full transition-all">
+          <div class="flex-1 w-full relative group overflow-hidden rounded-tl-[100px] rounded-br-[100px] shadow-xl h-[400px]">
+            <transition name="fade" mode="out-in">
+              <img
+                :key="currentSlide"
+                :src="bannerImages[currentSlide]"
+                alt="Homestay Banner"
+                class="w-full h-full object-cover"
+              />
+            </transition>
+            
+            <button 
+              @click="prevSlide" 
+              class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md text-white p-2 rounded-full transition-all"
+            >
               <ChevronLeft class="w-6 h-6" />
             </button>
-            <button class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md text-white p-2 rounded-full transition-all">
+
+            <button 
+              @click="nextSlide" 
+              class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md text-white p-2 rounded-full transition-all"
+            >
               <ChevronRight class="w-6 h-6" />
             </button>
+
+            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+              <button 
+                v-for="(img, index) in bannerImages" 
+                :key="index"
+                @click="goToSlide(index)"
+                :class="['w-2.5 h-2.5 rounded-full transition-all', currentSlide === index ? 'bg-white w-6' : 'bg-white/50']"
+              ></button>
+            </div>
           </div>
         </div>
       </div>
@@ -60,19 +80,29 @@
           </div>
 
           <div class="flex-1 w-full relative">
-            <div class="flex items-center justify-between px-6 py-3 w-full rounded-full border-b md:border-b-0 md:border-r border-gray-100">
+            <div class="flex items-center justify-between px-6 py-3 w-full rounded-full border-b md:border-b-0 md:border-r border-gray-100 hover:bg-gray-50 transition-colors">
               <div class="flex items-center gap-3 w-full">
                 <Calendar class="text-[#4A7055] opacity-60 w-5 h-5 shrink-0" />
                 <div class="flex flex-col w-full">
                   <div class="text-sm font-medium text-gray-700 mb-0.5">Nhận - Trả phòng</div>
-                  <div class="flex items-center gap-1 w-full">
-                    <input type="date" v-model="checkIn" class="date-input text-xs text-gray-500 bg-transparent outline-none cursor-pointer w-full" />
-                    <span class="text-xs text-gray-400">-</span>
-                    <input type="date" v-model="checkOut" class="date-input text-xs text-gray-500 bg-transparent outline-none cursor-pointer w-full" />
+                  <div class="flex items-center gap-1 w-full mt-0.25">
+                    <div class="relative flex-1 cursor-pointer group">
+                      <div class="text-xs group-hover:text-[#4A7055] transition-colors" :class="checkIn ? 'text-[#4A7055] font-bold' : 'text-gray-400'">
+                        {{ checkIn ? formatDate(checkIn) : 'ngày nhận' }}
+                      </div>
+                      <input type="date" v-model="checkIn" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer date-overlay" />
+                    </div>
+                    <span class="text-xs text-gray-300">-</span>
+                    <div class="relative flex-1 cursor-pointer group">
+                      <div class="text-xs group-hover:text-[#4A7055] transition-colors" :class="checkOut ? 'text-[#4A7055] font-bold' : 'text-gray-400'">
+                        {{ checkOut ? formatDate(checkOut) : 'ngày trả' }}
+                      </div>
+                      <input type="date" v-model="checkOut" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer date-overlay" />
+                    </div>
                   </div>
                 </div>
               </div>
-              <ChevronDown class="text-gray-400 w-4 h-4 hidden lg:block ml-2 shrink-0" />
+              <ChevronDown class="text-gray-400 w-4 h-4 hidden lg:block ml-2 shrink-0 pointer-events-none" />
             </div>
           </div>
 
@@ -118,8 +148,7 @@
       </div>
     </section>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow">
-      
+    <div id="room-list-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow scroll-mt-32">
       <div class="mb-16">
         <div class="flex justify-between items-end mb-6">
           <div>
@@ -159,17 +188,54 @@
           <RoomCard v-for="room in privateRooms" :key="room.id" :id="room.id" :title="room.title" :location="room.location" :type="room.type" :price="room.price" :imageUrl="room.imageUrl" />
         </div>
       </div>
-
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Link } from '@inertiajs/vue3'; // Dùng thẻ Link của Inertia
+// ĐÃ SỬA: Import thêm onUnmounted để dọn dẹp slider khi rời trang
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { Link } from '@inertiajs/vue3'; 
 import { Search, MapPin, Calendar, Users, Home as HomeIcon, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import RoomCard from '@/Components/RoomCard.vue';
 
+// --- LOGIC SLIDER ẢNH (Bổ sung để làm cho banner chạy) ---
+const bannerImages = [
+  'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2070&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1502672260266-1c1de2d9d0cb?q=80&w=2080&auto=format&fit=crop'
+];
+const currentSlide = ref(0);
+let slideInterval: any = null;
+
+const nextSlide = () => {
+  currentSlide.value = (currentSlide.value + 1) % bannerImages.length;
+  resetInterval();
+};
+
+const prevSlide = () => {
+  currentSlide.value = (currentSlide.value - 1 + bannerImages.length) % bannerImages.length;
+  resetInterval();
+};
+
+const goToSlide = (index: number) => {
+  currentSlide.value = index;
+  resetInterval();
+};
+
+const startInterval = () => {
+  slideInterval = setInterval(() => {
+    currentSlide.value = (currentSlide.value + 1) % bannerImages.length;
+  }, 4000); // 4 giây tự chuyển ảnh
+};
+
+const resetInterval = () => {
+  clearInterval(slideInterval);
+  startInterval();
+};
+
+
+// --- QUẢN LÝ TÌM KIẾM ---
 const location = ref('');
 const checkIn = ref('');
 const checkOut = ref('');
@@ -178,6 +244,35 @@ const type = ref('');
 const isSearching = ref(false);
 
 const activeDropdown = ref<string | null>(null);
+
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  const [year, month, day] = dateStr.split('-');
+  return `${day}/${month}/${year}`;
+};
+
+
+// --- CHẠY KHI TRANG VỪA LOAD LÊN ---
+onMounted(() => {
+  // 1. Kích hoạt tự động chuyển ảnh Banner
+  startInterval();
+
+  // 2. Kích hoạt hiệu ứng trượt mượt nếu bấm từ Home sang
+  if (window.location.hash === '#room-list-section') {
+    setTimeout(() => {
+      const section = document.getElementById('room-list-section');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 150);
+  }
+});
+
+// Khi rời trang thì tắt vòng lặp ảnh để web không bị nặng
+onUnmounted(() => {
+  clearInterval(slideInterval);
+});
+
 
 const daNangDistricts = [
   'Quận Hải Châu, Đà Nẵng',
@@ -240,6 +335,17 @@ const resetSearch = () => {
 </script>
 
 <style scoped>
+/* CSS CHO BANNER TRƯỢT ẢNH MƯỢT MÀ */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Ẩn icon tăng giảm số lượng */
 .hide-arrows::-webkit-outer-spin-button,
 .hide-arrows::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -248,18 +354,17 @@ const resetSearch = () => {
 .hide-arrows {
   -moz-appearance: textfield;
 }
-.date-input {
-  position: relative;
-}
-.date-input::-webkit-calendar-picker-indicator {
+
+/* ĐÂY LÀ ĐOẠN CSS MA THUẬT: Kéo giãn icon lịch bao phủ toàn bộ vùng chọn */
+.date-overlay::-webkit-calendar-picker-indicator {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
   width: 100%;
   height: 100%;
-  opacity: 0; 
+  margin: 0;
+  padding: 0;
   cursor: pointer;
+  opacity: 0; /* Giữ nó trong suốt nhưng vẫn bấm được */
 }
 </style>

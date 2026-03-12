@@ -51,12 +51,12 @@
         </div>
       </div>
     </div>
-    <Footer />
+    
   </div>
 </template>
 
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { CheckCircle } from 'lucide-vue-next';
-import Footer from '../Components/Footer.vue';
+import Footer from '../Components/Footer.vue'; 
 </script>

@@ -7,7 +7,7 @@ export default defineConfig({
     plugins: [
         tailwindcss(), // 2. Thêm hàm này vào đầu mảng plugins
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            input: ['resources/css/app.css', 'resources/ts/app.ts'],
             refresh: true,
         }),
         vue({

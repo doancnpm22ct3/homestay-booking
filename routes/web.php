@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,11 @@ Route::get('/payment', function () {
 // 5. Trang thanh toán thành công
 Route::get('/payment-success', function () {
     return Inertia::render('PaymentSuccess');
+});
+
+// 6. Trang về chúng tôi
+Route::get('/about', function () {
+    return Inertia::render('AboutUs'); // Chữ 'About' là tên file About.vue của bạn
 });
 
 

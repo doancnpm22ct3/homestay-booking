@@ -139,11 +139,11 @@
                 <div class="flex border-b border-gray-200">
                   <div class="flex-1 p-3 border-r border-gray-200">
                     <label class="block text-[10px] font-extrabold text-gray-900 uppercase mb-1">Nhận phòng</label>
-                    <input type="text" placeholder="Thêm ngày" class="w-full outline-none text-sm text-gray-600 bg-transparent" />
+                    <input type="date" class="w-full outline-none text-sm text-gray-600 bg-transparent cursor-pointer" />
                   </div>
                   <div class="flex-1 p-3">
                     <label class="block text-[10px] font-extrabold text-gray-900 uppercase mb-1">Trả phòng</label>
-                    <input type="text" placeholder="Thêm ngày" class="w-full outline-none text-sm text-gray-600 bg-transparent" />
+                    <input type="date" class="w-full outline-none text-sm text-gray-600 bg-transparent cursor-pointer" />
                   </div>
                 </div>
                 <div class="p-3 border-b border-gray-200">
@@ -179,22 +179,31 @@
       </div>
     </div>
     
-    <Footer />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { router } from '@inertiajs/vue3'; // Dùng Inertia router
+import { router } from '@inertiajs/vue3'; 
 import { MapPin, Star } from 'lucide-vue-next';
-import Footer from '../Components/Footer.vue'; // Gọi Footer vào trang
+
+// VÀ VẪN GIỮ IMPORT TẠI ĐÂY
+import Footer from '../Components/Footer.vue'; 
 
 const dates = ref('');
 const guests = ref('');
 const type = ref('');
 
 const handleBook = () => {
-  // Điều hướng sang trang thanh toán bằng Inertia
   router.get('/payment');
 };
 </script>
+
+<style scoped>
+/* CSS cho lịch gọn gàng hơn */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  margin-left: 0;
+}
+</style>
