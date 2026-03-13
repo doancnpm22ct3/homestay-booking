@@ -13,7 +13,11 @@
         <div>
           <h3 class="text-lg font-semibold mb-4 text-white">Liên hệ</h3>
           <ul class="space-y-2 text-white/80 text-sm">
-            <li><a href="#" class="hover:text-white transition-colors">Về chúng tôi</a></li>
+            <li>
+              <Link href="/about" class="hover:text-white transition-colors">
+                 Về Chúng tôi
+             </Link>
+            </li>
             <li><a href="#" class="hover:text-white transition-colors">Hỗ trợ</a></li>
           </ul>
         </div>

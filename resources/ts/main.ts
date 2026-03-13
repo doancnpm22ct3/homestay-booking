@@ -13,6 +13,7 @@ import RoomDetail from './pages/RoomDetail.vue';
 import Payment from './pages/Payment.vue';
 import PaymentSuccess from './pages/PaymentSuccess.vue';
 import Profile from './pages/Profile.vue';
+import AboutUs from './pages/AboutUs.vue'; // Đảm bảo bạn đã có file AboutUs.vue trong thư mục pages
 
 // --- CÁC TRANG CỦA ADMIN ---
 import AdminLayout from './pages/admin/AdminLayout.vue';
@@ -20,117 +21,104 @@ import AdminUsers from './pages/admin/AdminUsers.vue';
 import AdminRooms from './pages/admin/AdminRooms.vue';
 import AdminRoomForm from './pages/admin/AdminRoomForm.vue';
 
-
 const router = createRouter({
-  history: createWebHistory(),
-  routes: [
-    { path: '/', component: Home },
-    { path: '/login', component: Login },
-    { path: '/register', component: Register },
-    { path: '/forgot-password', component: ForgotPassword },
-    { path: '/listing', component: Listing },
-    { path: '/room/:id', component: RoomDetail },
-    { path: '/payment', component: Payment },
-    { path: '/payment-success', component: PaymentSuccess },
-    { path: '/profile', component: Profile },
+    history: createWebHistory(),
+    routes: [
+        { path: '/', component: Home },
+        { path: '/login', component: Login },
+        { path: '/register', component: Register },
+        { path: '/forgot-password', component: ForgotPassword },
+        { path: '/listing', component: Listing },
+        { path: '/room/:id', component: RoomDetail },
+        { path: '/payment', component: Payment },
+        { path: '/payment-success', component: PaymentSuccess },
+        { path: '/profile', component: Profile },
+        { path: '/about', component: AboutUs }, // Thêm dòng này vào mảng routes
 
-    // --- Route Admin ---
-    { 
-      path: '/admin', 
-      component: AdminLayout,
-      children: [
-        { path: 'rooms', component: AdminRooms },
-        { path: 'users', component: AdminUsers },
-        { path: 'rooms/create', component: AdminRoomForm },
-        { path: 'rooms/edit/:id', component: AdminRoomForm }
-      ]
-    }
-  ]
+        // --- Route Admin ---
+        { 
+            path: '/admin', 
+            component: AdminLayout,
+            children: [
+                { path: 'rooms', component: AdminRooms },
+                { path: 'users', component: AdminUsers },
+                { path: 'rooms/create', component: AdminRoomForm },
+                { path: 'rooms/edit/:id', component: AdminRoomForm }
+            ]
+        }
+    ]
 });
-
 
 // ==========================
 // NAVIGATION GUARD BẢO VỆ ADMIN
 // ==========================
 
-// --- BẮT ĐẦU ĐOẠN CODE BẢO VỆ VÀ TUẦN TRA ---
-router.beforeEach((to, from, next) => {
-  const userInfo = localStorage.getItem('user_info');
-  let user = null;
-  
-  if (userInfo) {
-    user = JSON.parse(userInfo);
+router.beforeEach(async (to, from, next) => {
+    const userInfo = localStorage.getItem('user_info');
+    let user = userInfo ? JSON.parse(userInfo) : null;
     
-    // LÍNH TUẦN TRA NGẦM: Hỏi server xem tài khoản có đang bị khóa không
-    // LÍNH TUẦN TRA NGẦM: Hỏi server xem có bị khóa hay đổi quyền không
-    fetch('/api/check-status', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: user.email })
-    }).then(async (res) => {
-      if (res.status === 401) { 
-        // 1. Bị khóa -> Tước thẻ, đá ra Login
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user_info');
-        alert('Cảnh báo: Tài khoản của bạn đã bị khóa vĩnh viễn!');
-        window.location.href = '/login'; 
-      } else if (res.ok) {
-        // 2. An toàn -> Rút thông tin mới nhất từ Server về
-        const data = await res.json();
-        
-        // Kẻ hở ở đây: Nếu chức vụ bị Admin đổi (VD: admin bị giáng chức thành customer)
-        if (data.user && data.user.role !== user.role) {
-          // Cập nhật lại thẻ bài mới vào bộ nhớ
-          localStorage.setItem('user_info', JSON.stringify(data.user));
-          alert('Quyền truy cập của bạn vừa bị thay đổi. Hệ thống sẽ tải lại!');
-          window.location.reload(); // Ép tải lại trang để ông Bảo vệ Router gõ đầu!
+    // 1. Kiểm tra quyền truy cập Admin trước
+    if (to.path.startsWith('/admin')) {
+        if (!user) {
+            alert('Vui lòng đăng nhập tài khoản Quản trị viên!');
+            return next('/login');
+        } 
+        if (user.role !== 'admin') {
+            alert('Cảnh báo: Bạn không có quyền truy cập khu vực này!');
+            return next('/');
         }
-      }
-    }).catch(() => {});
-  }
-
-  // Khối phân quyền Admin cũ giữ nguyên
-  if (to.path.startsWith('/admin')) {
-    if (!user) {
-      alert('Vui lòng đăng nhập tài khoản Quản trị viên!');
-      return next('/login');
-    } 
-    if (user.role !== 'admin') {
-      alert('Cảnh báo: Bạn không có quyền truy cập khu vực này!');
-      return next('/');
     }
-  }
 
-  next(); // Cho phép đi tiếp
+    // 2. Lính tuần tra ngầm (Chỉ chạy khi đã đăng nhập và không phải đang ở trang login)
+    if (user && to.path !== '/login') {
+        try {
+            const res = await fetch('/api/check-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: user.email })
+            });
+
+            if (res.status === 401) {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_info');
+                alert('Cảnh báo: Tài khoản của bạn đã bị khóa vĩnh viễn!');
+                return window.location.href = '/login';
+            } else if (res.ok) {
+                const data = await res.json();
+                if (data.user && data.user.role !== user.role) {
+                    localStorage.setItem('user_info', JSON.stringify(data.user));
+                    alert('Quyền truy cập của bạn vừa bị thay đổi. Hệ thống sẽ tải lại!');
+                    return window.location.reload();
+                }
+            }
+        } catch (e) {
+            console.error("Lỗi tuần tra:", e);
+        }
+    }
+
+    next();
 });
-// --- KẾT THÚC ĐOẠN CODE BẢO VỆ ---
 
 // --- BẮT ĐẦU: LÍNH GÁC NGẦM BẮT LỖI 401 ---
 const originalFetch = window.fetch;
 window.fetch = async (...args) => {
-  // Soi xem khách đang gọi API nào
-  const url = typeof args[0] === 'string' ? args[0] : (args[0] && args[0].url ? args[0].url : '');
-  
-  const response = await originalFetch(...args);
-  
-  // CHỈ bắt lỗi 401 NẾU đường dẫn KHÔNG phải là đang Đăng nhập
-  if (response.status === 401 && !url.includes('login')) {
-    // 1. Tước thẻ, xóa sạch thông tin
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_info');
+    // Sửa lỗi Property 'url' does not exist
+    const requestInfo = args[0] as any;
+    const url = typeof requestInfo === 'string' ? requestInfo : (requestInfo?.url || requestInfo?.href || '');
     
-    // 2. Hiện cảnh báo
-    alert('Tài khoản của bạn đã bị Admin khóa! Buộc phải đăng xuất ngay lập tức.');
+    const response = await originalFetch(...args);
     
-    // 3. Đá văng ra trang Login
-    window.location.href = '/login';
-  }
-  
-  return response;
+    if (response.status === 401 && !url.includes('login')) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_info');
+        alert('Tài khoản của bạn đã bị Admin khóa hoặc phiên đăng nhập hết hạn!');
+        window.location.href = '/login';
+    }
+    
+    return response;
 };
-// --- KẾT THÚC LÍNH GÁC NGẦM ---
-// ==========================
 
+// --- KHỞI TẠO APP ---
 const app = createApp(App);
 app.use(router);
-app.mount('#root');
+app.mount('#app'); // Chỉ giữ lại một dòng này thôi!
