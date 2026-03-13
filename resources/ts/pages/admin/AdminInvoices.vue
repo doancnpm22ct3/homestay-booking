@@ -193,7 +193,7 @@ const closeInvoiceModal = () => {
 
 const fetchBookings = async () => {
   try {
-    const response = await fetch('/api/admin/bookings');
+    const response = await fetch('/api/admin/invoices');
     if (response.ok) {
       bookings.value = await response.json();
     }
@@ -205,7 +205,7 @@ const fetchBookings = async () => {
 const handleCheckout = async (id: number) => {
   if (confirm('Khách đã thanh toán phần còn lại? Bấm OK để chốt Checkout và gửi hóa đơn cho khách!')) {
     try {
-      const response = await fetch(`/api/admin/bookings/${id}/checkout`, { method: 'PUT' });
+      const response = await fetch(`/api/admin/invoices/${id}/checkout`, { method: 'PUT' });
       const data = await response.json();
       
       if (response.ok) {
@@ -223,7 +223,7 @@ const handleCheckout = async (id: number) => {
 const deleteBooking = async (id: number) => {
   if (confirm('Xóa hóa đơn này vĩnh viễn?')) {
     try {
-      const response = await fetch(`/api/admin/bookings/${id}`, { method: 'DELETE' });
+      const response = await fetch(`/api/admin/invoices/${id}`, { method: 'DELETE' });
       if (response.ok) {
         fetchBookings();
       }
