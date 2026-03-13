@@ -115,8 +115,8 @@
               </button>
             </td>
             <td class="td-cell">
-              <div class="font-medium text-gray-900">{{ b.customer?.name }}</div>
-              <div class="text-xs text-gray-400">{{ b.customer?.phone }}</div>
+              <div class="font-medium text-gray-900">{{ b.customer?.name || b.customer_name || 'Khách vãng lai' }}</div>
+              <div class="text-xs text-gray-400">{{ b.customer?.phone || b.customer_phone || 'Không có SĐT' }}</div>
             </td>
             <td class="td-cell">
               <div class="font-medium">{{ b.room?.room_number || b.room?.title || b.room_name || 'Không rõ' }}</div>

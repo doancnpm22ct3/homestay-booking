@@ -75,16 +75,36 @@ class RoomController extends Controller
 
             // 2. Cập nhật tiện nghi (Xóa sạch tiện nghi cũ của phòng này và lưu lại các tick mới)
             DB::table('room_amenities')->where('room_id', $id)->delete();
-            if ($request->has('amenities')) {
-                foreach ($request->amenities as $amenity_id) {
-                    DB::table('room_amenities')->insert([
-                        'room_id' => $id,
-                        'amenity_id' => $amenity_id
-                    ]);
+            $amenities = $request->input('amenities', []);
+            // Đảm bảo amenities là mảng (form data có thể gửi lên chuỗi 'null' hoặc chuỗi json)
+            if (is_string($amenities)) {
+                $amenities = json_decode($amenities, true) ?? [];
+            }
+            if (!empty($amenities) && is_array($amenities)) {
+                foreach ($amenities as $amenity_id) {
+                    if ($amenity_id && $amenity_id !== 'null') {
+                        DB::table('room_amenities')->insert([
+                            'room_id' => $id,
+                            'amenity_id' => $amenity_id
+                        ]);
+                    }
                 }
             }
 
-            // 3. Upload thêm ảnh mới nếu admin có chọn thêm
+            // 3. Xử lý ảnh cũ (xóa những ảnh không còn trong retained_images)
+            $retainedUrls = $request->input('retained_images', []);
+            $oldImages = RoomImage::where('room_id', $room->id)->get();
+            foreach ($oldImages as $oldImg) {
+                if (!in_array($oldImg->image_url, $retainedUrls)) {
+                    // Xóa file vật lý trong storage (Lấy path tương đối sau /storage/)
+                    $filePath = str_replace('/storage/', '', $oldImg->image_url);
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($filePath);
+                    // Xóa record trong DB
+                    $oldImg->delete();
+                }
+            }
+
+            // 4. Upload thêm ảnh mới nếu admin có chọn thêm
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $key => $file) {
                     $path = $file->store('rooms', 'public');
@@ -164,13 +184,18 @@ class RoomController extends Controller
             ]);
 
             // 2. Lưu tiện nghi vào bảng trung gian room_amenities
-            if ($request->has('amenities')) {
-                // Laravel tự parse mảng gửi lên
-                foreach ($request->amenities as $amenity_id) {
-                    DB::table('room_amenities')->insert([
-                        'room_id' => $room->id,
-                        'amenity_id' => $amenity_id
-                    ]);
+            $amenities = $request->input('amenities', []);
+            if (is_string($amenities)) {
+                $amenities = json_decode($amenities, true) ?? [];
+            }
+            if (!empty($amenities) && is_array($amenities)) {
+                foreach ($amenities as $amenity_id) {
+                    if ($amenity_id && $amenity_id !== 'null') {
+                        DB::table('room_amenities')->insert([
+                            'room_id' => $room->id,
+                            'amenity_id' => $amenity_id
+                        ]);
+                    }
                 }
             }
 
@@ -195,5 +220,25 @@ class RoomController extends Controller
             DB::rollBack();
             return response()->json(['error' => 'Lỗi khi lưu: ' . $e->getMessage()], 500);
         }
+    }
+
+    public function storeAmenity(Request $request)
+    {
+        $request->validate(['name' => 'required|string']);
+        
+        $id = DB::table('amenities')->insertGetId([
+            'name' => $request->name,
+            'icon' => $request->icon ?? 'star'
+        ]);
+        
+        $amenity = DB::table('amenities')->where('id', $id)->first();
+        return response()->json($amenity, 201);
+    }
+
+    public function deleteAmenity($id)
+    {
+        DB::table('amenities')->where('id', $id)->delete();
+        DB::table('room_amenities')->where('amenity_id', $id)->delete();
+        return response()->json(['message' => 'Đã xóa tiện nghi']);
     }
 }

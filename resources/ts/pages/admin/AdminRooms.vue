@@ -117,7 +117,8 @@ const stats = ref({
 // Hàm lấy dữ liệu danh sách phòng
 const fetchRooms = async () => {
   try {
-    const response = await fetch('/api/rooms');
+    // Gọi API với param ?all=true để Admin có thể xem được cả những phòng đang ẩn
+    const response = await fetch('/api/rooms?all=true');
     const data = await response.json();
     
     // Xử lý format URL ảnh giống như ngoài trang chủ

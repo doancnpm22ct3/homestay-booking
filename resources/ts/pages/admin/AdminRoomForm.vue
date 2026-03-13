@@ -157,7 +157,9 @@ onMounted(async () => {
     if (amRes.ok) {
       const rawAmenities = await amRes.json();
       // Chỉ lấy những tiện nghi thực sự có tên đàng hoàng
-      availableAmenities.value = rawAmenities.filter((a: any) => a && a.name && a.name.trim() !== '' && a.name !== 'null');
+      availableAmenities.value = rawAmenities
+        .filter((a: any) => a && a.name && a.name.trim() !== '' && a.name !== 'null')
+        .map((a: any) => ({ ...a, id: Number(a.id) }));
     }
   } catch (err) {
     console.error('Lỗi tải tiện nghi:', err);
@@ -191,11 +193,12 @@ onMounted(async () => {
       form.value.is_visible = data.is_visible !== 0; 
 
       if (data.amenity_list) {
-        form.value.amenities = data.amenity_list.map((a: any) => a.id);
+        form.value.amenities = data.amenity_list.map((a: any) => Number(a.id));
         
         // Đẩy thêm các tiện nghi phòng đang có vào list tổng (vẫn phải qua lưới lọc)
         data.amenity_list.forEach((dbAmenity: any) => {
           if (dbAmenity && dbAmenity.name && dbAmenity.name.trim() !== '' && dbAmenity.name !== 'null') {
+            dbAmenity.id = Number(dbAmenity.id);
             if (!availableAmenities.value.some(a => a.id === dbAmenity.id)) {
               availableAmenities.value.push(dbAmenity);
             }
@@ -224,7 +227,11 @@ const addCustomAmenity = async () => {
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ name: newAmenity.value.trim() })
       });
+      if (!response.ok) {
+        throw new Error('Không thể tạo tiện nghi này.');
+      }
       const newAm = await response.json();
+      newAm.id = Number(newAm.id);
       if (!availableAmenities.value.some(a => a.id === newAm.id)) {
         availableAmenities.value.push(newAm);
       }
@@ -287,6 +294,7 @@ const handleSubmit = async () => {
     
     form.value.amenities.forEach(id => formData.append('amenities[]', id.toString()));
     selectedFiles.value.forEach(file => formData.append('images[]', file));
+    imagePreviews.value.filter(img => !img.isNew).forEach(img => formData.append('retained_images[]', img.url));
 
     let url = '/api/rooms';
     if (isEdit.value) {

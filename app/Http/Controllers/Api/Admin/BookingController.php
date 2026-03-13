@@ -54,7 +54,17 @@ class BookingController extends Controller
             $query->where('booking_code','like','%'.$request->booking_code.'%');
         }
 
-        return response()->json($query->paginate($request->per_page ?? 15));
+        $bookings = $query->paginate($request->per_page ?? 15);
+        
+        $bookings->getCollection()->transform(function ($booking) {
+            $booking->customer_name = $booking->customer->name ?? $booking->customer_name ?? 'Khách vãng lai';
+            $booking->customer_phone = $booking->customer->phone ?? $booking->customer_phone ?? '';
+            $booking->customer_email = $booking->customer->email ?? $booking->customer_email ?? '';
+            $booking->room_name = $booking->room->title ?? $booking->room_name ?? 'Không rõ';
+            return $booking;
+        });
+
+        return response()->json($bookings);
     }
 
     // GET /api/admin/bookings/stats
@@ -96,10 +106,15 @@ class BookingController extends Controller
         return response()->json($days);
     }
 
-    // GET /api/admin/bookings/{id}
     public function show($id)
     {
         $b = Booking::with(['customer','room','room.images','services','payments.recordedBy','activities','createdBy'])->findOrFail($id);
+        
+        $b->customer_name = $b->customer->name ?? $b->customer_name ?? 'Khách vãng lai';
+        $b->customer_phone = $b->customer->phone ?? $b->customer_phone ?? '';
+        $b->customer_email = $b->customer->email ?? $b->customer_email ?? '';
+        $b->room_name = $b->room->title ?? $b->room_name ?? 'Không rõ';
+
         return response()->json($b);
     }
 

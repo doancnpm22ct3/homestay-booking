@@ -12,10 +12,14 @@ use App\Http\Controllers\Api\Admin\RoomAvailabilityController;
 
 // --- GHI ĐÈ API LẤY DANH SÁCH PHÒNG (TRẢ VỀ KÈM ẢNH) ---
 Route::get('/rooms', function (Request $request) {
-    $rooms = DB::table('rooms')
-                ->where('is_visible', 1)
-                ->where('status', '!=', 'hidden')
-                ->get();
+    $query = DB::table('rooms');
+
+    // Nếu không có param ?all=true (tức là người dùng thường) thì mới ẩn đi
+    if (!$request->query('all')) {
+        $query->where('is_visible', 1)->where('status', '!=', 'hidden');
+    }
+
+    $rooms = $query->get();
 
     foreach ($rooms as $room) {
         $room->images = DB::table('room_images')->where('room_id', $room->id)->get();
@@ -36,7 +40,7 @@ Route::get('/rooms/{id}', function ($id) {
     $room->images = DB::table('room_images')->where('room_id', $id)->get();
 
     // Lấy tiện nghi
-    $room->amenities = DB::table('room_amenities')
+    $room->amenity_list = DB::table('room_amenities')
         ->join('amenities', 'room_amenities.amenity_id', '=', 'amenities.id')
         ->where('room_amenities.room_id', $id)
         ->select('amenities.*')

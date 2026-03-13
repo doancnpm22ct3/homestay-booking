@@ -12,10 +12,30 @@ class AdminBookingController extends Controller
 
     public function index()
     {
-       
-        $bookings = Booking::orderBy('id', 'desc')->get()->map(function ($booking) {
-
+        $bookings = Booking::with(['customer', 'room'])->orderBy('id', 'desc')->get()->map(function ($booking) {
             $booking->time_vn = $booking->created_at->format('H:i - d/m/Y');
+            
+            // Map dữ liệu từ quan hệ (nếu có) sang các trường cũ để Hóa đơn hiển thị được
+            $booking->customer_name = $booking->customer->name ?? $booking->customer_name ?? 'Khách lẻ';
+            $booking->customer_email = $booking->customer->email ?? $booking->customer_email ?? '';
+            $booking->customer_phone = $booking->customer->phone ?? $booking->customer_phone ?? '';
+            $booking->room_name = $booking->room->title ?? $booking->room_name ?? 'Không rõ';
+            
+            // Map giá trị tiền tệ
+            $booking->total_price = $booking->total_amount > 0 ? $booking->total_amount : $booking->total_price;
+            $booking->deposit_amount = $booking->paid_amount > 0 ? $booking->paid_amount : $booking->deposit_amount;
+            
+            // Map trạng thái thanh toán nếu thiếu
+            if (empty($booking->payment_status)) {
+                if ($booking->paid_amount >= $booking->total_amount && $booking->total_amount > 0) {
+                    $booking->payment_status = 'completed';
+                } elseif ($booking->paid_amount > 0) {
+                    $booking->payment_status = 'deposited';
+                } else {
+                    $booking->payment_status = 'pending';
+                }
+            }
+            
             return $booking;
         });
 

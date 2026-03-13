@@ -28,9 +28,9 @@
             <section>
               <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">👤 Khách hàng</h3>
               <div class="grid grid-cols-2 gap-3 text-sm">
-                <div><span class="text-gray-400">Họ tên:</span> <span class="font-medium ml-1">{{ booking.customer?.name }}</span></div>
-                <div><span class="text-gray-400">SĐT:</span> <a :href="`tel:${booking.customer?.phone}`" class="text-emerald-600 hover:underline ml-1">{{ booking.customer?.phone }}</a></div>
-                <div><span class="text-gray-400">Email:</span> <span class="ml-1">{{ booking.customer?.email || '—' }}</span></div>
+                <div><span class="text-gray-400">Họ tên:</span> <span class="font-medium ml-1">{{ booking.customer?.name || booking.customer_name || 'Khách vãng lai' }}</span></div>
+                <div><span class="text-gray-400">SĐT:</span> <a :href="`tel:${booking.customer?.phone || booking.customer_phone}`" class="text-emerald-600 hover:underline ml-1">{{ booking.customer?.phone || booking.customer_phone || 'Không có SĐT' }}</a></div>
+                <div><span class="text-gray-400">Email:</span> <span class="ml-1">{{ booking.customer?.email || booking.customer_email || '—' }}</span></div>
                 <div><span class="text-gray-400">Nguồn:</span> <span class="ml-1">{{ sourceLabel(booking.source) }}</span></div>
               </div>
             </section>
