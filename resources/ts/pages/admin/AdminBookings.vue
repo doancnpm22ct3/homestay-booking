@@ -323,7 +323,8 @@ function applyDateFilter(date: string) {
 // ─── Helpers ─────────────────────────────────────
 function fmtDate(d: string) {
   if (!d) return '—';
-  const [y,m,day] = d.split('-');
+  const cleanDate = d.slice(0, 10);
+  const [y, m, day] = cleanDate.split('-');
   return `${day}/${m}/${y}`;
 }
 function fmtMoney(n: number) {
