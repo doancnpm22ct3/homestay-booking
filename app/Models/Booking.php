@@ -11,6 +11,7 @@ class Booking extends Model
     use HasFactory;
 
     protected $fillable = [
+        // My fields
         'booking_code','customer_id','room_id',
         'check_in_date','check_out_date','check_in_time','check_out_time',
         'adults','children','status','source',
@@ -19,6 +20,9 @@ class Booking extends Model
         'guest_note','internal_note',
         'created_by','confirmed_by','checked_in_by','checked_out_by',
         'cancelled_at','cancel_reason','refund_amount',
+        // Partner fields
+        'customer_name', 'customer_email', 'customer_phone', 
+        'room_name', 'total_price', 'deposit_amount', 'payment_status'
     ];
 
     protected $casts = [

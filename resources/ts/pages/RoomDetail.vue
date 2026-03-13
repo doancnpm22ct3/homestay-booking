@@ -347,7 +347,25 @@ const validateCapacity = () => {
   return true;
 };
 
+// HÀM XỬ LÝ KHI BẤM NÚT ĐẶT PHÒNG
 const handleBook = () => {
+<<<<<<< HEAD
+  
+  const draftBooking = {
+    roomId: room.value.id,
+    roomName: room.value.title,
+    roomImage: room.value.image,
+    pricePerNight: room.value.price,
+    adults: adults.value,
+    children: children.value
+    
+  };
+  
+  
+  localStorage.setItem('draft_booking', JSON.stringify(draftBooking));
+
+  router.push('/payment');
+=======
   if (validateCapacity()) {
     router.push({
       path: '/payment',
@@ -360,6 +378,7 @@ const handleBook = () => {
       }
     });
   }
+>>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
 };
 </script>
 

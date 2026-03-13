@@ -21,6 +21,7 @@ import AdminUsers from './pages/admin/AdminUsers.vue';
 import AdminRooms from './pages/admin/AdminRooms.vue';
 import AdminRoomForm from './pages/admin/AdminRoomForm.vue';
 import AdminBookings from './pages/admin/AdminBookings.vue';
+import AdminInvoices from './pages/admin/AdminInvoices.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -46,6 +47,7 @@ const router = createRouter({
         { path: 'rooms/create', component: AdminRoomForm },
         { path: 'rooms/edit/:id', component: AdminRoomForm },
         { path: 'booking-management', component: AdminBookings },
+        { path: 'invoices', component: AdminInvoices },
       ]
     }
   ]

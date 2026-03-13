@@ -61,6 +61,12 @@ Route::get('/amenities', [App\Http\Controllers\Api\RoomController::class, 'getAm
 Route::post('/amenities', [App\Http\Controllers\Api\RoomController::class, 'storeAmenity']);
 Route::delete('/amenities/{id}', [App\Http\Controllers\Api\RoomController::class, 'deleteAmenity']);
 
+// --- ĐẶT PHÒNG & HÓA ĐƠN ---
+Route::post('/bookings', [App\Http\Controllers\Api\BookingController::class, 'store']);
+Route::get('/admin/bookings', [App\Http\Controllers\Api\AdminBookingController::class, 'index']);
+Route::put('/admin/bookings/{id}/checkout', [App\Http\Controllers\Api\AdminBookingController::class, 'checkout']);
+Route::delete('/admin/bookings/{id}', [App\Http\Controllers\Api\AdminBookingController::class, 'destroy']);
+
 // --- QUẢN LÝ NGƯỜI DÙNG (ADMIN) ---
 Route::get('/admin/users', [AdminUserController::class, 'index']);
 Route::post('/admin/users', [AdminUserController::class, 'store']);
