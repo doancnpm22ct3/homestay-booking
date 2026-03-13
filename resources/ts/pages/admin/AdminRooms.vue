@@ -119,7 +119,26 @@ const fetchRooms = async () => {
   try {
     const response = await fetch('/api/rooms');
     const data = await response.json();
-    rooms.value = data;
+    
+    // Xử lý format URL ảnh giống như ngoài trang chủ
+    rooms.value = data.map((room: any) => {
+      let thumb = 'https://picsum.photos/seed/room/600/400';
+      if (room.images && room.images.length > 0) {
+        thumb = room.images[0].image_url;
+      } else if (room.image_url) {
+        thumb = room.image_url;
+      }
+      
+      // Thêm prefix /storage/
+      if (thumb && !thumb.startsWith('http') && !thumb.startsWith('/storage/') && !thumb.startsWith('data:')) {
+        thumb = thumb.startsWith('/') ? `/storage${thumb}` : `/storage/${thumb}`;
+      }
+      
+      return {
+        ...room,
+        image: thumb // Map lại trường image cho table dùng ({ room.image })
+      };
+    });
   } catch (error) {
     console.error('Lỗi khi tải danh sách phòng:', error);
   }

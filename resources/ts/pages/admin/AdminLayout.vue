@@ -14,6 +14,9 @@
         <router-link to="/admin/bookings" class="flex items-center px-6 py-3 text-emerald-100 hover:bg-emerald-800 hover:text-white transition-colors" active-class="bg-emerald-800 text-white border-l-4 border-emerald-400">
           <CalendarDays class="w-5 h-5 mr-3" /> Đơn đặt phòng
         </router-link>
+        <router-link to="/admin/booking-management" class="flex items-center px-6 py-3 text-emerald-100 hover:bg-emerald-800 hover:text-white transition-colors" active-class="bg-emerald-800 text-white border-l-4 border-emerald-400">
+          <ClipboardList class="w-5 h-5 mr-3" /> Quản lý Booking
+        </router-link>
         <router-link to="/admin/users" class="flex items-center px-6 py-3 text-emerald-100 hover:bg-emerald-800 hover:text-white transition-colors" active-class="bg-emerald-800 text-white border-l-4 border-emerald-400">
           <Users class="w-5 h-5 mr-3" /> Người dùng
         </router-link>
@@ -41,5 +44,5 @@
 </template>
 
 <script setup lang="ts">
-import { LayoutDashboard, Home, CalendarDays, Users, LogOut } from 'lucide-vue-next';
+import { LayoutDashboard, Home, CalendarDays, ClipboardList, Users, LogOut } from 'lucide-vue-next';
 </script>

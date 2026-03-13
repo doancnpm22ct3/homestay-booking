@@ -401,6 +401,10 @@ onMounted(async () => {
           thumb = room.image_url;
       }
 
+      if (thumb && !thumb.startsWith('http') && !thumb.startsWith('/storage/') && !thumb.startsWith('data:')) {
+          thumb = thumb.startsWith('/') ? `/storage${thumb}` : `/storage/${thumb}`;
+      }
+
       let rawType = room.type;
       if (rawType !== 'room' && rawType !== 'house') {
           rawType = 'house'; 

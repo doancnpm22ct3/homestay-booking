@@ -430,6 +430,11 @@ onMounted(async () => {
       } else if (room.image_url) {
           thumb = room.image_url;
       }
+      
+      // Thêm /storage/ nếu URL là đường dẫn tương đối (từ DB)
+      if (thumb && !thumb.startsWith('http') && !thumb.startsWith('/storage/') && !thumb.startsWith('data:')) {
+          thumb = thumb.startsWith('/') ? `/storage${thumb}` : `/storage/${thumb}`;
+      }
 
       return {
         id: String(room.id),

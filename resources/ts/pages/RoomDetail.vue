@@ -266,15 +266,24 @@ onMounted(async () => {
     data.amenity_list = data.amenities || [];
     room.value = data;
 
+    // Handler format imageURL
+    const formatImageUrl = (url: string) => {
+      if (!url) return '';
+      if (!url.startsWith('http') && !url.startsWith('/storage/') && !url.startsWith('data:')) {
+        return url.startsWith('/') ? `/storage${url}` : `/storage/${url}`;
+      }
+      return url;
+    };
+
     // Xử lý hình ảnh dự phòng cực kỳ chắc chắn
     if (data.images && data.images.length > 0) {
       const primaryImg = data.images.find((img: any) => img.is_primary);
-      mainImage.value = primaryImg ? primaryImg.image_url : data.images[0].image_url;
+      mainImage.value = formatImageUrl(primaryImg ? primaryImg.image_url : data.images[0].image_url);
       
       // Nếu chỉ có 1 ảnh thì dùng chung cho ảnh phụ để giao diện không bị thủng
       subImages.value = data.images
-          .filter((img: any) => img.image_url !== mainImage.value)
-          .map((img: any) => img.image_url);
+          .filter((img: any) => img.image_url !== (primaryImg ? primaryImg.image_url : data.images[0].image_url))
+          .map((img: any) => formatImageUrl(img.image_url));
           
       // Lấp đầy mảng ảnh phụ nếu thiếu
       while (subImages.value.length < 4) {
