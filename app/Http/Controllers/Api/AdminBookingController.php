@@ -32,6 +32,8 @@ class AdminBookingController extends Controller
 
         // Đổi trạng thái thành đã thanh toán toàn bộ
         $booking->payment_status = 'completed';
+        $booking->status = 'confirmed'; // Tự động xác nhận booking
+        $booking->paid_amount = $booking->total_amount; // Cập nhật payment amount
         $booking->save();
 
         // TẠM THỜI MÔ PHỎNG GỬI MAIL (Sau này sếp tích hợp gửi Gmail thật vào đây)
