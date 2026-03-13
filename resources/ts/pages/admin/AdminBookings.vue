@@ -119,8 +119,8 @@
               <div class="text-xs text-gray-400">{{ b.customer?.phone }}</div>
             </td>
             <td class="td-cell">
-              <div class="font-medium">{{ b.room?.room_number || b.room?.title }}</div>
-              <div class="text-xs text-gray-400">{{ b.room?.type }}</div>
+              <div class="font-medium">{{ b.room?.room_number || b.room?.title || b.room_name || 'Không rõ' }}</div>
+              <div class="text-xs text-gray-400">{{ b.room?.type || 'N/A' }}</div>
             </td>
             <td class="td-cell" :class="isToday(b.check_in_date)?'text-red-600 font-semibold':''">{{ fmtDate(b.check_in_date) }}</td>
             <td class="td-cell" :class="isToday(b.check_out_date)?'text-orange-500 font-semibold':''">{{ fmtDate(b.check_out_date) }}</td>
@@ -330,9 +330,11 @@ function fmtMoney(n: number) {
   return new Intl.NumberFormat('vi-VN').format(n ?? 0) + 'đ';
 }
 function isToday(d: string) {
+  if (!d) return false;
   return d?.slice(0,10) === new Date().toISOString().slice(0,10);
 }
 function nightsCount(ci: string, co: string) {
+  if (!ci || !co) return 0;
   return Math.round((new Date(co).getTime() - new Date(ci).getTime()) / 86400000);
 }
 function paymentBadge(b: any) {

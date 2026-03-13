@@ -255,7 +255,11 @@ const handlePayment = async () => {
         customer_email: customerInfo.value.email, // Thêm email (code bạn kia cần)
         customer_phone: customerInfo.value.phone, // Thêm phone (code bạn kia cần)
         total_price: totalPrice.value,     // Thêm total_price (code bạn kia)
-        deposit_amount: depositAmount      // Thêm deposit_amount (code bạn kia)
+        deposit_amount: depositAmount,     // Thêm deposit_amount (code bạn kia)
+        check_in_date: checkIn.value,
+        check_out_date: checkOut.value,
+        adults: adults.value,
+        children: children.value
       })
     });
 

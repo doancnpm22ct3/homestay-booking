@@ -12,7 +12,6 @@ class BookingController extends Controller
     // HÀM LƯU ĐƠN ĐẶT PHÒNG TỪ KHÁCH
     public function store(Request $request)
     {
-        // 1. Lưu hóa đơn vào DB
         $booking = Booking::create([
             'booking_code' => 'HD-' . strtoupper(uniqid()), // Tạo mã hóa đơn ngẫu nhiên (VD: HD-64A1B...)
             'customer_name' => $request->customer_name,
@@ -21,7 +20,19 @@ class BookingController extends Controller
             'room_name' => $request->room_name,
             'total_price' => $request->total_price,
             'deposit_amount' => $request->deposit_amount,
-            'payment_status' => 'deposited' // Mặc định là đã cọc
+            'payment_status' => 'deposited', // Mặc định là đã cọc
+            // Dữ liệu cho Module Quản Lý Booking:
+            'customer_id' => auth()->id() ?? null,
+            'room_id' => $request->room_id,
+            'check_in_date' => $request->check_in_date,
+            'check_out_date' => $request->check_out_date,
+            'adults' => $request->adults ?? 1,
+            'children' => $request->children ?? 0,
+            'status' => 'pending', 
+            'source' => 'website',
+            'subtotal' => $request->total_price,
+            'total_amount' => $request->total_price,
+            'paid_amount' => $request->deposit_amount
         ]);
 
         // 2. Tự động đổi trạng thái phòng thành "Đã đặt cọc" (booked)
