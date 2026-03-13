@@ -3,37 +3,17 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow w-full font-['Inter']">
       <h1 class="text-3xl font-bold text-gray-900 mb-8 font-['Playfair_Display']">Xác nhận thông tin</h1>
       
-<<<<<<< HEAD
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
-=======
       <div v-if="loading" class="text-center py-20 text-[#4A7055] font-medium animate-pulse">
         Đang tải thông tin thanh toán...
       </div>
 
       <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-12">
->>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
         <div class="lg:col-span-2">
           <form @submit.prevent="handlePayment" class="space-y-8 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
             <div class="space-y-6">
               <h2 class="text-xl font-bold text-gray-900">Thông tin liên hệ</h2>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-<<<<<<< HEAD
-                  <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Tên *</label>
-                  <input v-model="form.name" type="text" id="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
-                </div>
-                <div>
-                  <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                  <input v-model="form.email" type="email" id="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
-                </div>
-                <div class="md:col-span-2">
-                  <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại *</label>
-                  <input v-model="form.phone" type="tel" id="phone" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
-                </div>
-                <div class="md:col-span-2">
-                  <label for="note" class="block text-sm font-medium text-gray-700 mb-1">Ghi chú</label>
-                  <textarea v-model="form.note" id="note" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"></textarea>
-=======
                   <label for="name" class="block text-sm font-bold text-gray-700 mb-2">Tên *</label>
                   <input type="text" id="name" v-model="customerInfo.name" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-[#4A7055] focus:border-[#4A7055] outline-none transition-colors" />
                 </div>
@@ -48,7 +28,6 @@
                 <div class="md:col-span-2">
                   <label for="note" class="block text-sm font-bold text-gray-700 mb-2">Ghi chú</label>
                   <textarea id="note" v-model="customerInfo.note" rows="4" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-[#4A7055] focus:border-[#4A7055] outline-none transition-colors"></textarea>
->>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
                 </div>
               </div>
             </div>
@@ -79,36 +58,21 @@
               </div>
             </div>
 
-<<<<<<< HEAD
-            <div class="pt-8 border-t border-gray-200">
-              <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-bold text-lg transition-colors">
-                Xác nhận & Thanh toán cọc
-=======
             <div class="pt-8 border-t border-gray-100">
-              <button type="submit" class="w-full bg-[#4A7055] hover:bg-[#3b5a44] text-white py-4 rounded-xl font-bold text-lg transition-colors shadow-md">
-                Thanh toán
->>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
+              <button type="submit" :disabled="isSubmitting" class="w-full bg-[#4A7055] hover:bg-[#3b5a44] text-white py-4 rounded-xl font-bold text-lg transition-colors shadow-md disabled:bg-gray-400">
+                {{ isSubmitting ? 'Đang xử lý...' : 'Xác nhận & Thanh toán cọc' }}
               </button>
             </div>
           </form>
         </div>
 
         <div class="lg:col-span-1">
-<<<<<<< HEAD
-          <div v-if="draftBooking" class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm sticky top-24">
-            <div class="flex gap-4 mb-6 pb-6 border-b border-gray-200">
-              <img :src="draftBooking.roomImage" alt="Room" class="w-24 h-24 object-cover rounded-xl" referrerpolicy="no-referrer" />
-              <div>
-                <h3 class="font-semibold text-gray-900 line-clamp-2 mb-1">{{ draftBooking.roomName }}</h3>
-                <div class="text-sm text-gray-500">Phòng Homestay</div>
-=======
           <div v-if="room" class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm sticky top-24">
             <div class="flex gap-4 mb-6 pb-6 border-b border-gray-100">
               <img :src="primaryImage" alt="Room" class="w-24 h-24 object-cover rounded-xl shadow-sm" referrerpolicy="no-referrer" />
               <div>
                 <h3 class="font-bold text-gray-900 line-clamp-2 mb-1">{{ room.title }}</h3>
                 <div class="text-sm text-[#4A7055] font-medium">{{ room.type === 'house' ? 'Nguyên căn' : 'Phòng riêng' }}</div>
->>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
               </div>
             </div>
 
@@ -116,14 +80,6 @@
             
             <div class="space-y-4 mb-6 pb-6 border-b border-gray-100 text-sm">
               <div class="flex justify-between">
-<<<<<<< HEAD
-                <span class="text-gray-600">Ngày</span>
-                <span class="font-medium text-gray-900 text-right">Sắp tới</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">Số lượng</span>
-                <span class="font-medium text-gray-900 text-right">{{ draftBooking.adults }} người lớn, {{ draftBooking.children }} trẻ em</span>
-=======
                 <span class="text-gray-500">Ngày nhận - trả</span>
                 <span class="font-bold text-gray-900 text-right">{{ formatDate(checkIn) }} - {{ formatDate(checkOut) }}</span>
               </div>
@@ -136,35 +92,11 @@
               <div class="flex justify-between">
                 <span class="text-gray-500">Thời gian lưu trú</span>
                 <span class="font-bold text-[#4A7055] text-right">{{ numberOfNights }} đêm</span>
->>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
               </div>
             </div>
 
             <div class="space-y-4 mb-6 pb-6 border-b border-gray-100">
               <div class="flex justify-between">
-<<<<<<< HEAD
-                <span class="text-gray-600">Giá phòng (1 đêm)</span>
-                <span class="font-medium text-gray-900">{{ Number(draftBooking.pricePerNight).toLocaleString('vi-VN') }}đ</span>
-              </div>
-              <div class="flex justify-between items-center pt-2">
-                <span class="font-bold text-gray-900 text-lg">Tổng tiền</span>
-                <span class="font-bold text-gray-900 text-xl">{{ Number(totalPrice).toLocaleString('vi-VN') }}đ</span>
-              </div>
-            </div>
-
-            <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 flex justify-between items-center">
-              <div>
-                <span class="font-bold text-emerald-800 block">Thanh toán cọc (30%)</span>
-                <span class="text-xs text-emerald-600">Phần còn lại thu khi nhận phòng</span>
-              </div>
-              <span class="font-bold text-emerald-700 text-2xl">{{ Number(depositAmount).toLocaleString('vi-VN') }}đ</span>
-            </div>
-
-          </div>
-          
-          <div v-else class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm text-center text-gray-500">
-            Đang tải thông tin phòng...
-=======
                 <span class="text-gray-500 underline">{{ formatPrice(room.price) }} x {{ numberOfNights }} đêm</span>
                 <span class="font-medium text-gray-900">{{ formatPrice(room.price * numberOfNights) }}</span>
               </div>
@@ -184,7 +116,10 @@
               <p class="font-bold text-lg text-gray-900">{{ formatPrice(totalPrice * 0.3) }}</p>
             </div>
 
->>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
+          </div>
+          
+          <div v-else class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm text-center text-gray-500">
+            Đang tải thông tin phòng...
           </div>
         </div>
       </div>
@@ -194,13 +129,8 @@
 </template>
 
 <script setup lang="ts">
-<<<<<<< HEAD
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-=======
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
->>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
 
 // Định nghĩa Interface
 interface RoomData {
@@ -213,16 +143,10 @@ interface RoomData {
 
 const route = useRoute();
 const router = useRouter();
-<<<<<<< HEAD
-const paymentMethod = ref('bank');
-const draftBooking = ref<any>(null);
-
-// Form thông tin
-const form = ref({
-=======
 
 // State
 const loading = ref(true);
+const isSubmitting = ref(false);
 const room = ref<RoomData | null>(null);
 const primaryImage = ref('https://picsum.photos/seed/roommain/200/200');
 
@@ -235,79 +159,12 @@ const children = ref(Number(route.query.children) || 0);
 
 const paymentMethod = ref('bank');
 const customerInfo = ref({
->>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
   name: '',
   email: '',
   phone: '',
   note: ''
 });
 
-<<<<<<< HEAD
-// Biến tính tiền
-const totalPrice = ref(0);
-const depositAmount = ref(0);
-
-// CHẠY KHI TRANG VỪA LOAD
-onMounted(() => {
-  // 1. Mở balo (localStorage) lấy thông tin phòng khách vừa chọn
-  const savedBooking = localStorage.getItem('draft_booking');
-  if (savedBooking) {
-    draftBooking.value = JSON.parse(savedBooking);
-    
-    // Tính tổng tiền (Tạm tính 1 đêm, sếp có thể nhân lên sau nếu có logic chọn số ngày)
-    totalPrice.value = Number(draftBooking.value.pricePerNight);
-    
-    // TÍNH CỌC 30%
-    depositAmount.value = totalPrice.value * 0.3; 
-  } else {
-    alert('Không tìm thấy thông tin đặt phòng!');
-    router.push('/');
-  }
-
-  // 2. Tự động điền thông tin nếu khách đã đăng nhập
-  const userInfo = localStorage.getItem('user_info');
-  if (userInfo) {
-    const user = JSON.parse(userInfo);
-    form.value.name = user.name || '';
-    form.value.email = user.email || '';
-    form.value.phone = user.phone || '';
-  }
-});
-
-// HÀM XỬ LÝ CHỐT ĐƠN VÀ BẮN API
-const handlePayment = async () => {
-  try {
-    const response = await fetch('/api/bookings', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        room_id: draftBooking.value.roomId,
-        room_name: draftBooking.value.roomName,
-        customer_name: form.value.name,
-        customer_email: form.value.email,
-        customer_phone: form.value.phone,
-        total_price: totalPrice.value,
-        deposit_amount: depositAmount.value
-      })
-    });
-
-    if (response.ok) {
-      alert('🎉 Đặt phòng thành công! (Giả lập thanh toán cọc)');
-      localStorage.removeItem('draft_booking'); // Xóa bộ nhớ tạm
-      
-      // Chuyển sang trang Success của sếp
-      router.push('/payment-success'); 
-    } else {
-      const data = await response.json();
-      alert('Lỗi: ' + (data.message || 'Không thể đặt phòng lúc này.'));
-    }
-  } catch (error) {
-    alert('Lỗi kết nối máy chủ!');
-  }
-=======
 // Tính số đêm
 const numberOfNights = computed(() => {
   if (!checkIn.value || !checkOut.value) return 1;
@@ -341,7 +198,13 @@ onMounted(async () => {
 
     if (data.images && data.images.length > 0) {
       const pImg = data.images.find((img: any) => img.is_primary);
-      primaryImage.value = pImg ? pImg.image_url : data.images[0].image_url;
+      let thumbUrl = pImg ? pImg.image_url : data.images[0].image_url;
+      
+      if (thumbUrl && !thumbUrl.startsWith('http') && !thumbUrl.startsWith('/storage/')) {
+        thumbUrl = thumbUrl.startsWith('/') ? `/storage${thumbUrl}` : `/storage/${thumbUrl}`;
+      }
+      
+      primaryImage.value = thumbUrl;
     }
   } catch (error) {
     console.error('Lỗi lấy thông tin phòng thanh toán:', error);
@@ -349,6 +212,15 @@ onMounted(async () => {
     router.push('/listing');
   } finally {
     loading.value = false;
+  }
+
+  // Tự động điền thông tin nếu khách đã đăng nhập
+  const userInfo = localStorage.getItem('user_info');
+  if (userInfo) {
+    const user = JSON.parse(userInfo);
+    customerInfo.value.name = user.name || '';
+    customerInfo.value.email = user.email || '';
+    customerInfo.value.phone = user.phone || '';
   }
 });
 
@@ -365,15 +237,44 @@ const formatPrice = (price: number) => {
 
 // Gửi thanh toán
 const handlePayment = async () => {
-  // Ở đây sau này Hiếu sẽ viết API gọi xuống backend để lưu Booking
-  // Hiện tại ta chuyển luôn sang trang Success
+  if(isSubmitting.value) return;
+  isSubmitting.value = true;
   
-  // router.push({
-  //   path: '/payment-success',
-  //   query: { bookingId: 'TEMP123' }
-  // });
-  
-  router.push('/payment-success');
->>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
+  try {
+    const depositAmount = totalPrice.value * 0.3;
+    const response = await fetch('/api/bookings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        room_id: room.value?.id,
+        room_name: room.value?.title,      // Thêm tên phòng (code bạn kia cần)
+        customer_name: customerInfo.value.name, // Thêm tên KH (code bạn kia cần)
+        customer_email: customerInfo.value.email, // Thêm email (code bạn kia cần)
+        customer_phone: customerInfo.value.phone, // Thêm phone (code bạn kia cần)
+        total_price: totalPrice.value,     // Thêm total_price (code bạn kia)
+        deposit_amount: depositAmount      // Thêm deposit_amount (code bạn kia)
+      })
+    });
+
+    if (response.ok) {
+      alert('🎉 Đặt phòng thành công! (Giả lập thanh toán cọc)');
+      
+      // Chuyển sang trang Success 
+      router.push('/payment-success'); 
+    } else {
+      const data = await response.json();
+      alert('Lỗi: ' + (data.message || 'Không thể đặt phòng lúc này.'));
+    }
+  } catch (error) {
+    alert('Lỗi kết nối máy chủ!');
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 </script>
+
+<style scoped>
+</style>

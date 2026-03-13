@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
@@ -8,28 +7,19 @@
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
-=======
->>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
-
-<<<<<<< HEAD
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
---
--- Cơ sở dữ liệu: `homestay_booking`
---
-=======
 -- Xóa database cũ bị lỗi và tạo lại cái mới sạch sẽ
 DROP DATABASE IF EXISTS `homestay_booking`;
 CREATE DATABASE IF NOT EXISTS `homestay_booking` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `homestay_booking`;
->>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
 
 -- Cấu trúc bảng cho bảng `amenities`
 CREATE TABLE `amenities` (
@@ -357,13 +347,8 @@ ALTER TABLE `room_images`
 -- AUTO_INCREMENT cho bảng `users`
 ALTER TABLE `users`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-<<<<<<< HEAD
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-=======
-
-COMMIT;
->>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
