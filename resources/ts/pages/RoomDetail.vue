@@ -280,11 +280,22 @@ const validateCapacity = () => {
   return true;
 };
 
+// HÀM XỬ LÝ KHI BẤM NÚT ĐẶT PHÒNG
 const handleBook = () => {
-  if (validateCapacity()) {
-    alert(`Đã duyệt! Bạn đặt phòng cho ${adults.value} người lớn và ${children.value} trẻ em hợp lệ.`);
-    // Chuẩn bị cho trang thanh toán
-    // router.push('/payment');
-  }
+  
+  const draftBooking = {
+    roomId: room.value.id,
+    roomName: room.value.title,
+    roomImage: room.value.image,
+    pricePerNight: room.value.price,
+    adults: adults.value,
+    children: children.value
+    
+  };
+  
+  
+  localStorage.setItem('draft_booking', JSON.stringify(draftBooking));
+
+  router.push('/payment');
 };
 </script>

@@ -18,6 +18,13 @@ Route::post('/amenities', [App\Http\Controllers\Api\RoomController::class, 'stor
 Route::delete('/amenities/{id}', [App\Http\Controllers\Api\RoomController::class, 'deleteAmenity']); // Xóa vĩnh viễn
 Route::post('/register', [App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login']);
+
+// Khách đặt phòng
+
+Route::post('/bookings', [App\Http\Controllers\Api\BookingController::class, 'store']);
+Route::get('/admin/bookings', [App\Http\Controllers\Api\AdminBookingController::class, 'index']);
+Route::put('/admin/bookings/{id}/checkout', [App\Http\Controllers\Api\AdminBookingController::class, 'checkout']);
+Route::delete('/admin/bookings/{id}', [App\Http\Controllers\Api\AdminBookingController::class, 'destroy']);
 // Route xóa phòng
 Route::delete('/admin/rooms/{id}', [App\Http\Controllers\Api\RoomController::class, 'destroy']);
 // -- quản lý người dùng ---

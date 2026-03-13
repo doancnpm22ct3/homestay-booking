@@ -19,6 +19,8 @@ import AdminLayout from './pages/admin/AdminLayout.vue';
 import AdminUsers from './pages/admin/AdminUsers.vue';
 import AdminRooms from './pages/admin/AdminRooms.vue';
 import AdminRoomForm from './pages/admin/AdminRoomForm.vue';
+import AdminInvoices from './pages/admin/AdminInvoices.vue';
+
 
 
 const router = createRouter({
@@ -42,7 +44,8 @@ const router = createRouter({
         { path: 'rooms', component: AdminRooms },
         { path: 'users', component: AdminUsers },
         { path: 'rooms/create', component: AdminRoomForm },
-        { path: 'rooms/edit/:id', component: AdminRoomForm }
+        { path: 'rooms/edit/:id', component: AdminRoomForm },
+        { path: 'invoices', component: AdminInvoices },
       ]
     }
   ]
