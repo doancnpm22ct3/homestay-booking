@@ -12,12 +12,12 @@
             <p class="text-lg text-gray-700 mb-8 font-['Inter']">
               Săn ngay ưu đãi giảm đến 30% cho các homestay view biển đẹp nhất tháng này.
             </p>
-            <router-link 
-              to="/listing#room-list-section"
+            <Link 
+              href="/listing#room-list-section"
               class="inline-block bg-[#4A7055] hover:bg-[#3b5a44] text-white px-8 py-3.5 rounded-lg font-semibold transition-colors shadow-md"
             >
               Đặt phòng ngay
-            </router-link>
+            </Link>
           </div>
 
           <div class="flex-1 w-full relative group overflow-hidden rounded-tl-[100px] rounded-br-[100px] shadow-xl h-[400px]">
@@ -161,9 +161,9 @@
             <h2 class="text-3xl font-bold text-gray-900 mb-2 font-['Playfair_Display']">Được tìm kiếm nhiều nhất</h2>
             <p class="text-gray-600">Khám phá những chỗ nghỉ phổ biến nhất hiện nay</p>
           </div>
-          <router-link to="/listing" class="text-[#4A7055] font-medium hover:text-[#3b5a44] hidden sm:block">
+          <Link href="/listing" class="text-[#4A7055] font-medium hover:text-[#3b5a44] hidden sm:block">
             Xem tất cả &rarr;
-          </router-link>
+          </Link>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <RoomCard
@@ -175,13 +175,12 @@
             :type="room.type"
             :price="room.price"
             :imageUrl="room.imageUrl"
-            :status="room.status"
           />
         </div>
         <div class="mt-8 text-center sm:hidden">
-          <router-link to="/listing" class="text-[#4A7055] font-medium hover:text-[#3b5a44]">
+          <Link href="/listing" class="text-[#4A7055] font-medium hover:text-[#3b5a44]">
             Xem tất cả &rarr;
-          </router-link>
+          </Link>
         </div>
       </div>
     </section>
@@ -191,7 +190,7 @@
         <h2 class="text-3xl font-bold text-gray-900 mb-10 text-center font-['Playfair_Display']">Loại chỗ nghỉ của bạn</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-          <router-link to="/listing?type=house" class="group relative rounded-2xl overflow-hidden h-80 shadow-md">
+          <Link href="/listing#house-section" class="group relative rounded-2xl overflow-hidden h-80 shadow-md">
             <img
               src="https://picsum.photos/seed/fullhouse/800/600"
               alt="Full House"
@@ -202,9 +201,9 @@
               <h3 class="text-3xl font-bold text-white mb-2">Full House</h3>
               <p class="text-white/90">Trải nghiệm không gian riêng tư trọn vẹn</p>
             </div>
-          </router-link>
+          </Link>
 
-          <router-link to="/listing?type=room" class="group relative rounded-2xl overflow-hidden h-80 shadow-md">
+          <Link href="/listing#room-section" class="group relative rounded-2xl overflow-hidden h-80 shadow-md">
             <img
               src="https://picsum.photos/seed/roomtype/800/600"
               alt="Room"
@@ -215,7 +214,7 @@
               <h3 class="text-3xl font-bold text-white mb-2">Phòng riêng</h3>
               <p class="text-white/90">Tiết kiệm chi phí, tiện nghi đầy đủ</p>
             </div>
-          </router-link>
+          </Link>
 
         </div>
       </div>
@@ -249,12 +248,12 @@
                 <span class="text-gray-800 font-medium">Thanh toán an toàn, uy tín</span>
               </li>
             </ul>
-            <router-link 
-              to="/about" 
+            <Link 
+              href="/about" 
               class="inline-block bg-[#4A7055] text-white px-8 py-3 rounded-full font-bold hover:bg-[#3b5a44] transition-colors shadow-md"
             >
               Tìm hiểu thêm
-            </router-link>
+            </Link>
           </div>
           <div class="relative">
             <div class="aspect-square rounded-3xl overflow-hidden shadow-xl border-4 border-white">
@@ -302,65 +301,67 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, onUnmounted } from 'vue'; // Cần import thêm onMounted, onUnmounted
+import { Link, router } from '@inertiajs/vue3';
 import { Search, MapPin, Calendar, Users, Home as HomeIcon, Star, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-vue-next';
-import RoomCard from '../components/RoomCard.vue'; 
+import RoomCard from '../Components/RoomCard.vue'; 
 
-const router = useRouter();
-
-interface Room {
-  id: string;
-  title: string;
-  location: string;
-  type: string;
-  price: string;
-  imageUrl: string;
-  status: string;
-}
-
+// --- QUẢN LÝ SLIDER ẢNH ---
 const bannerImages = [
   'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2070&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1502672260266-1c1de2d9d0cb?q=80&w=2080&auto=format&fit=crop'
 ];
 const currentSlide = ref(0);
-let slideInterval: ReturnType<typeof setInterval> | null = null;
+let slideInterval: any = null;
 
+// Chuyển ảnh tiếp theo
 const nextSlide = () => {
   currentSlide.value = (currentSlide.value + 1) % bannerImages.length;
-  resetInterval();
+  resetInterval(); // Reset lại thời gian nếu người dùng tự bấm
 };
 
+// Chuyển ảnh trước đó
 const prevSlide = () => {
   currentSlide.value = (currentSlide.value - 1 + bannerImages.length) % bannerImages.length;
   resetInterval();
 };
 
+// Đi tới ảnh cụ thể khi bấm dấu chấm
 const goToSlide = (index: number) => {
   currentSlide.value = index;
   resetInterval();
 };
 
+// Khởi tạo vòng lặp tự động chuyển ảnh
 const startInterval = () => {
   slideInterval = setInterval(() => {
     currentSlide.value = (currentSlide.value + 1) % bannerImages.length;
-  }, 4000);
+  }, 4000); // 4000 = 4 giây chuyển ảnh 1 lần
 };
 
+// Đặt lại thời gian
 const resetInterval = () => {
-  if (slideInterval) clearInterval(slideInterval);
+  clearInterval(slideInterval);
   startInterval();
 };
 
-onUnmounted(() => {
-  if (slideInterval) clearInterval(slideInterval);
+// Khi trang load lên thì bắt đầu tự động chạy slider
+onMounted(() => {
+  startInterval();
 });
 
+// Khi rời khỏi trang thì dọn dẹp để tránh lỗi bộ nhớ
+onUnmounted(() => {
+  clearInterval(slideInterval);
+});
+
+
+// --- QUẢN LÝ TÌM KIẾM (Đã có sẵn) ---
 const location = ref('');
 const checkIn = ref('');
 const checkOut = ref('');
-const guests = ref<string | number>('');
+const guests = ref('');
 const type = ref('');
 const activeDropdown = ref<string | null>(null);
 
@@ -395,57 +396,17 @@ const selectType = (selectedType: string) => {
 };
 
 const handleSearch = () => {
-  router.push({
-    path: '/listing',
-    query: {
-      location: location.value,
-      type: type.value,
-      guests: guests.value,
-      checkIn: checkIn.value,
-      checkOut: checkOut.value
-    }
-  });
+  router.get('/listing');
 };
 
-const popularRooms = ref<Room[]>([]);
-
-onMounted(async () => {
-  startInterval(); 
-
-  try {
-    const response = await fetch('/api/rooms');
-    const data = await response.json();
-    
-    // Lọc an toàn: Kiểm tra is_visible (có thể là số 1, chuỗi "1" hoặc true)
-    const visibleRooms = data.filter((room: any) => 
-        room.status !== 'hidden' && 
-        (room.is_visible == 1 || room.is_visible === true)
-    ); 
-
-    popularRooms.value = visibleRooms.map((room: any) => {
-      // Logic lấy ảnh CỰC KỲ CHẮC CHẮN
-      let thumb = 'https://picsum.photos/seed/room/800/600';
-      if (room.images && room.images.length > 0) {
-          thumb = room.images[0].image_url;
-      } else if (room.image_url) {
-          thumb = room.image_url;
-      }
-
-      return {
-        id: String(room.id),
-        title: room.title,
-        location: room.location,
-        type: room.type === 'room' ? 'Phòng riêng' : 'Nguyên căn', // Gom chung villa vào Nguyên căn
-        price: Number(room.price).toLocaleString('vi-VN') + ' VNĐ/đêm', 
-        imageUrl: thumb, 
-        status: room.status
-      };
-    }).slice(0, 6); 
-    
-  } catch (error) {
-    console.error('Lỗi khi tải dữ liệu trang chủ:', error);
-  }
-});
+const popularRooms = [
+  { id: '1', title: 'Phòng Mơ Màng, Số 10 Núi Thành', location: 'Quận Cẩm Lệ, TP. Đà Nẵng', type: 'Phòng', price: '120.000đ', imageUrl: 'https://picsum.photos/seed/room1/800/600' },
+  { id: '2', title: 'Phòng Mơ Màng, Số 10 Núi Thành', location: 'Quận Cẩm Lệ, TP. Đà Nẵng', type: 'Phòng', price: '120.000đ', imageUrl: 'https://picsum.photos/seed/room2/800/600' },
+  { id: '3', title: 'Phòng Mơ Màng, Số 10 Núi Thành', location: 'Quận Cẩm Lệ, TP. Đà Nẵng', type: 'Phòng', price: '120.000đ', imageUrl: 'https://picsum.photos/seed/room3/800/600' },
+  { id: '4', title: 'Phòng Mơ Màng, Số 10 Núi Thành', location: 'Quận Cẩm Lệ, TP. Đà Nẵng', type: 'Phòng', price: '120.000đ', imageUrl: 'https://picsum.photos/seed/room4/800/600' },
+  { id: '5', title: 'Phòng Mơ Màng, Số 10 Núi Thành', location: 'Quận Cẩm Lệ, TP. Đà Nẵng', type: 'Phòng', price: '120.000đ', imageUrl: 'https://picsum.photos/seed/room5/800/600' },
+  { id: '6', title: 'Phòng Mơ Màng, Số 10 Núi Thành', location: 'Quận Cẩm Lệ, TP. Đà Nẵng', type: 'Phòng', price: '120.000đ', imageUrl: 'https://picsum.photos/seed/room6/800/600' },
+];
 </script>
 
 <style scoped>
@@ -463,12 +424,10 @@ onMounted(async () => {
 .hide-arrows::-webkit-outer-spin-button,
 .hide-arrows::-webkit-inner-spin-button {
   -webkit-appearance: none;
-  appearance: none;
   margin: 0;
 }
 .hide-arrows {
   -moz-appearance: textfield;
-  appearance: textfield;
 }
 
 .date-overlay::-webkit-calendar-picker-indicator {

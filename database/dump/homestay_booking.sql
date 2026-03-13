@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
@@ -7,10 +8,13 @@
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
+=======
+>>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
+<<<<<<< HEAD
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -20,22 +24,19 @@ SET time_zone = "+00:00";
 --
 -- Cơ sở dữ liệu: `homestay_booking`
 --
+=======
+-- Xóa database cũ bị lỗi và tạo lại cái mới sạch sẽ
+DROP DATABASE IF EXISTS `homestay_booking`;
+CREATE DATABASE IF NOT EXISTS `homestay_booking` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `homestay_booking`;
+>>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2
 
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `amenities`
---
-
 CREATE TABLE `amenities` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `icon` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Đang đổ dữ liệu cho bảng `amenities`
---
 
 INSERT INTO `amenities` (`id`, `name`, `icon`) VALUES
 (1, 'Wifi miễn phí', 'wifi'),
@@ -46,12 +47,7 @@ INSERT INTO `amenities` (`id`, `name`, `icon`) VALUES
 (6, 'Máy sấy tóc', 'wind'),
 (7, 'hieu', 'star');
 
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `bookings`
---
-
 CREATE TABLE `bookings` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `booking_code` varchar(255) NOT NULL,
@@ -77,12 +73,7 @@ INSERT INTO `bookings` (`id`, `booking_code`, `customer_name`, `customer_email`,
 (2, 'HD-69B38BA4645A8', 'Lan Anh', 'volananh2k4@gmail.com', '0945999305', '2', 7000000.00, 2100000.00, 'completed', NULL, 'bank', '2026-03-13 03:59:32', '2026-03-13 04:00:01'),
 (3, 'HD-69B38BF8ED5AB', 'Lan Anh', 'volananh2k4@gmail.com', '0945999305', '2', 7000000.00, 2100000.00, 'completed', NULL, 'bank', '2026-03-13 04:00:56', '2026-03-13 04:01:34');
 
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `failed_jobs`
---
-
 CREATE TABLE `failed_jobs` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `uuid` varchar(255) NOT NULL,
@@ -93,21 +84,12 @@ CREATE TABLE `failed_jobs` (
   `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `migrations`
---
-
 CREATE TABLE `migrations` (
   `id` int(10) UNSIGNED NOT NULL,
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `migrations`
---
 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (1, '2014_10_12_100000_create_password_resets_table', 1),
@@ -119,24 +101,14 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (9, '2026_03_11_143215_create_bookings_table', 5),
 (10, '2026_03_13_030243_add_paid_at_to_bookings_table', 5);
 
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `password_resets`
---
-
 CREATE TABLE `password_resets` (
   `email` varchar(255) NOT NULL,
   `token` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `personal_access_tokens`
---
-
 CREATE TABLE `personal_access_tokens` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `tokenable_type` varchar(255) NOT NULL,
@@ -149,10 +121,6 @@ CREATE TABLE `personal_access_tokens` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `personal_access_tokens`
---
 
 INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `name`, `token`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`) VALUES
 (1, 'App\\Models\\User', 1, 'auth_token', '849a6eefd02fab9ec956e83d28d176ce39a7c8aadcd15a94fcaf2a33f7443250', '[\"*\"]', NULL, NULL, '2026-03-09 03:22:51', '2026-03-09 03:22:51'),
@@ -208,12 +176,7 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (58, 'App\\Models\\User', 12, 'auth_token', '6e8f358d12debeff910f7b29701a3636cc3113e904f7e5c49c2e50ce58de391e', '[\"*\"]', NULL, NULL, '2026-03-13 03:59:45', '2026-03-13 03:59:45'),
 (59, 'App\\Models\\User', 15, 'auth_token', '5ae447b3f59abb4d60b4139c2c97807527aac7519441953887d5db3c885aa3b0', '[\"*\"]', NULL, NULL, '2026-03-13 04:00:41', '2026-03-13 04:00:41');
 
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `reviews`
---
-
 CREATE TABLE `reviews` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
@@ -223,12 +186,7 @@ CREATE TABLE `reviews` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `rooms`
---
-
 CREATE TABLE `rooms` (
   `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
@@ -242,10 +200,6 @@ CREATE TABLE `rooms` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Đang đổ dữ liệu cho bảng `rooms`
---
-
 INSERT INTO `rooms` (`id`, `title`, `location`, `type`, `price`, `max_guests`, `description`, `status`, `is_visible`, `created_at`) VALUES
 (4, 'Phòng hạnh phúc', 'Đà Nẵng , Hải Châu', 'house', 0.00, 4, NULL, 'booked', 1, '2026-03-08 18:48:32'),
 (5, 'phòng 1', 'Thanh Khê', 'house', 100000.00, 2, NULL, 'booked', 0, '2026-03-08 18:57:03'),
@@ -253,20 +207,11 @@ INSERT INTO `rooms` (`id`, `title`, `location`, `type`, `price`, `max_guests`, `
 (11, '1', '1', 'room', 100000.00, 2, NULL, 'booked', 1, '2026-03-10 17:52:30'),
 (12, '2', 'dsd', 'room', 7000000.00, 2, 'sach dep', 'booked', 1, '2026-03-11 13:45:48');
 
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `room_amenities`
---
-
 CREATE TABLE `room_amenities` (
   `room_id` int(11) NOT NULL,
   `amenity_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Đang đổ dữ liệu cho bảng `room_amenities`
---
 
 INSERT INTO `room_amenities` (`room_id`, `amenity_id`) VALUES
 (4, 2),
@@ -280,22 +225,13 @@ INSERT INTO `room_amenities` (`room_id`, `amenity_id`) VALUES
 (12, 5),
 (12, 6);
 
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `room_images`
---
-
 CREATE TABLE `room_images` (
   `id` int(11) NOT NULL,
   `room_id` int(11) NOT NULL,
   `image_url` varchar(255) NOT NULL,
   `is_primary` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Đang đổ dữ liệu cho bảng `room_images`
---
 
 INSERT INTO `room_images` (`id`, `room_id`, `image_url`, `is_primary`) VALUES
 (5, 4, '/storage/rooms/H13FB0FYqkD6GRFsZKOlHB3wb0J4dJebbWd8KbV4.png', 1),
@@ -311,12 +247,7 @@ INSERT INTO `room_images` (`id`, `room_id`, `image_url`, `is_primary`) VALUES
 (17, 11, '/storage/rooms/tPvbyK9p2a2Jzc8xiVrEZL5iNn3vGl43GzVWa3Wi.png', 1),
 (20, 12, '/storage/rooms/uSiTxpZLTOzhjikRQnYLb33Cu18VHkTPQf1NTglm.jpg', 1);
 
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `users`
---
-
 CREATE TABLE `users` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -331,10 +262,6 @@ CREATE TABLE `users` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Đang đổ dữ liệu cho bảng `users`
---
-
 INSERT INTO `users` (`id`, `name`, `email`, `role`, `status`, `phone`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
 (9, 'votronghieu1', 'tronghieuvo9@gmail.com', 'customer', 'active', '0906123931', NULL, '$2y$10$dJi7w3tzWfOIhT/U/kFjaeH35x.E1mBNt9696UisqLztctVQkfKx.', NULL, '2026-03-09 04:21:29', '2026-03-09 10:35:00'),
 (12, 'admin', 'admin@gmail.com', 'admin', 'active', '1', NULL, '$2y$10$9VuzbFvDsHTLldawJA5SoucTImooB9VsjISTMpUmeyt/wYrQ/U0Z6', NULL, '2026-03-09 04:46:24', '2026-03-09 04:46:24'),
@@ -342,144 +269,101 @@ INSERT INTO `users` (`id`, `name`, `email`, `role`, `status`, `phone`, `email_ve
 (14, 'anh ngu', 'anh@gmail.com', 'customer', 'active', '0906123333', NULL, '$2y$10$.VidHnEsUZhC4LiuP7qFcO3rWYBjYjjooNxF85AUYJ02m2kw9Rs0C', NULL, '2026-03-11 06:13:35', '2026-03-11 06:14:01'),
 (15, 'Lan Anh', 'volananh2k4@gmail.com', 'customer', 'active', '0945999305', NULL, '$2y$10$OP9qeiy8GykRTZj8PUs4YevbDc6otBLYZauesw3sLl.VqTkNRMDOq', NULL, '2026-03-11 07:55:59', '2026-03-11 08:23:00');
 
---
--- Chỉ mục cho các bảng đã đổ
---
-
---
 -- Chỉ mục cho bảng `amenities`
---
 ALTER TABLE `amenities`
   ADD PRIMARY KEY (`id`);
 
---
 -- Chỉ mục cho bảng `bookings`
---
 ALTER TABLE `bookings`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `bookings_booking_code_unique` (`booking_code`);
 
---
 -- Chỉ mục cho bảng `failed_jobs`
---
 ALTER TABLE `failed_jobs`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
 
---
 -- Chỉ mục cho bảng `migrations`
---
 ALTER TABLE `migrations`
   ADD PRIMARY KEY (`id`);
 
---
 -- Chỉ mục cho bảng `password_resets`
---
 ALTER TABLE `password_resets`
   ADD PRIMARY KEY (`email`);
 
---
 -- Chỉ mục cho bảng `personal_access_tokens`
---
 ALTER TABLE `personal_access_tokens`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
   ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`);
 
---
 -- Chỉ mục cho bảng `reviews`
---
 ALTER TABLE `reviews`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`),
   ADD KEY `room_id` (`room_id`);
 
---
 -- Chỉ mục cho bảng `rooms`
---
 ALTER TABLE `rooms`
   ADD PRIMARY KEY (`id`);
 
---
 -- Chỉ mục cho bảng `room_amenities`
---
 ALTER TABLE `room_amenities`
   ADD PRIMARY KEY (`room_id`,`amenity_id`),
   ADD KEY `amenity_id` (`amenity_id`);
 
---
 -- Chỉ mục cho bảng `room_images`
---
 ALTER TABLE `room_images`
   ADD PRIMARY KEY (`id`),
   ADD KEY `room_id` (`room_id`);
 
---
 -- Chỉ mục cho bảng `users`
---
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `users_email_unique` (`email`);
 
---
--- AUTO_INCREMENT cho các bảng đã đổ
---
-
---
 -- AUTO_INCREMENT cho bảng `amenities`
---
 ALTER TABLE `amenities`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
---
 -- AUTO_INCREMENT cho bảng `bookings`
---
 ALTER TABLE `bookings`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
---
 -- AUTO_INCREMENT cho bảng `failed_jobs`
---
 ALTER TABLE `failed_jobs`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
---
 -- AUTO_INCREMENT cho bảng `migrations`
---
 ALTER TABLE `migrations`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
---
 -- AUTO_INCREMENT cho bảng `personal_access_tokens`
---
 ALTER TABLE `personal_access_tokens`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
---
 -- AUTO_INCREMENT cho bảng `reviews`
---
 ALTER TABLE `reviews`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
---
 -- AUTO_INCREMENT cho bảng `rooms`
---
 ALTER TABLE `rooms`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
---
 -- AUTO_INCREMENT cho bảng `room_images`
---
 ALTER TABLE `room_images`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
---
 -- AUTO_INCREMENT cho bảng `users`
---
 ALTER TABLE `users`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+<<<<<<< HEAD
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+=======
+
+COMMIT;
+>>>>>>> 5c00cb4170f0acfca4924e1975a0a699ee2fffe2

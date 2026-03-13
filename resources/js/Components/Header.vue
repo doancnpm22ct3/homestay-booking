@@ -3,32 +3,32 @@
     <div class="max-w-[1440px] mx-auto px-10 h-20 flex items-center justify-between">
       
       <div class="flex items-center">
-        <router-link to="/" class="text-4xl font-extrabold text-black font-['Playfair_Display'] tracking-widest">
+        <Link href="/" class="text-4xl font-extrabold text-black font-['Playfair_Display'] tracking-widest">
           LOGO
-        </router-link>
+        </Link>
       </div>
 
-      <div v-if="!user" class="hidden md:flex items-center space-x-4">
-        <router-link 
-          to="/register" 
+      <div v-if="!isLoggedIn" class="hidden md:flex items-center space-x-4">
+        <Link 
+          href="/register" 
           class="bg-[#4A7055] text-white px-6 py-2.5 rounded-md font-medium font-['Inter'] text-sm hover:bg-[#3b5a44] transition-colors shadow-sm"
         >
           Đăng kí
-        </router-link>
+        </Link>
         
-        <router-link
-          to="/login"
+        <Link
+          href="/login"
           class="bg-[#4A7055] text-white px-6 py-2.5 rounded-md font-medium font-['Inter'] text-sm hover:bg-[#3b5a44] transition-colors shadow-sm"
         >
           Đăng nhập
-        </router-link>
+        </Link>
       </div>
 
       <div v-else class="hidden md:flex items-center space-x-6 relative">
         
-        <div @click="router.push('/profile')" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+        <div @click="router.get('/profile')" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
           <div class="text-right">
-            <div class="font-bold text-gray-900 font-['Inter'] text-sm">{{ user.name }}</div>
+            <div class="font-bold text-gray-900 font-['Inter'] text-sm">Death Pool</div>
             <div class="text-xs text-gray-500 font-['Inter']">Đà Nẵng, Việt Nam</div>
           </div>
           <img src="https://i.pravatar.cc/150?img=11" alt="Avatar" class="w-10 h-10 rounded-full border border-[#4A7055] object-cover" />
@@ -94,49 +94,25 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { Link, router } from '@inertiajs/vue3';
 import { Menu, Bell, LogOut } from 'lucide-vue-next';
 
-// 1. Định nghĩa Interface cho User để Typescript hiểu cấu trúc dữ liệu
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role?: string;
-  status?: string;
-  phone?: string | null;
-}
+// Trạng thái đăng nhập
+const isLoggedIn = ref(false);
 
-const router = useRouter();
-
-// 2. Khai báo biến user sử dụng Interface đã định nghĩa
-const user = ref<User | null>(null);
+// Trạng thái bật/tắt dialog thông báo
 const showNotifications = ref(false);
 
 onMounted(() => {
-  checkLoginStatus();
+  // Ghi chú nhỏ: Sau này team Backend sẽ bỏ localStorage và dùng session của Laravel, 
+  // nhưng hiện tại dùng cái này để bạn test giao diện vẫn rất OK!
+  isLoggedIn.value = localStorage.getItem('isLoggedIn') === 'true';
 });
 
-const checkLoginStatus = () => {
-  const userInfo = localStorage.getItem('user_info');
-  if (userInfo) {
-    user.value = JSON.parse(userInfo) as User; // Ép kiểu dữ liệu khi parse JSON
-  }
-};
-
 const handleLogout = () => {
-  // Xóa token và thông tin user khỏi localStorage
-  localStorage.removeItem('auth_token');
-  localStorage.removeItem('user_info');
-
-  // Reset state
-  user.value = null;
-  showNotifications.value = false;
-
-  alert('Đã đăng xuất thành công!');
-  router.push('/login');
-  
-  // Force reload để xóa triệt để cache/state cũ nếu cần thiết
-  window.location.reload();
+  localStorage.removeItem('isLoggedIn');
+  isLoggedIn.value = false;
+  showNotifications.value = false; 
+  router.get('/login'); // Inertia thay vì window.location
 };
 </script>

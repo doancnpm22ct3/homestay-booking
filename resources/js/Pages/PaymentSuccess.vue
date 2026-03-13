@@ -3,7 +3,6 @@
     <div class="flex-grow flex items-center justify-center py-12">
       <div class="max-w-3xl w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-          
           <div class="bg-[#4A7055]/5 p-8 text-center border-b border-[#4A7055]/10">
             <div class="w-20 h-20 bg-[#4A7055]/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle class="w-10 h-10 text-[#4A7055]" />
@@ -41,22 +40,23 @@
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-              <router-link to="/profile" class="bg-[#4A7055] hover:bg-[#3b5a44] text-white px-8 py-3.5 rounded-xl font-bold text-center transition-colors shadow-sm">
+              <Link href="/profile" class="bg-[#4A7055] hover:bg-[#3b5a44] text-white px-8 py-3.5 rounded-xl font-bold text-center transition-colors shadow-sm">
                 Xem hóa đơn
-              </router-link>
-              <router-link to="/" class="bg-white border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 px-8 py-3.5 rounded-xl font-bold text-center transition-colors">
+              </Link>
+              <Link href="/" class="bg-white border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 px-8 py-3.5 rounded-xl font-bold text-center transition-colors">
                 Trang chủ
-              </router-link>
+              </Link>
             </div>
           </div>
-
         </div>
       </div>
     </div>
+    
   </div>
 </template>
 
 <script setup lang="ts">
+import { Link } from '@inertiajs/vue3';
 import { CheckCircle } from 'lucide-vue-next';
-// Đã xóa import { Link } từ Inertia và Footer.vue (nếu cấu trúc Layout cha đã bao bọc sẵn)
+import Footer from '../Components/Footer.vue'; 
 </script>

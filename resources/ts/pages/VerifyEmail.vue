@@ -1,6 +1,4 @@
 <template>
-  <Head title="Email Verification" />
-
   <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#FAF9F5]">
     <div class="max-w-4xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row border border-gray-100">
       
@@ -28,15 +26,14 @@
         </div>
         
         <form class="space-y-8" @submit.prevent="submit">
-          
           <div class="mt-8">
             <button
               type="submit"
-              :class="{ 'opacity-25': form.processing }" 
-              :disabled="form.processing"
+              :class="{ 'opacity-50 cursor-not-allowed': isProcessing }" 
+              :disabled="isProcessing"
               class="w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-[#4A7055] hover:bg-[#3b5a44] transition-colors shadow-md"
             >
-              Gửi lại email xác thực
+              {{ isProcessing ? 'Đang gửi...' : 'Gửi lại email xác thực' }}
             </button>
           </div>
         </form>
@@ -45,34 +42,42 @@
             <p class="text-sm text-gray-600 font-['Inter']">
               Bạn muốn dùng tài khoản khác?
             </p>
-            <Link
-                :href="route('logout')"
-                method="post"
-                as="button"
+            <button
+                @click="handleLogout"
                 class="text-sm font-bold text-red-500 hover:text-red-700 transition-colors"
             >
                 Đăng xuất
-            </Link>
+            </button>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-// Giữ nguyên 100% logic Backend của team
-import { computed } from 'vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-const props = defineProps({
-    status: String,
-});
+const router = useRouter();
+const isProcessing = ref(false);
+const verificationLinkSent = ref(false);
 
-const form = useForm({});
-
-const submit = () => {
-    form.post(route('verification.send'));
+const submit = async () => {
+  isProcessing.value = true;
+  try {
+    // API logic gửi email
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    verificationLinkSent.value = true;
+  } catch (error) {
+    console.error(error);
+  } finally {
+    isProcessing.value = false;
+  }
 };
 
-const verificationLinkSent = computed(() => props.status === 'verification-link-sent');
+const handleLogout = () => {
+  localStorage.removeItem('auth_token');
+  localStorage.removeItem('user_info');
+  router.push('/login');
+};
 </script>

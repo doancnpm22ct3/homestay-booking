@@ -11,17 +11,17 @@
             <p class="text-lg text-gray-700 mb-8 font-['Inter']">
               Săn ngay ưu đãi giảm đến 30% cho các homestay view biển đẹp nhất tháng này.
             </p>
-            <button class="bg-[#4A7055] hover:bg-[#3b5a44] text-white px-8 py-3.5 rounded-lg font-medium transition-colors shadow-md">
+            <button class="bg-[#4A7055] hover:bg-[#3b5a44] text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md">
               Đặt phòng ngay
             </button>
           </div>
 
           <div class="flex-1 w-full relative group overflow-hidden rounded-tl-[100px] rounded-br-[100px] shadow-xl h-[400px]">
             <transition name="fade" mode="out-in">
-              <img 
+              <img
                 :key="currentSlide"
-                :src="bannerImages[currentSlide]" 
-                alt="Homestay"
+                :src="bannerImages[currentSlide]"
+                alt="Homestay Banner"
                 class="w-full h-full object-cover"
               />
             </transition>
@@ -121,7 +121,7 @@
             </button>
             <div v-if="activeDropdown === 'type'" class="absolute top-full left-0 mt-4 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
               <div class="flex flex-col">
-                <button @click="selectType('Phòng riêng')" class="text-left px-5 py-3 hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors border-b border-gray-50">Phòng riêng</button>
+                <button @click="selectType('Phòng')" class="text-left px-5 py-3 hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors border-b border-gray-50">Phòng</button>
                 <button @click="selectType('Nguyên căn')" class="text-left px-5 py-3 hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors">Nguyên căn</button>
               </div>
             </div>
@@ -149,18 +149,17 @@
     </section>
 
     <div id="room-list-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow scroll-mt-32">
-      
-      <div v-if="isSearching" class="mb-16">
-        <div class="flex justify-between items-end mb-8">
+      <div class="mb-16">
+        <div class="flex justify-between items-end mb-6">
           <div>
             <h2 class="text-3xl font-bold text-gray-900 font-['Playfair_Display']">
-              Kết quả tìm kiếm ({{ filteredRooms.length }})
+              {{ isSearching ? `Kết quả tìm kiếm (${filteredRooms.length})` : 'Được tìm kiếm nhiều nhất' }}
             </h2>
-            <p class="text-sm text-[#4A7055] mt-1 font-medium">
-              {{ location || 'Mọi nơi' }} <span v-if="type">• {{ type }}</span> <span v-if="guests">• {{ guests }} khách</span>
+            <p v-if="isSearching" class="text-sm text-[#4A7055] mt-1 font-medium">
+              {{ location || 'Đà Nẵng' }} <span v-if="type">• {{ type }}</span> <span v-if="guests">• {{ guests }} khách</span>
             </p>
           </div>
-          <button @click="resetSearch" class="text-sm text-gray-500 hover:text-[#4A7055] font-medium underline">
+          <button v-if="isSearching" @click="resetSearch" class="text-sm text-gray-500 hover:text-[#4A7055] font-medium underline">
             Xóa bộ lọc
           </button>
         </div>
@@ -172,120 +171,42 @@
         </div>
 
         <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <RoomCard 
-            v-for="room in filteredRooms" 
-            :key="room.id" 
-            :id="room.id" 
-            :title="room.title" 
-            :location="room.location" 
-            :type="room.type" 
-            :price="room.price" 
-            :imageUrl="room.imageUrl" 
-            :status="room.status"
-          />
+          <RoomCard v-for="(room, index) in filteredRooms" :key="index" :id="room.id" :title="room.title" :location="room.location" :type="room.type" :price="room.price" :imageUrl="room.imageUrl" />
         </div>
       </div>
 
-      <div v-else>
-        
-        <div class="mb-20" v-if="popularRooms.length > 0">
-          <div class="flex justify-between items-end mb-8">
-            <div>
-              <h2 class="text-3xl font-bold text-gray-900 font-['Playfair_Display'] mb-2">Được tìm kiếm nhiều nhất</h2>
-              <p class="text-gray-600 font-medium">Khám phá những chỗ nghỉ phổ biến nhất hiện nay</p>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <RoomCard 
-              v-for="(room, index) in popularRooms" 
-              :key="'pop-'+index" 
-              :id="room.id" 
-              :title="room.title" 
-              :location="room.location" 
-              :type="room.type" 
-              :price="room.price" 
-              :imageUrl="room.imageUrl" 
-              :status="room.status"
-            />
-          </div>
+      <div class="mb-16" v-if="!isSearching || type === 'Nguyên căn'">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 font-['Playfair_Display']">Homestay Nguyên căn</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <RoomCard v-for="room in houseRooms" :key="room.id" :id="room.id" :title="room.title" :location="room.location" :type="room.type" :price="room.price" :imageUrl="room.imageUrl" />
         </div>
+      </div>
 
-        <div class="mb-20" v-if="houseRooms.length > 0">
-          <div class="flex justify-between items-end mb-8">
-            <div>
-              <h2 class="text-3xl font-bold text-gray-900 font-['Playfair_Display'] mb-2">Homestay Nguyên căn</h2>
-              <p class="text-gray-600 font-medium">Không gian riêng tư, thoải mái trọn vẹn cho cả gia đình</p>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <RoomCard 
-              v-for="(room, index) in houseRooms" 
-              :key="'house-'+index" 
-              :id="room.id" 
-              :title="room.title" 
-              :location="room.location" 
-              :type="room.type" 
-              :price="room.price" 
-              :imageUrl="room.imageUrl" 
-              :status="room.status"
-            />
-          </div>
+      <div v-if="!isSearching || type === 'Phòng'">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 font-['Playfair_Display']">Homestay Phòng riêng</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <RoomCard v-for="room in privateRooms" :key="room.id" :id="room.id" :title="room.title" :location="room.location" :type="room.type" :price="room.price" :imageUrl="room.imageUrl" />
         </div>
-
-        <div class="mb-16" v-if="privateRooms.length > 0">
-          <div class="flex justify-between items-end mb-8">
-            <div>
-              <h2 class="text-3xl font-bold text-gray-900 font-['Playfair_Display'] mb-2">Homestay Phòng riêng</h2>
-              <p class="text-gray-600 font-medium">Tiết kiệm chi phí, lý tưởng cho cặp đôi hoặc du lịch một mình</p>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <RoomCard 
-              v-for="(room, index) in privateRooms" 
-              :key="'room-'+index" 
-              :id="room.id" 
-              :title="room.title" 
-              :location="room.location" 
-              :type="room.type" 
-              :price="room.price" 
-              :imageUrl="room.imageUrl" 
-              :status="room.status"
-            />
-          </div>
-        </div>
-
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+// ĐÃ SỬA: Import thêm onUnmounted để dọn dẹp slider khi rời trang
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { Link } from '@inertiajs/vue3'; 
 import { Search, MapPin, Calendar, Users, Home as HomeIcon, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-vue-next';
-import RoomCard from '../components/RoomCard.vue';
+import RoomCard from '@/Components/RoomCard.vue';
 
-interface Room {
-  id: string;
-  title: string;
-  location: string;
-  rawType: string;
-  type: string;
-  price: string;
-  imageUrl: string;
-  status: string;
-}
-
-const route = useRoute();
-const router = useRouter();
-
+// --- LOGIC SLIDER ẢNH (Bổ sung để làm cho banner chạy) ---
 const bannerImages = [
   'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2070&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1502672260266-1c1de2d9d0cb?q=80&w=2080&auto=format&fit=crop'
 ];
 const currentSlide = ref(0);
-let slideInterval: ReturnType<typeof setInterval> | null = null;
+let slideInterval: any = null;
 
 const nextSlide = () => {
   currentSlide.value = (currentSlide.value + 1) % bannerImages.length;
@@ -305,20 +226,23 @@ const goToSlide = (index: number) => {
 const startInterval = () => {
   slideInterval = setInterval(() => {
     currentSlide.value = (currentSlide.value + 1) % bannerImages.length;
-  }, 4000);
+  }, 4000); // 4 giây tự chuyển ảnh
 };
 
 const resetInterval = () => {
-  if (slideInterval) clearInterval(slideInterval);
+  clearInterval(slideInterval);
   startInterval();
 };
 
+
+// --- QUẢN LÝ TÌM KIẾM ---
 const location = ref('');
 const checkIn = ref('');
 const checkOut = ref('');
-const guests = ref<string | number>('');
+const guests = ref('');
 const type = ref('');
 const isSearching = ref(false);
+
 const activeDropdown = ref<string | null>(null);
 
 const formatDate = (dateStr: string) => {
@@ -326,6 +250,29 @@ const formatDate = (dateStr: string) => {
   const [year, month, day] = dateStr.split('-');
   return `${day}/${month}/${year}`;
 };
+
+
+// --- CHẠY KHI TRANG VỪA LOAD LÊN ---
+onMounted(() => {
+  // 1. Kích hoạt tự động chuyển ảnh Banner
+  startInterval();
+
+  // 2. Kích hoạt hiệu ứng trượt mượt nếu bấm từ Home sang
+  if (window.location.hash === '#room-list-section') {
+    setTimeout(() => {
+      const section = document.getElementById('room-list-section');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 150);
+  }
+});
+
+// Khi rời trang thì tắt vòng lặp ảnh để web không bị nặng
+onUnmounted(() => {
+  clearInterval(slideInterval);
+});
+
 
 const daNangDistricts = [
   'Quận Hải Châu, Đà Nẵng',
@@ -351,123 +298,28 @@ const selectType = (selectedType: string) => {
   activeDropdown.value = null;
 };
 
-const allRooms = ref<Room[]>([]);
-const filteredRooms = ref<Room[]>([]); 
+const mockDatabase = [
+  { id: '1', title: 'Căn hộ Cẩm Lệ View Phố', location: 'Quận Cẩm Lệ, Đà Nẵng', type: 'Phòng', price: '120.000đ', imageUrl: 'https://picsum.photos/seed/dn1/800/600' },
+  { id: '2', title: 'Villa Biển Mỹ Khê', location: 'Quận Sơn Trà, Đà Nẵng', type: 'Nguyên căn', price: '1.200.000đ', imageUrl: 'https://picsum.photos/seed/dn2/800/600' },
+  { id: '3', title: 'Studio Trung Tâm Hải Châu', location: 'Quận Hải Châu, Đà Nẵng', type: 'Phòng', price: '350.000đ', imageUrl: 'https://picsum.photos/seed/dn3/800/600' },
+  { id: '4', title: 'Homestay Gần Cầu Rồng', location: 'Quận Sơn Trà, Đà Nẵng', type: 'Phòng', price: '250.000đ', imageUrl: 'https://picsum.photos/seed/dn4/800/600' },
+  { id: '5', title: 'Biệt thự Ngũ Hành Sơn', location: 'Quận Ngũ Hành Sơn, Đà Nẵng', type: 'Nguyên căn', price: '2.500.000đ', imageUrl: 'https://picsum.photos/seed/dn5/800/600' },
+  { id: '6', title: 'Nhà Vườn Hòa Vang', location: 'Huyện Hòa Vang, Đà Nẵng', type: 'Nguyên căn', price: '800.000đ', imageUrl: 'https://picsum.photos/seed/dn6/800/600' },
+];
 
-// --- THUẬT TOÁN ĐẢM BẢO LUÔN CÓ ĐỦ 6 THẺ (Dùng để test UI) ---
-const fillToSix = (arr: Room[]) => {
-  if (arr.length === 0) return [];
-  let result = [...arr];
-  // Nhân bản mảng cho đến khi lớn hơn hoặc bằng 6
-  while (result.length < 6) {
-    result = result.concat(arr);
-  }
-  // Cắt đúng 6 cái đầu tiên
-  return result.slice(0, 6);
-};
+const filteredRooms = ref([...mockDatabase]); 
 
-// --- 3 MỤC DANH SÁCH (Đã áp dụng fillToSix để ép cứng 6 thẻ) ---
-const popularRooms = computed(() => {
-  return fillToSix(allRooms.value);
-});
-
-const houseRooms = computed(() => {
-  const houses = allRooms.value.filter(room => room.rawType === 'house');
-  return fillToSix(houses);
-});
-
-const privateRooms = computed(() => {
-  const rooms = allRooms.value.filter(room => room.rawType === 'room');
-  return fillToSix(rooms);
-});
-
-onMounted(async () => {
-  startInterval();
-
-  try {
-    const response = await fetch('/api/rooms');
-    const data = await response.json();
-    
-    const visibleRooms = data.filter((room: any) => 
-        room.status !== 'hidden' && 
-        (room.is_visible == 1 || room.is_visible === true)
-    );
-    
-    allRooms.value = visibleRooms.map((room: any) => {
-      let thumb = 'https://picsum.photos/seed/room/800/600';
-      if (room.images && room.images.length > 0) {
-          thumb = room.images[0].image_url;
-      } else if (room.image_url) {
-          thumb = room.image_url;
-      }
-
-      let rawType = room.type;
-      if (rawType !== 'room' && rawType !== 'house') {
-          rawType = 'house'; 
-      }
-
-      return {
-        id: String(room.id),
-        title: room.title,
-        location: room.location,
-        rawType: rawType, 
-        type: rawType === 'house' ? 'Nguyên căn' : 'Phòng riêng',
-        price: Number(room.price).toLocaleString('vi-VN') + ' VNĐ/đêm',
-        imageUrl: thumb,
-        status: room.status
-      };
-    });
-
-    if (route.query.location || route.query.type || route.query.guests) {
-      location.value = (route.query.location as string) || '';
-      
-      if (route.query.type === 'house') type.value = 'Nguyên căn';
-      else if (route.query.type === 'room') type.value = 'Phòng riêng';
-      else type.value = (route.query.type as string) || '';
-
-      guests.value = (route.query.guests as string) || '';
-      checkIn.value = (route.query.checkIn as string) || '';
-      checkOut.value = (route.query.checkOut as string) || '';
-      
-      executeSearch();
-    } else {
-      filteredRooms.value = [...allRooms.value];
-    }
-
-  } catch (error) {
-    console.error('Lỗi khi tải danh sách phòng:', error);
-  }
-
-  if (route.hash === '#room-list-section') {
-    setTimeout(() => {
-      const section = document.getElementById('room-list-section');
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 300); 
-  }
-});
-
-onUnmounted(() => {
-  if (slideInterval) clearInterval(slideInterval);
-});
+const houseRooms = computed(() => mockDatabase.filter(r => r.type === 'Nguyên căn'));
+const privateRooms = computed(() => mockDatabase.filter(r => r.type === 'Phòng'));
 
 const executeSearch = () => {
   isSearching.value = true;
   activeDropdown.value = null; 
 
-  filteredRooms.value = allRooms.value.filter(room => {
-    const matchLocation = location.value === '' || room.location.includes(location.value);
+  filteredRooms.value = mockDatabase.filter(room => {
+    const matchLocation = location.value === '' || room.location === location.value;
     const matchType = type.value === '' || room.type === type.value;
     return matchLocation && matchType;
-  });
-
-  router.replace({
-    query: {
-      location: location.value || undefined,
-      type: type.value === 'Nguyên căn' ? 'house' : (type.value === 'Phòng riêng' ? 'room' : undefined),
-      guests: guests.value ? String(guests.value) : undefined
-    }
   });
 };
 
@@ -478,13 +330,12 @@ const resetSearch = () => {
   guests.value = '';
   type.value = '';
   isSearching.value = false;
-  filteredRooms.value = [...allRooms.value];
-  
-  router.replace({ query: {} }); 
+  filteredRooms.value = [...mockDatabase];
 };
 </script>
 
 <style scoped>
+/* CSS CHO BANNER TRƯỢT ẢNH MƯỢT MÀ */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s ease;
@@ -494,17 +345,17 @@ const resetSearch = () => {
   opacity: 0;
 }
 
+/* Ẩn icon tăng giảm số lượng */
 .hide-arrows::-webkit-outer-spin-button,
 .hide-arrows::-webkit-inner-spin-button {
   -webkit-appearance: none;
-  appearance: none;
   margin: 0;
 }
 .hide-arrows {
   -moz-appearance: textfield;
-  appearance: textfield;
 }
 
+/* ĐÂY LÀ ĐOẠN CSS MA THUẬT: Kéo giãn icon lịch bao phủ toàn bộ vùng chọn */
 .date-overlay::-webkit-calendar-picker-indicator {
   position: absolute;
   top: 0;
@@ -514,6 +365,6 @@ const resetSearch = () => {
   margin: 0;
   padding: 0;
   cursor: pointer;
-  opacity: 0; 
+  opacity: 0; /* Giữ nó trong suốt nhưng vẫn bấm được */
 }
 </style>

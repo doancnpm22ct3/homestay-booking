@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homestay Booking</title>
 
-    @vite(['resources/ts/main.ts'])
+    @vite(['resources/ts/index.css', 'resources/ts/main.ts'])
 </head>
 
 <body>

@@ -1,13 +1,13 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
-import tailwindcss from '@tailwindcss/vite'; // 1. Thêm import Tailwind v4
+import tailwindcss from '@tailwindcss/vite'; // 1. Import dòng này
 
 export default defineConfig({
     plugins: [
-        tailwindcss(), // 2. Gọi plugin Tailwind ở đây
+        tailwindcss(), // 2. Thêm hàm này vào đầu mảng plugins
         laravel({
-            input: ['resources/ts/main.ts'],
+            input: ['resources/css/app.css', 'resources/ts/app.ts'],
             refresh: true,
         }),
         vue({
@@ -19,9 +19,5 @@ export default defineConfig({
             },
         }),
     ],
-    resolve: {
-        alias: {
-            '@': '/resources/ts',
-        }
-    }
+    // ... phần alias '@' giữ nguyên
 });

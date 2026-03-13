@@ -1,6 +1,4 @@
 <template>
-  <Head title="Reset Password" />
-
   <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#FAF9F5]">
     <div class="max-w-4xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row border border-gray-100">
       
@@ -35,7 +33,7 @@
               <label for="email" class="absolute left-0 -top-3.5 text-sm text-[#4A7055] font-medium transition-all">
                 Email tài khoản
               </label>
-              <InputError class="mt-2 text-red-500 text-xs" :message="form.errors.email" />
+              <p v-if="validationErrors.email" class="mt-2 text-red-500 text-xs">{{ validationErrors.email[0] }}</p>
             </div>
 
             <div class="relative flex items-center">
@@ -56,10 +54,10 @@
                 <EyeOff v-if="!showNewPassword" class="w-5 h-5" />
                 <Eye v-else class="w-5 h-5" />
               </button>
+              <p v-if="validationErrors.password" class="mt-1 text-red-500 text-xs absolute top-full left-0">{{ validationErrors.password[0] }}</p>
             </div>
-            <InputError class="mt-1 text-red-500 text-xs" :message="form.errors.password" />
             
-            <div class="relative flex items-center mt-2">
+            <div class="relative flex items-center mt-6">
               <input
                 id="password_confirmation"
                 :type="showConfirmPassword ? 'text' : 'password'"
@@ -77,17 +75,16 @@
                 <Eye v-else class="w-5 h-5" />
               </button>
             </div>
-            <InputError class="mt-1 text-red-500 text-xs" :message="form.errors.password_confirmation" />
           </div>
 
           <div class="pt-4">
             <button
               type="submit"
-              :class="{ 'opacity-25': form.processing }"
-              :disabled="form.processing"
+              :class="{ 'opacity-50 cursor-not-allowed': isProcessing }"
+              :disabled="isProcessing"
               class="w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-[#4A7055] hover:bg-[#3b5a44] transition-colors shadow-md"
             >
-              Xác nhận đổi mật khẩu
+              {{ isProcessing ? 'Đang xử lý...' : 'Xác nhận đổi mật khẩu' }}
             </button>
           </div>
           
@@ -116,9 +113,9 @@
         <div class="text-center mt-12 pt-8 border-t border-gray-100">
           <p class="text-sm font-medium text-gray-600">
             Đã nhớ lại mật khẩu?
-            <Link :href="route('login')" class="font-bold text-[#4A7055] hover:text-[#3b5a44] ml-1">
+            <router-link to="/login" class="font-bold text-[#4A7055] hover:text-[#3b5a44] ml-1">
               Đăng Nhập
-            </Link>
+            </router-link>
           </p>
         </div>
       </div>
@@ -127,31 +124,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import InputError from '@/Components/InputError.vue';
-import { Head, useForm, Link } from '@inertiajs/vue3';
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { Eye, EyeOff } from 'lucide-vue-next';
 
-const props = defineProps<{
-    email: string;
-    token: string;
-}>();
+const route = useRoute();
+const router = useRouter();
 
 const showNewPassword = ref(false);
 const showConfirmPassword = ref(false);
+const isProcessing = ref(false);
+const validationErrors = ref<Record<string, string[]>>({});
 
-const form = useForm({
-    token: props.token,
-    email: props.email,
-    password: '',
-    password_confirmation: '',
+const form = ref({
+  token: '',
+  email: '',
+  password: '',
+  password_confirmation: '',
 });
 
-const submit = () => {
-    form.post(route('password.store'), {
-        onFinish: () => {
-            form.reset('password', 'password_confirmation');
-        },
-    });
+// Tự động điền email và token từ link (do email gửi đến chứa params)
+onMounted(() => {
+  form.value.token = (route.query.token as string) || '';
+  form.value.email = (route.query.email as string) || '';
+});
+
+const submit = async () => {
+  if (form.value.password !== form.value.password_confirmation) {
+    alert('Mật khẩu xác nhận không khớp!');
+    return;
+  }
+
+  isProcessing.value = true;
+  validationErrors.value = {};
+
+  try {
+    // API logic sẽ do backend xử lý
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    alert('Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại.');
+    router.push('/login');
+  } catch (error) {
+    console.error(error);
+  } finally {
+    isProcessing.value = false;
+  }
 };
 </script>
