@@ -116,4 +116,5 @@ Route::prefix('admin')->group(function () {
     Route::get('/rooms/available',     [RoomAvailabilityController::class, 'available']);
     Route::get('/rooms/all-status',    [RoomAvailabilityController::class, 'allRooms']);
     Route::patch('/rooms/{id}/status', [RoomAvailabilityController::class, 'updateStatus']);
+    Route::patch('/rooms/{id}/toggle-maintenance', [RoomAvailabilityController::class, 'toggleMaintenance']);
 });

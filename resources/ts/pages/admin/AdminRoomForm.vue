@@ -34,11 +34,8 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái hiện tại</label>
             <select v-model="form.status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-white">
-              <option value="available">Trống / Sẵn sàng đón khách</option>
-              <option value="booked">Đã đặt cọc / Chờ check-in</option>
-              <option value="in_use">Đang có khách sử dụng</option>
-              <option value="maintenance">Đang dọn dẹp / Bảo trì</option>
-              <option value="hidden">Tạm ẩn phòng này</option>
+              <option value="available">Sẵn sàng đón khách</option>
+              <option value="maintenance">Bảo trì / Đóng phòng</option>
             </select>
           </div>
           <div>
@@ -48,6 +45,10 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Số khách tối đa</label>
             <input v-model="form.max_guests" type="number" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Số lượng giường</label>
+            <input v-model="form.beds" type="number" readonly class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed" />
           </div>
           
           <div class="md:col-span-2 mt-2 bg-emerald-50 border border-emerald-100 p-4 rounded-lg flex items-center gap-3">
@@ -143,19 +144,29 @@ const availableAmenities = ref<any[]>([]);
 
 const form = ref({
   title: '', location: '', type: 'room', price: 0,
-  max_guests: 2, description: '', status: 'available',
+  max_guests: 2, beds: 1, description: '', status: 'available',
   is_visible: true,
   amenities: [] as number[],
 });
 
 const selectedFiles = ref<File[]>([]);
 const imagePreviews = ref<{url: string, isNew: boolean}[]>([]);
+
 // TỰ ĐỘNG CẬP NHẬT SỨC CHỨA THEO LOẠI PHÒNG
 watch(() => form.value.type, (newType) => {
   if (newType === 'house') {
     form.value.max_guests = 20; // Nếu chọn Nguyên căn -> Tự set 20 người
   } else if (newType === 'room' && form.value.max_guests === 20) {
     form.value.max_guests = 2;  // Nếu quay lại phòng riêng -> Tự trả về phòng nhỏ mặc định
+  }
+});
+
+// TỰ ĐỘNG CẬP NHẬT SỐ GIƯỜNG THEO SỨC CHỨA
+watch(() => form.value.max_guests, (newGuests) => {
+  if (newGuests === 2) {
+    form.value.beds = 1;
+  } else if (newGuests === 4) {
+    form.value.beds = 2;
   }
 });
 onMounted(async () => {
@@ -188,6 +199,7 @@ onMounted(async () => {
       form.value.type = data.type || 'room';
       form.value.price = data.price || 0;
       form.value.max_guests = data.max_guests || 2;
+      form.value.beds = data.beds || 1;
       
       // XÓA TẬN GỐC LỖI HIỆN CHỮ "null"
       if (data.description === null || data.description === 'null' || data.description === 'undefined' || !data.description) {
@@ -270,6 +282,11 @@ const handleFileUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
   if (target.files) {
     Array.from(target.files).forEach(file => {
+      // Validate giới hạn dung lượng ảnh (3MB)
+      if (file.size > 3 * 1024 * 1024) {
+        alert(`Ảnh [${file.name}] vượt quá giới hạn 3MB, vui lòng chọn ảnh nhẹ hơn`);
+        return;
+      }
       selectedFiles.value.push(file);
       imagePreviews.value.push({ url: URL.createObjectURL(file), isNew: true });
     });
@@ -293,6 +310,7 @@ const handleSubmit = async () => {
     formData.append('type', form.value.type);
     formData.append('price', form.value.price.toString());
     formData.append('max_guests', form.value.max_guests.toString());
+    formData.append('beds', form.value.beds.toString());
     
     // Đảm bảo không ném chữ "null" xuống Database nữa
     formData.append('description', form.value.description || '');

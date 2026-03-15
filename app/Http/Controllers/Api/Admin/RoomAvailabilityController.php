@@ -43,4 +43,24 @@ class RoomAvailabilityController extends Controller
         $room->update([...$request->only(['room_status','out_of_order_reason','estimated_fix_date']),'room_status_updated_by'=>auth('sanctum')->id()]);
         return response()->json(['message'=>"Phòng {$room->room_number}: {$old} → {$request->room_status}",'room'=>$room]);
     }
+
+    // PATCH /api/admin/rooms/{id}/toggle-maintenance
+    public function toggleMaintenance($id)
+    {
+        $room = Room::findOrFail($id);
+        
+        // Chỉ cho phép toggle nếu phòng đang available hoặc maintenance
+        if (!in_array($room->status, ['available', 'maintenance'])) {
+            return response()->json(['message' => 'Phòng đang được sử dụng hoặc đã đặt cọc, không thể chuyển đổi trạng thái'], 422);
+        }
+
+        $newStatus = $room->status === 'available' ? 'maintenance' : 'available';
+        
+        $room->update(['status' => $newStatus]);
+        
+        return response()->json([
+            'message' => "Đã chuyển phòng thành " . ($newStatus === 'available' ? 'Sẵn sàng' : 'Bảo trì'),
+            'room' => $room
+        ]);
+    }
 }

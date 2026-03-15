@@ -52,6 +52,23 @@
       </div>
     </div>
 
+    <!-- Thanh tìm kiếm & Lọc -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4 flex flex-wrap gap-3 items-center">
+      <input
+        v-model="searchQuery"
+        placeholder="Tìm kiếm theo tên phòng..."
+        class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+      />
+      <select v-model="filterStatus" class="px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400">
+        <option value="">Tất cả trạng thái</option>
+        <option value="available">Trống / Sẵn sàng</option>
+        <option value="booked">Đã đặt cọc</option>
+        <option value="in_use">Đang ở</option>
+        <option value="maintenance">Bảo trì</option>
+      </select>
+      <span class="text-sm text-gray-400">{{ filteredRooms.length }} kết quả</span>
+    </div>
+
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <table class="w-full text-left border-collapse">
         <thead>
@@ -65,7 +82,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="room in rooms" :key="room.id" class="border-b border-gray-100 hover:bg-gray-50 transition-colors text-sm">
+          <tr v-for="room in filteredRooms" :key="room.id" class="border-b border-gray-100 hover:bg-gray-50 transition-colors text-sm">
             <td class="p-4">
               <img :src="room.image" alt="Room" class="w-16 h-12 object-cover rounded-md border border-gray-200" referrerpolicy="no-referrer" />
             </td>
@@ -80,12 +97,21 @@
               <span v-else class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium">Tạm ẩn</span>
             </td>
             <td class="p-4 text-center">
-              <div class="flex items-center justify-center gap-3">
-                <button @click="openRoomDetail(room.id)" class="text-emerald-600 hover:text-emerald-800 bg-emerald-50 p-1.5 rounded-md transition-colors" title="Xem chi tiết (Quick View)">
+              <div class="flex items-center justify-center gap-2">
+                <button @click="openRoomDetail(room.id)" class="text-emerald-600 hover:text-emerald-800 bg-emerald-50 p-1.5 rounded-md transition-colors" title="Xem chi tiết">
                   <Eye class="w-4 h-4" />
                 </button>
                 <button @click="editRoom(room.id)" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-1.5 rounded-md transition-colors" title="Chỉnh sửa">
                   <Edit class="w-4 h-4" />
+                </button>
+                <button
+                  v-if="room.status === 'available' || room.status === 'maintenance'"
+                  @click="toggleMaintenance(room)"
+                  :title="room.status === 'available' ? 'Chuyển sang Bảo trì' : 'Mở phòng trở lại'"
+                  :class="room.status === 'available' ? 'text-orange-500 bg-orange-50 hover:text-orange-700' : 'text-gray-500 bg-gray-100 hover:text-gray-700'"
+                  class="p-1.5 rounded-md transition-colors"
+                >
+                  <Wrench class="w-4 h-4" />
                 </button>
                 <button @click="deleteRoom(room.id)" class="text-red-600 hover:text-red-800 bg-red-50 p-1.5 rounded-md transition-colors" title="Xóa">
                   <Trash2 class="w-4 h-4" />
@@ -93,8 +119,8 @@
               </div>
             </td>
           </tr>
-          <tr v-if="rooms.length === 0">
-            <td colspan="6" class="p-8 text-center text-gray-500">Chưa có phòng nào trong hệ thống.</td>
+          <tr v-if="filteredRooms.length === 0">
+            <td colspan="6" class="p-8 text-center text-gray-500">Không có phòng nào khớp với tiêu chí tìm kiếm.</td>
           </tr>
         </tbody>
       </table>
@@ -195,9 +221,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { Plus, Edit, Trash2, Eye, X, Home, MapPin, Users, Star } from 'lucide-vue-next';
+import { Plus, Edit, Trash2, Eye, X, Home, MapPin, Users, Star, Wrench } from 'lucide-vue-next';
 
 const router = useRouter();
 
@@ -205,6 +231,18 @@ const router = useRouter();
 const rooms = ref<any[]>([]);
 const stats = ref({
   total: 0, available: 0, deposited: 0, occupied: 0, maintenance: 0
+});
+
+// Search / Filter
+const searchQuery = ref('');
+const filterStatus = ref('');
+
+const filteredRooms = computed(() => {
+  return rooms.value.filter(room => {
+    const matchesName = !searchQuery.value || room.title?.toLowerCase().includes(searchQuery.value.toLowerCase());
+    const matchesStatus = !filterStatus.value || room.status === filterStatus.value;
+    return matchesName && matchesStatus;
+  });
 });
 
 // State quản lý Modal Quick View
@@ -319,6 +357,30 @@ const deleteRoom = async (id: number) => {
       console.error('Lỗi khi xóa phòng:', error);
       alert('Lỗi kết nối đến máy chủ!');
     }
+  }
+};
+
+// Quick Maintenance Toggle
+const toggleMaintenance = async (room: any) => {
+  const nextStatus = room.status === 'available' ? 'Bảo Trì' : 'Sẵn sàng';
+  if (!confirm(`Chuyển phòng này sang trạng thái ${nextStatus}?`)) return;
+  try {
+    const res = await fetch(`/api/admin/rooms/${room.id}/toggle-maintenance`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}`, 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      // Cập nhật trực tiếp trên giao diện không cần reload
+      const idx = rooms.value.findIndex(r => r.id === room.id);
+      if (idx !== -1) rooms.value[idx].status = data.room.status;
+      fetchStats();
+    } else {
+      const d = await res.json();
+      alert(d.message || 'Lỗi khi thay đổi trạng thái phòng');
+    }
+  } catch (error) {
+    alert('Lỗi kết nối đến máy chủ!');
   }
 };
 </script>

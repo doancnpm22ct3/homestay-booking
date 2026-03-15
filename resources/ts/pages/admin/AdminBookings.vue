@@ -56,9 +56,17 @@
 
       <!-- Advanced Filter Row -->
       <div class="flex flex-wrap gap-3">
-        <input v-model="filters.booking_code" @input="debounceFetch" placeholder="Mã booking..." class="input-sm w-36" />
-        <input v-model="filters.customer_search" @input="debounceFetch" placeholder="Tên / SĐT / Email..." class="input-sm w-48" />
-        <select v-model="filters.date_type" @change="debounceFetch" class="input-sm w-36">
+        <input v-model="filters.booking_code" @input="debounceFetch" placeholder="Mã booking..." class="input-sm w-32" />
+        <input v-model="filters.customer_search" @input="debounceFetch" placeholder="Tên / SĐT / Email..." class="input-sm w-44" />
+        <select v-model="filters.status" @change="debounceFetch" class="input-sm w-36">
+          <option value="">Trạng thái...</option>
+          <option value="pending">Chờ xử lý</option>
+          <option value="deposited">Đã cọc</option>
+          <option value="checked_in">Đang ở</option>
+          <option value="completed">Hoàn thành</option>
+          <option value="cancelled">Đã hủy</option>
+        </select>
+        <select v-model="filters.date_type" @change="debounceFetch" class="input-sm w-32">
           <option value="">Theo ngày...</option>
           <option value="check_in">Check-in</option>
           <option value="check_out">Check-out</option>
@@ -137,6 +145,12 @@
             </td>
             <td class="td-cell">
               <div class="flex items-center gap-1">
+                <button v-if="b.status === 'deposited'" @click="checkInBooking(b.id)" class="px-2 py-1 bg-emerald-600 text-white text-xs rounded hover:bg-emerald-700 font-medium transition-colors">
+                  Nhận phòng
+                </button>
+                <button v-if="b.status === 'deposited'" @click="cancelBooking(b.id)" class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 font-medium transition-colors">
+                  Hủy Booking
+                </button>
                 <button @click="openDetail(b.id)" class="action-btn" title="Xem chi tiết">
                   <Eye class="w-3.5 h-3.5" />
                 </button>
@@ -224,7 +238,7 @@ const calendarYear    = ref(new Date().getFullYear());
 const calendarMonth   = ref(new Date().getMonth() + 1);
 
 const pagination = reactive({ currentPage: 1, lastPage: 1, total: 0 });
-const filters    = reactive({ booking_code:'', customer_search:'', date_type:'', date_from:'', date_to:'', source:'' });
+const filters    = reactive({ booking_code:'', customer_search:'', status:'', date_type:'', date_from:'', date_to:'', source:'' });
 
 let debounceTimer: ReturnType<typeof setTimeout>;
 const debounceFetch = () => { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => { pagination.currentPage = 1; fetchBookings(); }, 400); };
@@ -259,6 +273,7 @@ async function fetchBookings() {
   if (activeTab.value) params.append('tab', activeTab.value);
   if (filters.booking_code)  params.append('booking_code', filters.booking_code);
   if (filters.customer_search) params.append('customer_search', filters.customer_search);
+  if (filters.status)     params.append('status', filters.status);
   if (filters.date_type)  params.append('date_type', filters.date_type);
   if (filters.date_from)  params.append('date_from', filters.date_from);
   if (filters.date_to)    params.append('date_to', filters.date_to);
@@ -358,7 +373,7 @@ function occupancyColor(rate: number) { return rate >= 80 ? 'text-red-500' : rat
 function occupancyBg(rate: number)    { return rate >= 80 ? 'bg-red-400' : rate >= 50 ? 'bg-yellow-400' : 'bg-green-400'; }
 
 function resetFilters() {
-  Object.assign(filters, { booking_code:'', customer_search:'', date_type:'', date_from:'', date_to:'', source:'' });
+  Object.assign(filters, { booking_code:'', customer_search:'', status:'', date_type:'', date_from:'', date_to:'', source:'' });
   fetchBookings();
 }
 
@@ -372,6 +387,43 @@ function exportCSV() {
   const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
   const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
   a.download = `bookings_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+}
+
+async function checkInBooking(id: number) {
+  if (!confirm('Bạn có chắc chắn muốn xác nhận Check-in cho phòng này?')) return;
+  loading.value = true;
+  const res = await fetch(`${API}/bookings/${id}/checkin`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' }
+  });
+  loading.value = false;
+  if (res.ok) {
+    alert('Check-in thành công!');
+    fetchBookings();
+    fetchStats();
+  } else {
+    const d = await res.json();
+    alert(d.message || 'Lỗi khi check-in');
+  }
+}
+
+async function cancelBooking(id: number) {
+  if (!confirm('Bạn có chắc chắn muốn hủy booking này? Tiền cọc sẽ được tính làm phí phạt.')) return;
+  loading.value = true;
+  const res = await fetch(`${API}/bookings/${id}/cancel`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ cancel_reason: 'Khách bùng cọc/báo hủy' })
+  });
+  loading.value = false;
+  if (res.ok) {
+    alert('Hủy booking thành công. Phòng đã sẵn sàng đón khách mới.');
+    fetchBookings();
+    fetchStats();
+  } else {
+    const d = await res.json();
+    alert(d.message || 'Lỗi khi hủy booking');
+  }
 }
 
 function changePage(page: number) { pagination.currentPage = page; fetchBookings(); }

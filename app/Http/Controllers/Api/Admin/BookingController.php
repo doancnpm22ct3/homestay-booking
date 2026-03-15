@@ -226,7 +226,8 @@ class BookingController extends Controller
     public function checkin(Request $request, $id)
     {
         $booking = Booking::findOrFail($id);
-        if (!in_array($booking->status,['confirmed','pending'])) return response()->json(['message'=>'Không thể check-in'],422);
+        // Chấp nhận check-in từ trạng thái deposited hoặc confirmed/pending (tùy existing logic)
+        if (!in_array($booking->status,['deposited','confirmed','pending'])) return response()->json(['message'=>'Không thể check-in'],422);
         DB::beginTransaction();
         try {
             if ($request->room_id && $request->room_id != $booking->room_id) {
@@ -235,7 +236,8 @@ class BookingController extends Controller
                 $booking->logActivity('room_changed','Đổi phòng khi check-in',['room_id'=>$old],['room_id'=>$request->room_id]);
             }
             $booking->update(['status'=>'checked_in','checked_in_by'=>auth('sanctum')->id()]);
-            $booking->room()->update(['room_status'=>'occupied','room_status_updated_by'=>auth('sanctum')->id()]);
+            // Theo yêu cầu: cập nhật trạng thái Room thành in_use
+            $booking->room()->update(['status'=>'in_use','room_status'=>'occupied','room_status_updated_by'=>auth('sanctum')->id()]);
             $booking->logActivity('checkin','Khách đã check-in thành công');
             DB::commit();
             return response()->json(['message'=>'Check-in thành công','booking'=>$booking->fresh(['customer','room'])]);
@@ -247,21 +249,57 @@ class BookingController extends Controller
     {
         $booking = Booking::findOrFail($id);
         if ($booking->status !== 'checked_in') return response()->json(['message'=>'Booking phải ở Checked-in'],422);
-        $request->validate(['extra_amount'=>'nullable|numeric|min:0','payment_amount'=>'nullable|numeric|min:0','payment_method'=>'nullable|in:cash,transfer,card']);
+        
+        $request->validate([
+            'additional_fee' => 'nullable|numeric|min:0',
+            'additional_note'=> 'nullable|string',
+            'payment_method' => 'nullable|in:cash,transfer,card'
+        ]);
+
         DB::beginTransaction();
         try {
-            if ((float)($request->extra_amount??0) > 0) {
-                $booking->services()->create(['service_name'=>$request->extra_note??'Phụ phí check-out','unit_price'=>(int)$request->extra_amount,'quantity'=>1,'total_price'=>(int)$request->extra_amount]);
-                $booking->increment('total_amount',(int)$request->extra_amount);
-                $booking->increment('subtotal',(int)$request->extra_amount);
+            $addFee = (float)($request->additional_fee ?? 0);
+            
+            // Tính final_paid (Lưu ý tổng tiền booking->total_amount đã được update nếu thêm services)
+            // Nếu update additional_fee:
+            if ($addFee > 0) {
+                $booking->increment('total_amount', (int)$addFee);
+                $booking->increment('subtotal', (int)$addFee);
             }
-            if ((float)($request->payment_amount??0) > 0) {
-                $booking->payments()->create(['amount'=>(int)$request->payment_amount,'payment_method'=>$request->payment_method??'cash','payment_type'=>'balance','recorded_by'=>auth('sanctum')->id(),'note'=>'Thanh toán khi check-out']);
-                $booking->increment('paid_amount',(int)$request->payment_amount);
+            
+            $final_paid = $booking->total_amount - $booking->paid_amount;
+            
+            if ($final_paid > 0) {
+                $booking->payments()->create([
+                    'amount' => $final_paid,
+                    'payment_method' => $request->payment_method ?? 'cash',
+                    'payment_type' => 'balance',
+                    'recorded_by' => auth('sanctum')->id(),
+                    'note' => 'Thanh toán khi check-out'
+                ]);
+                $booking->increment('paid_amount', $final_paid);
             }
-            $booking->update(['status'=>'checked_out','checked_out_by'=>auth('sanctum')->id()]);
-            $booking->room()->update(['room_status'=>'dirty','room_status_updated_by'=>auth('sanctum')->id()]);
-            $booking->logActivity('checkout','Khách đã check-out. Phòng chuyển sang Dirty.');
+
+            // Update booking status
+            $booking->update([
+                'status' => 'completed',
+                'checked_out_by' => auth('sanctum')->id(),
+                'paid_at' => now(),
+                'additional_fee' => $addFee,
+                'additional_note' => $request->additional_note
+            ]);
+
+            // Cập nhật trạng thái Room thành maintenance
+            $booking->room()->update([
+                'status' => 'maintenance',
+                'room_status' => 'dirty',
+                'room_status_updated_by' => auth('sanctum')->id()
+            ]);
+
+            // Tự động chuyển phòng sang Available sau 1h
+            dispatch(new \App\Jobs\CleanRoomJob($booking->room_id))->delay(now()->addHour());
+
+            $booking->logActivity('checkout','Khách đã check-out. Phòng chuyển sang bảo trì/dọn dẹp.');
             DB::commit();
             return response()->json(['message'=>'Check-out thành công','booking'=>$booking->fresh(['customer','room','payments'])]);
         } catch (\Exception $e) { DB::rollBack(); return response()->json(['message'=>$e->getMessage()],500); }
@@ -279,7 +317,13 @@ class BookingController extends Controller
             if ((int)($request->refund_amount??0) > 0) {
                 $booking->payments()->create(['amount'=>(int)$request->refund_amount,'payment_method'=>$request->refund_method??'transfer','payment_type'=>'refund','recorded_by'=>auth('sanctum')->id(),'note'=>'Hoàn tiền: '.$request->cancel_reason]);
             }
-            if ($booking->room->room_status === 'occupied') $booking->room()->update(['room_status'=>'dirty']);
+            
+            // Cập nhật trạng thái phòng thành available
+            $booking->room()->update([
+                'status' => 'available',
+                'room_status' => 'clean'
+            ]);
+
             $booking->logActivity('cancelled',"Booking hủy: {$request->cancel_reason}");
             DB::commit();
             return response()->json(['message'=>'Hủy thành công','booking'=>$booking->fresh()]);
