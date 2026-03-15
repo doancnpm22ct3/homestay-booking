@@ -24,10 +24,11 @@
             <input v-model="form.location" type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Loại phòng</label>
-            <select v-model="form.type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-white">
-              <option value="room">Phòng riêng</option>
-              <option value="house">Nguyên căn</option>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tiêu chuẩn sức chứa</label>
+            <select v-model.number="form.max_guests" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-white">
+              <option :value="2">Phòng Tiêu Chuẩn (2 Người lớn + 1 Trẻ em)</option>
+              <option :value="4">Phòng Gia Đình (4 Người lớn + 2 Trẻ em)</option>
+              <option v-if="form.type === 'house'" :value="20">Nguyên Căn (Tối đa 20 Người lớn)</option>
             </select>
           </div>
           <div>
@@ -128,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ArrowLeft, UploadCloud, X, Save } from 'lucide-vue-next';
 
@@ -149,7 +150,14 @@ const form = ref({
 
 const selectedFiles = ref<File[]>([]);
 const imagePreviews = ref<{url: string, isNew: boolean}[]>([]);
-
+// TỰ ĐỘNG CẬP NHẬT SỨC CHỨA THEO LOẠI PHÒNG
+watch(() => form.value.type, (newType) => {
+  if (newType === 'house') {
+    form.value.max_guests = 20; // Nếu chọn Nguyên căn -> Tự set 20 người
+  } else if (newType === 'room' && form.value.max_guests === 20) {
+    form.value.max_guests = 2;  // Nếu quay lại phòng riêng -> Tự trả về phòng nhỏ mặc định
+  }
+});
 onMounted(async () => {
   // 1. TẢI TIỆN NGHI VÀ LỌC SẠCH "BÓNG MA" TRONG DATABASE
   try {
