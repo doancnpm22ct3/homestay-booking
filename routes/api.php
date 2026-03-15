@@ -103,6 +103,7 @@ Route::prefix('admin')->group(function () {
     Route::post('/bookings/{id}/checkin', [BookingController::class, 'checkin']);
     Route::post('/bookings/{id}/checkout',[BookingController::class, 'checkout']);
     Route::post('/bookings/{id}/cancel',  [BookingController::class, 'cancel']);
+    Route::post('/bookings/{id}/transfer-room', [BookingController::class, 'transferRoom']);
 
     // Services
     Route::post('/bookings/{id}/services',         [BookingServiceController::class, 'store']);

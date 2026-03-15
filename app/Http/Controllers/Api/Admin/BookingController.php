@@ -282,7 +282,7 @@ class BookingController extends Controller
 
             // Update booking status
             $booking->update([
-                'status' => 'completed',
+                'status' => 'checked_out',
                 'checked_out_by' => auth('sanctum')->id(),
                 'paid_at' => now(),
                 'additional_fee' => $addFee,
@@ -309,7 +309,10 @@ class BookingController extends Controller
     public function cancel(Request $request, $id)
     {
         $booking = Booking::findOrFail($id);
-        if (in_array($booking->status,['checked_out','cancelled'])) return response()->json(['message'=>'Không thể hủy'],422);
+        // Chỉ cho hủy khi đang ở trạng thái deposited hoặc pending (chưa check-in)
+        if (!in_array($booking->status, ['deposited', 'pending', 'confirmed'])) {
+            return response()->json(['message' => 'Chỉ có thể hủy booking khi chưa check-in (đã cọc hoặc chờ xử lý)'], 422);
+        }
         $request->validate(['cancel_reason'=>'required|string','refund_amount'=>'nullable|numeric|min:0','refund_method'=>'nullable|in:cash,transfer,card']);
         DB::beginTransaction();
         try {
@@ -321,12 +324,65 @@ class BookingController extends Controller
             // Cập nhật trạng thái phòng thành available
             $booking->room()->update([
                 'status' => 'available',
-                'room_status' => 'clean'
+                'room_status' => 'available'
             ]);
 
             $booking->logActivity('cancelled',"Booking hủy: {$request->cancel_reason}");
             DB::commit();
             return response()->json(['message'=>'Hủy thành công','booking'=>$booking->fresh()]);
         } catch (\Exception $e) { DB::rollBack(); return response()->json(['message'=>$e->getMessage()],500); }
+    }
+
+    // POST /api/admin/bookings/{id}/transfer-room
+    public function transferRoom(Request $request, $id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        if ($booking->status !== 'checked_in') {
+            return response()->json(['message' => 'Chỉ có thể đổi phòng khi khách đang ở (checked_in)'], 422);
+        }
+
+        $request->validate(['new_room_id' => 'required|exists:rooms,id']);
+
+        $newRoomId = $request->new_room_id;
+        if ($newRoomId == $booking->room_id) {
+            return response()->json(['message' => 'Phòng mới phải khác phòng hiện tại'], 422);
+        }
+
+        $newRoom = Room::findOrFail($newRoomId);
+        if ($newRoom->status !== 'available') {
+            return response()->json(['message' => 'Phòng đã chọn không còn trống'], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $oldRoomId = $booking->room_id;
+            $oldRoom   = Room::findOrFail($oldRoomId);
+
+            // Phòng cũ -> dọn dẹp/bảo trì
+            $oldRoom->update(['status' => 'maintenance', 'room_status' => 'dirty']);
+
+            // Phòng mới -> đang sử dụng
+            $newRoom->update(['status' => 'in_use', 'room_status' => 'occupied']);
+
+            // Gán booking sang phòng mới
+            $booking->update(['room_id' => $newRoomId]);
+
+            $booking->logActivity(
+                'room_transferred',
+                "Đổi phòng: #{$oldRoomId} → #{$newRoomId}. Lý do: " . ($request->reason ?? 'Không rõ'),
+                ['room_id' => $oldRoomId],
+                ['room_id' => $newRoomId]
+            );
+
+            DB::commit();
+            return response()->json([
+                'message' => "Đổi phòng thành công! Phòng cũ đang được dọn dẹp.",
+                'booking' => $booking->fresh(['customer', 'room'])
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 }

@@ -63,7 +63,7 @@
           <option value="pending">Chờ xử lý</option>
           <option value="deposited">Đã cọc</option>
           <option value="checked_in">Đang ở</option>
-          <option value="completed">Hoàn thành</option>
+          <option value="checked_out">Hoàn thành</option>
           <option value="cancelled">Đã hủy</option>
         </select>
         <select v-model="filters.date_type" @change="debounceFetch" class="input-sm w-32">
@@ -151,10 +151,12 @@
                 <button v-if="b.status === 'deposited'" @click="cancelBooking(b.id)" class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 font-medium transition-colors">
                   Hủy Booking
                 </button>
+                <button v-if="b.status === 'checked_in' && b.room?.type === 'room'" @click="openTransfer(b)" class="px-2 py-1 bg-orange-500 text-white text-xs rounded hover:bg-orange-600 font-medium transition-colors">
+                  🔄 Đổi Phòng
+                </button>
                 <button @click="openDetail(b.id)" class="action-btn" title="Xem chi tiết">
                   <Eye class="w-3.5 h-3.5" />
                 </button>
-                <StatusChangeBtn :booking="b" @changed="fetchBookings" />
               </div>
             </td>
           </tr>
@@ -211,6 +213,7 @@
     <!-- Modals -->
     <AdminBookingCreate v-if="showCreateModal" @close="showCreateModal=false" @created="onCreated" />
     <AdminBookingDetail v-if="detailBookingId" :booking-id="detailBookingId" @close="detailBookingId=null" @updated="fetchBookings" />
+    <RoomTransferModal v-if="transferBooking" :booking="transferBooking" @close="transferBooking=null" @done="onTransferDone" />
   </div>
 </template>
 
@@ -221,6 +224,7 @@ import StatusBadge from './StatusBadge.vue';
 import StatusChangeBtn from './StatusChangeBtn.vue';
 import AdminBookingCreate from './AdminBookingCreate.vue';
 import AdminBookingDetail from './AdminBookingDetail.vue';
+import RoomTransferModal from './RoomTransferModal.vue';
 
 const API = '/api/admin';
 const token = () => localStorage.getItem('auth_token') || '';
@@ -233,6 +237,7 @@ const activeTab    = ref('');
 const viewMode     = ref('table');
 const showCreateModal = ref(false);
 const detailBookingId = ref<number|null>(null);
+const transferBooking  = ref<any>(null);
 const calendarData    = ref<Record<string,any>>({});
 const calendarYear    = ref(new Date().getFullYear());
 const calendarMonth   = ref(new Date().getMonth() + 1);
@@ -428,6 +433,8 @@ async function cancelBooking(id: number) {
 
 function changePage(page: number) { pagination.currentPage = page; fetchBookings(); }
 function openDetail(id: number) { detailBookingId.value = id; }
+function openTransfer(booking: any) { transferBooking.value = booking; }
+function onTransferDone() { fetchBookings(); fetchStats(); }
 function onCreated() { showCreateModal.value = false; fetchBookings(); fetchStats(); }
 
 watch(viewMode, (v) => { if (v === 'calendar') fetchCalendar(); });
