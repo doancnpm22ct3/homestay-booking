@@ -12,24 +12,61 @@
     </div>
 
     <form v-else @submit.prevent="handleSubmit" class="space-y-8">
+      <!-- LỰA CHỌN MÔ HÌNH THUÊ -->
+      <div class="bg-emerald-50 p-1 rounded-xl flex gap-1 border border-emerald-100 shadow-sm">
+        <button 
+          type="button"
+          @click="rentMode = 'whole_house'"
+          :class="[
+            'flex-1 py-3 px-4 rounded-lg font-bold transition-all flex items-center justify-center gap-2',
+            rentMode === 'whole_house' ? 'bg-white text-emerald-700 shadow-sm' : 'text-emerald-600/70 hover:bg-white/50'
+          ]"
+        >
+          <HomeIcon class="w-5 h-5" /> Thêm Nguyên Căn
+        </button>
+        <button 
+          type="button"
+          @click="rentMode = 'private_room'"
+          :class="[
+            'flex-1 py-3 px-4 rounded-lg font-bold transition-all flex items-center justify-center gap-2',
+            rentMode === 'private_room' ? 'bg-white text-emerald-700 shadow-sm' : 'text-emerald-600/70 hover:bg-white/50'
+          ]"
+        >
+          <LayoutGrid class="w-5 h-5" /> Thêm Phòng Riêng
+        </button>
+      </div>
+
       <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Thông tin cơ bản</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">
+          {{ rentMode === 'whole_house' ? 'Thông tin Nguyên Căn' : 'Thông tin Phòng Riêng' }}
+        </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tên phòng *</label>
+          <div :class="rentMode === 'whole_house' ? 'md:col-span-2' : ''">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              {{ rentMode === 'whole_house' ? 'Tên Nguyên Căn / Homestay *' : 'Tên phòng (VD: Phòng 101) *' }}
+            </label>
             <input v-model="form.title" type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
           </div>
-          <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ *</label>
-            <input v-model="form.location" type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tiêu chuẩn sức chứa</label>
-            <select v-model.number="form.max_guests" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-white">
-              <option :value="2">Phòng Tiêu Chuẩn (2 Người lớn + 1 Trẻ em)</option>
-              <option :value="4">Phòng Gia Đình (4 Người lớn + 2 Trẻ em)</option>
-              <option v-if="form.type === 'house'" :value="20">Nguyên Căn (Tối đa 20 Người lớn)</option>
+
+          <div v-if="rentMode === 'private_room'">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Thuộc Homestay *</label>
+            <select v-model="form.parent_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-white">
+              <option value="">-- Chọn Homestay cơ sở --</option>
+              <option v-for="h in homestays" :key="h.id" :value="h.id">{{ h.title }}</option>
             </select>
+          </div>
+
+          <div v-if="rentMode === 'private_room'">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Loại phòng *</label>
+            <select v-model="roomTypeStandard" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-white">
+              <option value="standard">Phòng Tiêu Chuẩn (2 Người lớn + 1 Trẻ em)</option>
+              <option value="family">Phòng Gia Đình (4 Người lớn + 2 Trẻ em)</option>
+            </select>
+          </div>
+
+          <div v-if="rentMode === 'whole_house'" class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ cụ thể (Đà Nẵng) *</label>
+            <input v-model="form.location" type="text" required placeholder="Nhập địa chỉ của nguyên căn này..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái hiện tại</label>
@@ -39,16 +76,8 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Giá / Đêm (VNĐ) *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Giá thuê / Đêm (VNĐ) *</label>
             <input v-model="form.price" type="number" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Số khách tối đa</label>
-            <input v-model="form.max_guests" type="number" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Số lượng giường</label>
-            <input v-model="form.beds" type="number" readonly class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed" />
           </div>
           
           <div class="md:col-span-2 mt-2 bg-emerald-50 border border-emerald-100 p-4 rounded-lg flex items-center gap-3">
@@ -132,43 +161,60 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { ArrowLeft, UploadCloud, X, Save } from 'lucide-vue-next';
+import { ArrowLeft, UploadCloud, X, Save, Home as HomeIcon, LayoutGrid } from 'lucide-vue-next';
 
 const route = useRoute();
 const router = useRouter();
 const isEdit = ref(route.path.includes('edit'));
 const isLoadingData = ref(false);
 
+const rentMode = ref<'whole_house' | 'private_room'>('whole_house');
+const homestays = ref<any[]>([]); // Danh sách homestay cha
+const roomTypeStandard = ref('standard');
+
 const newAmenity = ref('');
 const availableAmenities = ref<any[]>([]);
 
 const form = ref({
-  title: '', location: '', type: 'room', price: 0,
-  max_guests: 2, beds: 1, description: '', status: 'available',
+  title: '', location: '', rent_type: 'whole_house', parent_id: '', 
+  type: 'house', price: 0,
+  max_guests: 20, max_children: 0, beds: 1, description: '', status: 'available',
   is_visible: true,
   amenities: [] as number[],
 });
 
+// LOGIC CẬP NHẬT MÔ HÌNH THUÊ
+watch(rentMode, (newMode) => {
+  form.value.rent_type = newMode;
+  if (newMode === 'whole_house') {
+    form.value.type = 'house';
+    form.value.max_guests = 20;
+    form.value.max_children = 99;
+    form.value.parent_id = '';
+  } else {
+    form.value.type = 'room';
+    form.value.rent_type = 'private_room';
+    updatePrivateRoomCapacity();
+  }
+});
+
+// LOGIC CẬP NHẬT SỨC CHỨA PHÒNG RIÊNG
+const updatePrivateRoomCapacity = () => {
+  if (roomTypeStandard.value === 'standard') {
+    form.value.max_guests = 2;
+    form.value.max_children = 1;
+  } else {
+    form.value.max_guests = 4;
+    form.value.max_children = 2;
+  }
+};
+
+watch(roomTypeStandard, () => {
+  if (rentMode.value === 'private_room') updatePrivateRoomCapacity();
+});
+
 const selectedFiles = ref<File[]>([]);
 const imagePreviews = ref<{url: string, isNew: boolean}[]>([]);
-
-// TỰ ĐỘNG CẬP NHẬT SỨC CHỨA THEO LOẠI PHÒNG
-watch(() => form.value.type, (newType) => {
-  if (newType === 'house') {
-    form.value.max_guests = 20; // Nếu chọn Nguyên căn -> Tự set 20 người
-  } else if (newType === 'room' && form.value.max_guests === 20) {
-    form.value.max_guests = 2;  // Nếu quay lại phòng riêng -> Tự trả về phòng nhỏ mặc định
-  }
-});
-
-// TỰ ĐỘNG CẬP NHẬT SỐ GIƯỜNG THEO SỨC CHỨA
-watch(() => form.value.max_guests, (newGuests) => {
-  if (newGuests === 2) {
-    form.value.beds = 1;
-  } else if (newGuests === 4) {
-    form.value.beds = 2;
-  }
-});
 onMounted(async () => {
   // 1. TẢI TIỆN NGHI VÀ LỌC SẠCH "BÓNG MA" TRONG DATABASE
   try {
@@ -184,6 +230,16 @@ onMounted(async () => {
     console.error('Lỗi tải tiện nghi:', err);
   }
 
+  // 1.1 TẢI DANH SÁCH HOMESTAY (GỐC)
+  try {
+    const hsRes = await fetch('/api/admin/rooms/homestays');
+    if (hsRes.ok) {
+      homestays.value = await hsRes.json();
+    }
+  } catch (err) {
+    console.error('Lỗi tải danh sách homestay:', err);
+  }
+
   // 2. TẢI DỮ LIỆU CŨ LÊN FORM NẾU ĐANG LÀ SỬA PHÒNG
   if (isEdit.value) {
     isLoadingData.value = true;
@@ -196,10 +252,18 @@ onMounted(async () => {
 
       form.value.title = data.title || '';
       form.value.location = data.location || '';
+      form.value.rent_type = data.rent_type || (data.type === 'house' ? 'whole_house' : 'private_room');
+      form.value.parent_id = data.parent_id || '';
       form.value.type = data.type || 'room';
       form.value.price = data.price || 0;
       form.value.max_guests = data.max_guests || 2;
-      form.value.beds = data.beds || 1;
+      form.value.max_children = data.max_children || 0;
+
+      // Xác định rentMode và roomTypeStandard
+      rentMode.value = form.value.rent_type === 'private_room' ? 'private_room' : 'whole_house';
+      if (rentMode.value === 'private_room') {
+        roomTypeStandard.value = form.value.max_guests <= 2 ? 'standard' : 'family';
+      }
       
       // XÓA TẬN GỐC LỖI HIỆN CHỮ "null"
       if (data.description === null || data.description === 'null' || data.description === 'undefined' || !data.description) {
@@ -306,11 +370,13 @@ const handleSubmit = async () => {
   try {
     const formData = new FormData();
     formData.append('title', form.value.title);
-    formData.append('location', form.value.location);
+    formData.append('location', form.value.location || '');
+    formData.append('rent_type', form.value.rent_type);
+    formData.append('parent_id', form.value.parent_id || '');
     formData.append('type', form.value.type);
     formData.append('price', form.value.price.toString());
     formData.append('max_guests', form.value.max_guests.toString());
-    formData.append('beds', form.value.beds.toString());
+    formData.append('max_children', form.value.max_children.toString());
     
     // Đảm bảo không ném chữ "null" xuống Database nữa
     formData.append('description', form.value.description || '');

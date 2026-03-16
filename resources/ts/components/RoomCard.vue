@@ -30,10 +30,20 @@
           {{ title }}
         </h3>
         
-        <div class="flex items-center gap-1.5 text-gray-600 text-sm mb-5 font-['Inter']">
+        <div class="flex items-center gap-1.5 text-gray-600 text-sm mb-1 font-['Inter']">
           <MapPin class="w-4 h-4 shrink-0 text-[#4A7055] opacity-80" />
           <span class="line-clamp-1">{{ location }}</span>
         </div>
+
+        <div v-if="parentTitle" 
+             @click.stop="$emit('filterByParent', parentId)"
+             class="flex items-center gap-1.5 text-[#4A7055] hover:bg-emerald-100 cursor-pointer text-xs mb-4 font-bold font-['Inter'] bg-emerald-50 px-2 py-1 rounded-md w-fit transition-colors shadow-sm"
+             title="Xem tất cả phòng thuộc homestay này"
+        >
+          <HomeIcon class="w-3 h-3 shrink-0" />
+          <span class="line-clamp-1">Thuộc: {{ parentTitle }}</span>
+        </div>
+        <div v-else class="mb-5"></div>
         
         <div class="mt-auto pt-4 border-t border-gray-100/70 flex items-center justify-between">
           
@@ -63,6 +73,9 @@ import { MapPin, Star, Home as HomeIcon } from 'lucide-vue-next';
 
 const router = useRouter();
 
+// Define emits
+defineEmits(['filterByParent']);
+
 // Sử dụng cú pháp Type-only props declaration của Vue 3 + TypeScript
 const props = defineProps<{
   id: string;
@@ -71,7 +84,9 @@ const props = defineProps<{
   type: string;
   price: string;
   imageUrl: string;
-  status?: string; // Khai báo thêm prop status (có thể undefined)
+  status?: string; 
+  parentTitle?: string;
+  parentId?: number | string;
 }>();
 
 const goToDetail = () => {

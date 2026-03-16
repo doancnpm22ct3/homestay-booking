@@ -176,6 +176,8 @@
             :price="room.price"
             :imageUrl="room.imageUrl"
             :status="room.status"
+            :parentTitle="room.parentTitle"
+            :parentId="room.parentId"
           />
         </div>
         <div class="mt-8 text-center sm:hidden">
@@ -317,6 +319,8 @@ interface Room {
   price: string;
   imageUrl: string;
   status: string;
+  parentTitle?: string;
+  parentId?: number | string;
 }
 
 const bannerImages = [
@@ -423,15 +427,8 @@ onMounted(async () => {
     ); 
 
     popularRooms.value = visibleRooms.map((room: any) => {
-      // Logic lấy ảnh CỰC KỲ CHẮC CHẮN
-      let thumb = 'https://picsum.photos/seed/room/800/600';
-      if (room.images && room.images.length > 0) {
-          thumb = room.images[0].image_url;
-      } else if (room.image_url) {
-          thumb = room.image_url;
-      }
+      let thumb = room.image || 'https://picsum.photos/seed/room/800/600';
       
-      // Thêm /storage/ nếu URL là đường dẫn tương đối (từ DB)
       if (thumb && !thumb.startsWith('http') && !thumb.startsWith('/storage/') && !thumb.startsWith('data:')) {
           thumb = thumb.startsWith('/') ? `/storage${thumb}` : `/storage/${thumb}`;
       }
@@ -440,10 +437,12 @@ onMounted(async () => {
         id: String(room.id),
         title: room.title,
         location: room.location,
-        type: room.type === 'room' ? 'Phòng riêng' : 'Nguyên căn', // Gom chung villa vào Nguyên căn
+        type: room.rent_type === 'private_room' ? 'Phòng riêng' : 'Nguyên căn',
         price: Number(room.price).toLocaleString('vi-VN') + ' VNĐ/đêm', 
         imageUrl: thumb, 
-        status: room.status
+        status: room.status,
+        parentTitle: room.parent_title,
+        parentId: room.parent_id
       };
     }).slice(0, 6); 
     

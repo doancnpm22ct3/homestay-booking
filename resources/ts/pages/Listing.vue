@@ -150,6 +150,22 @@
 
     <div id="room-list-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow scroll-mt-32">
       
+      <!-- Banner lọc theo Homestay -->
+      <div v-if="filterByParentId" class="mb-10 bg-[#4A7055]/10 border border-[#4A7055]/20 p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4 text-[#4A7055]">
+          <div class="bg-[#4A7055] text-white p-3 rounded-2xl shadow-md">
+            <HomeIcon class="w-6 h-6" />
+          </div>
+          <div>
+            <h3 class="text-xl font-bold">Bạn đang xem phòng của Homestay</h3>
+            <p class="text-sm font-medium opacity-80">{{ selectedParentTitle }}</p>
+          </div>
+        </div>
+        <button @click="clearParentFilter" class="bg-[#4A7055] text-white px-6 py-2.5 rounded-full font-bold hover:bg-[#3b5a44] transition-all shadow-sm">
+          Xem tất cả homestay
+        </button>
+      </div>
+      
       <div v-if="isSearching" class="mb-16">
         <div class="flex justify-between items-end mb-8">
           <div>
@@ -182,34 +198,15 @@
             :price="room.price" 
             :imageUrl="room.imageUrl" 
             :status="room.status"
+            :parentTitle="room.parentTitle"
+            :parentId="room.parentId"
+            @filterByParent="setParentFilter"
           />
         </div>
       </div>
 
       <div v-else>
         
-        <div class="mb-20" v-if="popularRooms.length > 0">
-          <div class="flex justify-between items-end mb-8">
-            <div>
-              <h2 class="text-3xl font-bold text-gray-900 font-['Playfair_Display'] mb-2">Được tìm kiếm nhiều nhất</h2>
-              <p class="text-gray-600 font-medium">Khám phá những chỗ nghỉ phổ biến nhất hiện nay</p>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <RoomCard 
-              v-for="(room, index) in popularRooms" 
-              :key="'pop-'+index" 
-              :id="room.id" 
-              :title="room.title" 
-              :location="room.location" 
-              :type="room.type" 
-              :price="room.price" 
-              :imageUrl="room.imageUrl" 
-              :status="room.status"
-            />
-          </div>
-        </div>
-
         <div class="mb-20" v-if="houseRooms.length > 0">
           <div class="flex justify-between items-end mb-8">
             <div>
@@ -228,6 +225,9 @@
               :price="room.price" 
               :imageUrl="room.imageUrl" 
               :status="room.status"
+              :parentTitle="room.parentTitle"
+              :parentId="room.parentId"
+              @filterByParent="setParentFilter"
             />
           </div>
         </div>
@@ -250,6 +250,9 @@
               :price="room.price" 
               :imageUrl="room.imageUrl" 
               :status="room.status"
+              :parentTitle="room.parentTitle"
+              :parentId="room.parentId"
+              @filterByParent="setParentFilter"
             />
           </div>
         </div>
@@ -274,6 +277,8 @@ interface Room {
   price: string;
   imageUrl: string;
   status: string;
+  parentTitle?: string;
+  parentId?: number | string;
 }
 
 const route = useRoute();
@@ -320,6 +325,26 @@ const guests = ref<string | number>('');
 const type = ref('');
 const isSearching = ref(false);
 const activeDropdown = ref<string | null>(null);
+const filterByParentId = ref<number | string | null>(null);
+
+const selectedParentTitle = computed(() => {
+  if (!filterByParentId.value) return '';
+  const room = allRooms.value.find(r => r.parentId == filterByParentId.value || r.id == filterByParentId.value);
+  return room ? (room.parentTitle || room.title) : 'Homestay';
+});
+
+const setParentFilter = (parentId: number | string) => {
+  filterByParentId.value = parentId;
+  executeSearch();
+  // Scroll to list
+  const section = document.getElementById('room-list-section');
+  if (section) section.scrollIntoView({ behavior: 'smooth' });
+};
+
+const clearParentFilter = () => {
+  filterByParentId.value = null;
+  executeSearch();
+};
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return '';
@@ -354,31 +379,17 @@ const selectType = (selectedType: string) => {
 const allRooms = ref<Room[]>([]);
 const filteredRooms = ref<Room[]>([]); 
 
-// --- THUẬT TOÁN ĐẢM BẢO LUÔN CÓ ĐỦ 6 THẺ (Dùng để test UI) ---
-const fillToSix = (arr: Room[]) => {
-  if (arr.length === 0) return [];
-  let result = [...arr];
-  // Nhân bản mảng cho đến khi lớn hơn hoặc bằng 6
-  while (result.length < 6) {
-    result = result.concat(arr);
-  }
-  // Cắt đúng 6 cái đầu tiên
-  return result.slice(0, 6);
-};
-
-// --- 3 MỤC DANH SÁCH (Đã áp dụng fillToSix để ép cứng 6 thẻ) ---
+// --- 3 MỤC DANH SÁCH (Không duplication nữa) ---
 const popularRooms = computed(() => {
-  return fillToSix(allRooms.value);
+  return allRooms.value.slice(0, 6);
 });
 
 const houseRooms = computed(() => {
-  const houses = allRooms.value.filter(room => room.rawType === 'house');
-  return fillToSix(houses);
+  return allRooms.value.filter(room => room.rawType === 'whole_house');
 });
 
 const privateRooms = computed(() => {
-  const rooms = allRooms.value.filter(room => room.rawType === 'room');
-  return fillToSix(rooms);
+  return allRooms.value.filter(room => room.rawType === 'private_room');
 });
 
 onMounted(async () => {
@@ -394,31 +405,25 @@ onMounted(async () => {
     );
     
     allRooms.value = visibleRooms.map((room: any) => {
-      let thumb = 'https://picsum.photos/seed/room/800/600';
-      if (room.images && room.images.length > 0) {
-          thumb = room.images[0].image_url;
-      } else if (room.image_url) {
-          thumb = room.image_url;
-      }
+      let thumb = room.image || 'https://picsum.photos/seed/room/800/600';
 
       if (thumb && !thumb.startsWith('http') && !thumb.startsWith('/storage/') && !thumb.startsWith('data:')) {
           thumb = thumb.startsWith('/') ? `/storage${thumb}` : `/storage/${thumb}`;
       }
 
-      let rawType = room.type;
-      if (rawType !== 'room' && rawType !== 'house') {
-          rawType = 'house'; 
-      }
+      let rawType = room.rent_type;
 
       return {
         id: String(room.id),
         title: room.title,
         location: room.location,
         rawType: rawType, 
-        type: rawType === 'house' ? 'Nguyên căn' : 'Phòng riêng',
+        type: rawType === 'whole_house' ? 'Nguyên căn' : 'Phòng riêng',
         price: Number(room.price).toLocaleString('vi-VN') + ' VNĐ/đêm',
         imageUrl: thumb,
-        status: room.status
+        status: room.status,
+        parentTitle: room.parent_title,
+        parentId: room.parent_id
       };
     });
 
@@ -463,13 +468,14 @@ const executeSearch = () => {
   filteredRooms.value = allRooms.value.filter(room => {
     const matchLocation = location.value === '' || room.location.includes(location.value);
     const matchType = type.value === '' || room.type === type.value;
-    return matchLocation && matchType;
+    const matchParent = !filterByParentId.value || room.parentId == filterByParentId.value || room.id == filterByParentId.value;
+    return matchLocation && matchType && matchParent;
   });
 
   router.replace({
     query: {
       location: location.value || undefined,
-      type: type.value === 'Nguyên căn' ? 'house' : (type.value === 'Phòng riêng' ? 'room' : undefined),
+      type: type.value === 'Nguyên căn' ? 'whole_house' : (type.value === 'Phòng riêng' ? 'private_room' : undefined),
       guests: guests.value ? String(guests.value) : undefined
     }
   });
@@ -481,6 +487,7 @@ const resetSearch = () => {
   checkOut.value = '';
   guests.value = '';
   type.value = '';
+  filterByParentId.value = null;
   isSearching.value = false;
   filteredRooms.value = [...allRooms.value];
   
