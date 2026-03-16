@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use App\Models\Room;
 use App\Http\Controllers\Api\RoomController;
 use App\Http\Controllers\Api\AdminUserController;
 use App\Http\Controllers\Api\Admin\BookingController;
@@ -12,18 +13,39 @@ use App\Http\Controllers\Api\Admin\RoomAvailabilityController;
 
 // --- GHI ĐÈ API LẤY DANH SÁCH PHÒNG (TRẢ VỀ KÈM ẢNH) ---
 Route::get('/rooms', function (Request $request) {
-    $query = DB::table('rooms');
+    $query = Room::with(['images', 'parentHomestay']);
 
     // Nếu không có param ?all=true (tức là người dùng thường) thì mới ẩn đi
     if (!$request->query('all')) {
-        $query->where('is_visible', 1)->where('status', '!=', 'hidden');
+        $query->where('is_visible', 1)
+              ->where('status', '!=', 'hidden')
+              ->where('rent_type', '!=', 'room_based');
     }
 
-    $rooms = $query->get();
+    $rooms = $query->orderBy('id', 'desc')->get()->map(function($room) {
+        // Ưu tiên hình ảnh của chính phòng đó
+        $primaryImage = $room->images->where('is_primary', true)->first() 
+                        ?? $room->images->first();
+        
+        // Nếu không có ảnh, lấy ảnh của Homestay cha (nếu là phòng riêng)
+        if (!$primaryImage && $room->parentHomestay) {
+            $primaryImage = $room->parentHomestay->images->where('is_primary', true)->first()
+                           ?? $room->parentHomestay->images->first();
+        }
 
-    foreach ($rooms as $room) {
-        $room->images = DB::table('room_images')->where('room_id', $room->id)->get();
-    }
+        return [
+            'id' => $room->id,
+            'title' => $room->title,
+            'type' => $room->type,
+            'rent_type' => $room->rent_type,
+            'parent_id' => $room->parent_id,
+            'parent_title' => $room->parentHomestay ? $room->parentHomestay->title : null,
+            'price' => $room->price,
+            'status' => $room->status,
+            'is_visible' => $room->is_visible,
+            'image' => $primaryImage ? $primaryImage->image_url : null
+        ];
+    });
 
     return response()->json($rooms);
 });
@@ -118,4 +140,11 @@ Route::prefix('admin')->group(function () {
     Route::get('/rooms/all-status',    [RoomAvailabilityController::class, 'allRooms']);
     Route::patch('/rooms/{id}/status', [RoomAvailabilityController::class, 'updateStatus']);
     Route::patch('/rooms/{id}/toggle-maintenance', [RoomAvailabilityController::class, 'toggleMaintenance']);
+
+    // Mới: Lấy danh sách homestay và chuyển đổi mô hình
+    Route::get('/rooms/homestays', [RoomController::class, 'getHomestays']);
+    Route::post('/rooms/{id}/convert-to-room-based', [RoomController::class, 'convertToRoomBased']);
+    
+    // Mới: Danh sách hiển thị riêng cho Admin (có phân cấp)
+    Route::get('/rooms', [RoomController::class, 'adminIndex']);
 });

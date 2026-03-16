@@ -232,6 +232,7 @@ interface RoomData {
   price: string | number;
   description: string;
   max_guests: number;
+  max_children: number;
   images?: any[];
   amenities?: any[]; // <--- Sửa ở đây để khớp với Backend
   amenity_list?: any[]; // Giữ lại để template không bị lỗi
@@ -326,20 +327,21 @@ const validateCapacity = () => {
      return false;
   }
 
-  if (type === 'house' || type === 'villa') { // <--- Xử lý thêm loại villa
+  if (type === 'house') {
     if (adults.value > 20) {
       errorMessage.value = 'Nguyên căn chỉ chứa tối đa 20 người lớn. Vui lòng liên hệ hotline để được hỗ trợ.';
       return false;
     }
+    // Trẻ em không giới hạn cho nguyên căn
   } else {
     if (adults.value > max) {
         errorMessage.value = `Phòng này chỉ chứa tối đa ${max} người lớn. Vui lòng chọn phòng lớn hơn.`;
         return false;
     }
     
-    const maxChildrenAllowed = Math.ceil(max / 2);
-    if (children.value > maxChildrenAllowed) {
-        errorMessage.value = `Loại phòng này chỉ được kèm tối đa ${maxChildrenAllowed} trẻ em.`;
+    const maxChildren = room.value.max_children || 0;
+    if (children.value > maxChildren) {
+        errorMessage.value = `Loại phòng này chỉ được kèm tối đa ${maxChildren} trẻ em.`;
         return false;
     }
   }

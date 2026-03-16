@@ -10,6 +10,37 @@ use Illuminate\Support\Facades\DB;
 
 class RoomController extends Controller
 {
+    public function adminIndex()
+    {
+        // CHỈ LẤY CÁC PHÒNG CHA (Nguyên căn hoặc Tòa nhà)
+        $rooms = Room::withCount('childRooms')
+            ->with(['images', 'childRooms.images'])
+            ->whereIn('rent_type', ['whole_house', 'room_based'])
+            ->orderBy('id', 'desc')
+            ->get()
+            ->map(function($room) {
+                // Formatting for admin list
+                $primaryImage = $room->images->where('is_primary', true)->first() 
+                                ?? $room->images->first();
+                
+                $room->image = $primaryImage ? $primaryImage->image_url : 'https://picsum.photos/seed/fallback/100/100';
+
+                // Format child rooms if any (for room_based)
+                if ($room->childRooms) {
+                    $room->child_rooms = $room->childRooms->map(function($child) {
+                        $pImg = $child->images->where('is_primary', true)->first() 
+                                ?? $child->images->first();
+                        $child->image = $pImg ? $pImg->image_url : null;
+                        return $child;
+                    });
+                }
+                
+                return $room;
+            });
+
+        return response()->json($rooms);
+    }
+
     public function index()
     {
         // Lấy tất cả phòng, sắp xếp mới nhất lên đầu, kèm theo hình ảnh
@@ -35,7 +66,17 @@ class RoomController extends Controller
     }
     public function show($id)
     {
-        $room = Room::with('images')->find($id);
+        $room = Room::with(['images', 'childRooms.images'])->find($id);
+
+        if ($room && $room->rent_type === 'room_based') {
+            // Include formatted child rooms for homestay
+            $room->child_rooms = $room->childRooms->map(function($child) {
+                $primaryImage = $child->images->where('is_primary', true)->first() 
+                                ?? $child->images->first();
+                $child->image = $primaryImage ? $primaryImage->image_url : null;
+                return $child;
+            });
+        }
 
         if (!$room) {
             return response()->json(['message' => 'Không tìm thấy phòng'], 404);
@@ -61,13 +102,25 @@ class RoomController extends Controller
                 return response()->json(['message' => 'Không tìm thấy phòng'], 404);
             }
 
-            // 1. Cập nhật thông tin cơ bản (Đã bao gồm is_visible)
+            // Nếu là phòng riêng, tự động lấy location từ cha
+            $location = $request->location;
+            if ($request->rent_type === 'private_room' && $request->parent_id) {
+                $parent = Room::find($request->parent_id);
+                if ($parent) {
+                    $location = $parent->location;
+                }
+            }
+
+            // 1. Cập nhật thông tin cơ bản
             $room->update([
                 'title' => $request->title,
-                'location' => $request->location,
+                'location' => $location,
+                'rent_type' => $request->rent_type,
+                'parent_id' => $request->parent_id,
                 'type' => $request->type,
                 'price' => $request->price,
                 'max_guests' => $request->max_guests,
+                'max_children' => $request->max_children,
                 'description' => $request->description,
                 'status' => $request->status,
                 'is_visible' => $request->is_visible === 'true' || $request->is_visible == 1 ? 1 : 0,
@@ -171,13 +224,25 @@ class RoomController extends Controller
         try {
             DB::beginTransaction();
 
+            // Nếu là phòng riêng, tự động lấy location từ cha
+            $location = $request->location;
+            if ($request->rent_type === 'private_room' && $request->parent_id) {
+                $parent = Room::find($request->parent_id);
+                if ($parent) {
+                    $location = $parent->location;
+                }
+            }
+
             // 1. Lưu thông tin phòng vào bảng rooms
             $room = Room::create([
                 'title' => $request->title,
-                'location' => $request->location,
+                'location' => $location,
+                'rent_type' => $request->rent_type,
+                'parent_id' => $request->parent_id,
                 'type' => $request->type,
                 'price' => $request->price,
                 'max_guests' => $request->max_guests,
+                'max_children' => $request->max_children,
                 'description' => $request->description,
                 'status' => $request->status,
                 'is_visible' => $request->is_visible === 'true' || $request->is_visible == 1 ? 1 : 0,
@@ -240,5 +305,23 @@ class RoomController extends Controller
         DB::table('amenities')->where('id', $id)->delete();
         DB::table('room_amenities')->where('amenity_id', $id)->delete();
         return response()->json(['message' => 'Đã xóa tiện nghi']);
+    }
+
+    public function getHomestays()
+    {
+        // Lấy các homestay đang cho thuê phòng lẻ
+        $homestays = \App\Models\Room::where('rent_type', 'room_based')->get();
+        return response()->json($homestays);
+    }
+
+    public function convertToRoomBased($id)
+    {
+        $room = \App\Models\Room::find($id);
+        if (!$room) {
+            return response()->json(['message' => 'Không tìm thấy homestay'], 404);
+        }
+
+        $room->update(['rent_type' => 'room_based']);
+        return response()->json(['message' => 'Đã chuyển đổi sang mô hình cho thuê phòng lẻ thành công!', 'room' => $room]);
     }
 }

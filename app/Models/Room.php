@@ -13,8 +13,11 @@ class Room extends Model
         'title',
         'location',
         'type',
+        'rent_type',
+        'parent_id',
         'price',
         'max_guests',
+        'max_children',
         'description',
         'status',
         'is_visible',
@@ -50,4 +53,31 @@ class Room extends Model
                     ->where('check_out_date', '>', $checkIn);
             });
     }
-}
+
+    // Quan hệ: Một phòng thuộc một Homestay cha
+    public function parentHomestay()
+    {
+        return $this->belongsTo(Room::class, 'parent_id');
+    }
+
+    // Quan hệ: Một Homestay có nhiều phòng riêng
+    public function privateRooms()
+    {
+        return $this->hasMany(Room::class, 'parent_id');
+    }
+
+    public function childRooms()
+    {
+        return $this->hasMany(Room::class, 'parent_id');
+    }
+
+    // Cần ghi đè truy vấn location nếu là phòng riêng
+    public function getLocationAttribute($value)
+    {
+        // Nếu là phòng riêng và location trống, lấy từ cha
+        if ($this->rent_type === 'private_room' && (empty($value) || $value === 'null')) {
+            return $this->parentHomestay ? $this->parentHomestay->location : $value;
+        }
+        return $value;
+    }
+}
