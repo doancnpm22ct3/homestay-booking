@@ -67,14 +67,37 @@
         <option value="maintenance">Bảo trì</option>
       </select>
       <span class="text-sm text-gray-400">{{ filteredRooms.length }} kết quả</span>
+      <button @click="resetFilters" class="text-sm text-emerald-600 hover:text-emerald-800 font-medium whitespace-nowrap">Xóa bộ lọc</button>
       
       <div class="ml-auto flex items-center gap-2">
-        <div class="flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-700 rounded-md text-xs font-medium border border-purple-100">
+        <button 
+          @click="filterType = 'room_based'"
+          :class="['flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium border transition-all', 
+                   filterType === 'room_based' ? 'bg-purple-600 text-white border-purple-600 shadow-sm' : 'bg-purple-50 text-purple-700 border-purple-100 hover:bg-purple-100']"
+        >
           <LayoutGrid class="w-3.5 h-3.5" /> Tòa nhà/Cơ sở
-        </div>
-        <div class="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-medium border border-blue-100">
+        </button>
+        <button 
+          @click="filterType = 'whole_house'"
+          :class="['flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium border transition-all', 
+                   filterType === 'whole_house' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100']"
+        >
           <HomeIcon class="w-3.5 h-3.5" /> Nguyên căn
-        </div>
+        </button>
+        <button 
+          @click="filterType = 'home'"
+          :class="['flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium border transition-all', 
+                   filterType === 'home' ? 'bg-amber-600 text-white border-amber-600 shadow-sm' : 'bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100']"
+        >
+          <HomeIcon class="w-3.5 h-3.5" /> Phòng Home
+        </button>
+        <button 
+          @click="filterType = 'private_room_standalone'"
+          :class="['flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium border transition-all', 
+                   filterType === 'private_room_standalone' ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' : 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100']"
+        >
+          <LayoutGrid class="w-3.5 h-3.5" /> Phòng riêng (Độc lập)
+        </button>
       </div>
     </div>
 
@@ -116,8 +139,11 @@
               <div v-else-if="room.rent_type === 'room_based'" class="flex items-center gap-1.5 text-purple-600 font-medium">
                 <LayoutGrid class="w-4 h-4" /> Đang dơn lẻ
               </div>
-              <div v-else class="flex items-center gap-1.5 text-gray-500">
-                <div class="w-1.5 h-1.5 rounded-full bg-gray-400"></div> Phòng riêng lẻ
+              <div v-else-if="room.rent_type === 'home'" class="flex items-center gap-1.5 text-amber-600 font-medium">
+                <HomeIcon class="w-4 h-4" /> Phòng Home
+              </div>
+              <div v-else class="flex items-center gap-1.5 text-emerald-600 font-medium">
+                <LayoutGrid class="w-4 h-4" /> Phòng riêng (Độc lập)
               </div>
             </td>
             <td class="p-4 text-emerald-600 font-semibold">{{ Number(room.price).toLocaleString('vi-VN') }}đ</td>
@@ -227,6 +253,40 @@
           </tr>
         </tbody>
       </table>
+
+      <!-- Phân trang -->
+      <div v-if="pagination.last_page > 1" class="p-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
+        <p class="text-sm text-gray-500">
+          Hiển thị trang {{ pagination.current_page }} / {{ pagination.last_page }} (Tổng {{ pagination.total }} kết quả)
+        </p>
+        <div class="flex items-center gap-1">
+          <button 
+            @click="fetchRooms(pagination.current_page - 1)"
+            :disabled="pagination.current_page === 1"
+            class="px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+          >
+            Trước
+          </button>
+          
+          <button 
+            v-for="p in pagination.last_page" 
+            :key="p"
+            @click="fetchRooms(p)"
+            :class="['px-3 py-1.5 rounded border text-sm font-medium transition-colors', 
+                     p === pagination.current_page ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50']"
+          >
+            {{ p }}
+          </button>
+
+          <button 
+            @click="fetchRooms(pagination.current_page + 1)"
+            :disabled="pagination.current_page === pagination.last_page"
+            class="px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+          >
+            Sau
+          </button>
+        </div>
+      </div>
     </div>
 
     <div v-if="showDetailModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" @click.self="closeDetailModal">
@@ -280,7 +340,7 @@
                 <div>
                   <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Loại hình</p>
                   <p class="font-medium text-gray-900">
-                    {{ selectedRoom.rent_type === 'whole_house' ? 'Nguyên căn' : (selectedRoom.rent_type === 'room_based' ? 'Tòa nhà/Cơ sở' : 'Phòng riêng lẻ') }}
+                    {{ selectedRoom.rent_type === 'whole_house' ? 'Nguyên căn' : (selectedRoom.rent_type === 'home' ? 'Phòng Home (Độc lập)' : (selectedRoom.rent_type === 'room_based' ? 'Tòa nhà/Cơ sở' : 'Phòng riêng lẻ')) }}
                   </p>
                 </div>
                 <div v-if="selectedRoom.rent_type !== 'room_based'">
@@ -370,6 +430,11 @@ const router = useRouter();
 
 // State quản lý danh sách và thống kê
 const rooms = ref<any[]>([]);
+const pagination = ref({
+  current_page: 1,
+  last_page: 1,
+  total: 0
+});
 const stats = ref({
   total: 0, available: 0, deposited: 0, occupied: 0, maintenance: 0
 });
@@ -384,14 +449,25 @@ const toggleExpand = (id: number) => {
 // Search / Filter
 const searchQuery = ref('');
 const filterStatus = ref('');
+const filterType = ref('');
 
 const filteredRooms = computed(() => {
-  return rooms.value.filter(room => {
-    const matchesName = !searchQuery.value || room.title?.toLowerCase().includes(searchQuery.value.toLowerCase());
-    const matchesStatus = !filterStatus.value || room.status === filterStatus.value;
-    return matchesName && matchesStatus;
-  });
+  // Với Laravel pagination, filtering được xử lý tại backend.
+  // Ở đây chúng ta chỉ trả về rooms.value (đã được fetch theo filter).
+  return rooms.value;
 });
+
+// Watchers cho bộ lọc để fetch lại dữ liệu
+import { watch } from 'vue';
+watch([searchQuery, filterStatus, filterType], () => {
+  fetchRooms(1);
+}, { debounce: 500 } as any);
+
+const resetFilters = () => {
+  searchQuery.value = '';
+  filterStatus.value = '';
+  filterType.value = '';
+};
 
 // State quản lý Modal Quick View
 const showDetailModal = ref(false);
@@ -407,12 +483,23 @@ const formatUrl = (url: string) => {
 };
 
 // Hàm lấy dữ liệu danh sách phòng
-const fetchRooms = async () => {
+const fetchRooms = async (page = 1) => {
   try {
-    const response = await fetch('/api/admin/rooms'); // Dùng API Admin mới
+    const url = new URL('/api/admin/rooms', window.location.origin);
+    url.searchParams.append('page', page.toString());
+    if (searchQuery.value) url.searchParams.append('search', searchQuery.value);
+    if (filterStatus.value) url.searchParams.append('status', filterStatus.value);
+    if (filterType.value) url.searchParams.append('type', filterType.value);
+    
+    const response = await fetch(url.toString(), {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+        'Accept': 'application/json'
+      }
+    }); 
     const data = await response.json();
     
-    rooms.value = data.map((room: any) => {
+    rooms.value = data.data.map((room: any) => {
       let thumb = 'https://picsum.photos/seed/room/600/400';
       if (room.images && room.images.length > 0) {
         thumb = room.images[0].image_url;
@@ -421,6 +508,12 @@ const fetchRooms = async () => {
       }
       return { ...room, image: formatUrl(thumb) };
     });
+
+    pagination.value = {
+      current_page: data.current_page,
+      last_page: data.last_page,
+      total: data.total
+    };
   } catch (error) {
     console.error('Lỗi khi tải danh sách phòng:', error);
   }

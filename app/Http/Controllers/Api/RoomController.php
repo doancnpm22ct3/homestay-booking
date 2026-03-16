@@ -10,20 +10,53 @@ use Illuminate\Support\Facades\DB;
 
 class RoomController extends Controller
 {
-    public function adminIndex()
+    public function adminIndex(Request $request)
     {
-        // CHỈ LẤY CÁC PHÒNG CHA (Nguyên căn hoặc Tòa nhà)
-        $rooms = Room::withCount('childRooms')
+        // CHỈ LẤY CÁC PHÒNG CHA (Nguyên căn, Tòa nhà, Phòng Home, hoặc Phòng riêng lẻ không thuộc tòa nhà nào)
+        $query = Room::withCount('childRooms')
             ->with(['images', 'childRooms.images'])
-            ->whereIn('rent_type', ['whole_house', 'room_based'])
-            ->orderBy('id', 'desc')
-            ->get()
-            ->map(function($room) {
+            ->where(function($q) {
+                $q->whereIn('rent_type', ['whole_house', 'room_based', 'home'])
+                  ->orWhere(function($sq) {
+                      $sq->where('rent_type', 'private_room')
+                         ->whereNull('parent_id');
+                  });
+            });
+
+        // Search & Filter
+        if ($request->search) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+        if ($request->type) {
+            if ($request->type === 'private_room_standalone') {
+                $query->where('rent_type', 'private_room')->whereNull('parent_id');
+            } else {
+                $query->where('rent_type', $request->type);
+            }
+        }
+
+        $rooms = $query->orderBy('id', 'desc')->paginate($request->input('per_page', 10));
+
+        $rooms->getCollection()->transform(function($room) {
                 // Formatting for admin list
                 $primaryImage = $room->images->where('is_primary', true)->first() 
                                 ?? $room->images->first();
                 
                 $room->image = $primaryImage ? $primaryImage->image_url : 'https://picsum.photos/seed/fallback/100/100';
+
+                // Label hiển thị
+                if ($room->rent_type === 'whole_house') {
+                    $room->type_label = 'Nguyên căn';
+                } elseif ($room->rent_type === 'home') {
+                    $room->type_label = 'Phòng Home';
+                } elseif ($room->rent_type === 'room_based') {
+                    $room->type_label = 'Tòa nhà/Cơ sở';
+                } else {
+                    $room->type_label = 'Phòng riêng (Độc lập)';
+                }
 
                 // Format child rooms if any (for room_based)
                 if ($room->childRooms) {
@@ -187,14 +220,16 @@ class RoomController extends Controller
 // HÀM THỐNG KÊ SỐ LƯỢNG PHÒNG CHO ADMIN
     public function stats()
     {
-        // Đếm tổng tất cả các phòng
-        $total = \App\Models\Room::count();
+        // ĐẾM CHỈ CÁC PHÒNG CỐ ĐỊNH (Phòng đơn, Phòng Home, Nguyên căn)
+        // LOẠI BỎ 'room_based' (Tòa nhà/Homestay tổng) vì nó là vật chứa, không phải đơn vị thuê trực tiếp
         
-        // ĐẾM ĐÚNG TỪ KHÓA TRONG DATABASE CỦA BẠN NÈ:
-        $available = \App\Models\Room::where('status', 'available')->count(); // Phòng trống
-        $deposited = \App\Models\Room::where('status', 'booked')->count();    // Đã đặt cọc (chữ 'booked')
-        $occupied = \App\Models\Room::where('status', 'in_use')->count();     // Đang sử dụng (chữ 'in_use')
-        $maintenance = \App\Models\Room::where('status', 'maintenance')->count();
+        $baseQuery = \App\Models\Room::where('rent_type', '!=', 'room_based');
+
+        $total = (clone $baseQuery)->count();
+        $available = (clone $baseQuery)->where('status', 'available')->count();
+        $deposited = (clone $baseQuery)->where('status', 'booked')->count();
+        $occupied = (clone $baseQuery)->where('status', 'in_use')->count();
+        $maintenance = (clone $baseQuery)->where('status', 'maintenance')->count();
 
         // Trả về cho Vue hiển thị
         return response()->json([

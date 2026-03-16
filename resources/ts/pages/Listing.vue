@@ -385,7 +385,7 @@ const popularRooms = computed(() => {
 });
 
 const houseRooms = computed(() => {
-  return allRooms.value.filter(room => room.rawType === 'whole_house');
+  return allRooms.value.filter(room => room.rawType === 'whole_house' || room.rawType === 'home');
 });
 
 const privateRooms = computed(() => {
@@ -475,7 +475,7 @@ const executeSearch = () => {
   router.replace({
     query: {
       location: location.value || undefined,
-      type: type.value === 'Nguyên căn' ? 'whole_house' : (type.value === 'Phòng riêng' ? 'private_room' : undefined),
+      type: type.value === 'Nguyên căn' ? ['whole_house', 'home'] : (type.value === 'Phòng riêng' ? 'private_room' : undefined),
       guests: guests.value ? String(guests.value) : undefined
     }
   });
