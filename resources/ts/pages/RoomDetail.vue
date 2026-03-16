@@ -81,8 +81,8 @@
                   <Clock class="w-5 h-5 text-[#4A7055]" /> Giờ check in - check out
                 </h3>
                 <ul class="list-disc pl-5 text-gray-600 space-y-1.5 marker:text-[#4A7055]">
-                  <li>Giờ check in: 14:00 (Đúng giờ có thể delay 10-15 phút)</li>
-                  <li>Giờ check out: 12:00 (Đúng giờ có thể delay 10-15 phút)</li>
+                  <li>Giờ check in: Đúng giờ có thể delay 10-15 phút</li>
+                  <li>Giờ check out: Đúng giờ có thể delay 10-15 phút</li>
                   <li class="text-red-500 font-medium mt-2 list-none -ml-5 bg-red-50 p-2 rounded-md"><AlertTriangle class="w-4 h-4 inline-block mr-1 mb-1" />Khách có thể đến trễ tối đa 1 tiếng so với giờ Check-in. Quá 1 tiếng, hệ thống tự động hủy phòng và không hoàn cọc.</li>
                 </ul>
               </div>

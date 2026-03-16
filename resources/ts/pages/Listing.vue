@@ -279,21 +279,21 @@ interface Room {
 const route = useRoute();
 const router = useRouter();
 
-const bannerImages = [
-  'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2070&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1502672260266-1c1de2d9d0cb?q=80&w=2080&auto=format&fit=crop'
-];
+const bannerImages = ref([
+  '/images/banner 1.jpg',
+  '/images/banner 2.jpg',
+  '/images/banner 3.jpg'
+]);
 const currentSlide = ref(0);
 let slideInterval: ReturnType<typeof setInterval> | null = null;
 
 const nextSlide = () => {
-  currentSlide.value = (currentSlide.value + 1) % bannerImages.length;
+  currentSlide.value = (currentSlide.value + 1) % bannerImages.value.length;
   resetInterval();
 };
 
 const prevSlide = () => {
-  currentSlide.value = (currentSlide.value - 1 + bannerImages.length) % bannerImages.length;
+  currentSlide.value = (currentSlide.value - 1 + bannerImages.value.length) % bannerImages.value.length;
   resetInterval();
 };
 
@@ -304,7 +304,7 @@ const goToSlide = (index: number) => {
 
 const startInterval = () => {
   slideInterval = setInterval(() => {
-    currentSlide.value = (currentSlide.value + 1) % bannerImages.length;
+    currentSlide.value = (currentSlide.value + 1) % bannerImages.value.length;
   }, 4000);
 };
 

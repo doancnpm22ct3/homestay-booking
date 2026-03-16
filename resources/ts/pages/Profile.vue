@@ -29,7 +29,7 @@
               @click="activeTab = 'saved'"
               :class="['pb-4 border-b-2 transition-colors', activeTab === 'saved' ? 'border-[#4A7055] text-[#4A7055]' : 'border-transparent text-gray-400 hover:text-[#4A7055]']"
             >
-              Đã lưu
+              Đã thích
             </button>
             <button 
               @click="activeTab = 'history'"
@@ -135,9 +135,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import RoomCard from '../components/RoomCard.vue';
+
 
 // Khai báo Interface cho User
 interface User {
@@ -230,13 +231,31 @@ const handleUpdateAccount = async () => {
 };
 
 // DỮ LIỆU MẪU CỦA BẠN (Mình dùng lại component RoomCard để code ngắn gọn)
-const savedRooms = Array(6).fill({
-  id: '1',
-  title: 'Phòng Mơ Màng, Số 10 Núi Thành',
-  location: 'Quận Cẩm Lệ, TP. Đà Nẵng',
-  type: 'Phòng riêng',
-  price: '120.000đ',
-  imageUrl: 'https://picsum.photos/seed/room/800/600',
+// 1. Biến cục gạch thành đồ "sống" (reactive) và để trống ban đầu
+const savedRooms = ref<any[]>([]);
+
+// 2. Viết một hàm chuyên đi lục lọi bộ nhớ xem có lưu phòng nào không
+const loadSavedRooms = () => {
+  const data = localStorage.getItem('saved_rooms');
+  if (data) {
+    savedRooms.value = JSON.parse(data);
+  } else {
+    savedRooms.value = []; // Nếu chưa lưu gì thì trả về mảng rỗng
+  }
+};
+
+// 3. Chạy hàm này ngay khi vừa vào trang Profile
+onMounted(() => {
+  // ... (Đoạn check user cũ của bạn ở trên cứ giữ nguyên nhé) ...
+  
+  // Gọi hàm lấy phòng đã lưu
+  loadSavedRooms();
+});
+
+watch(activeTab, (newTab) => {
+  if (newTab === 'saved') {
+    loadSavedRooms();
+  }
 });
 
 const historyRooms = Array(3).fill({

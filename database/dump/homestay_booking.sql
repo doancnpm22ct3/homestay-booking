@@ -1,4 +1,6 @@
 -- Homestay Booking SQL Dump
+USE `homestay_booking`;
+SET FOREIGN_KEY_CHECKS = 0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -352,3 +354,4 @@ INSERT INTO `users` (`id`, `name`, `email`, `role`, `status`, `phone`, `email_ve
 ('15', 'Lan Anh', 'volananh2k4@gmail.com', 'customer', 'active', '0945999305', NULL, '$2y$10$OP9qeiy8GykRTZj8PUs4YevbDc6otBLYZauesw3sLl.VqTkNRMDOq', NULL, '2026-03-11 14:55:59', '2026-03-11 15:23:00');
 
 COMMIT;
+SET FOREIGN_KEY_CHECKS = 1;

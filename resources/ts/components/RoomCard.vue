@@ -2,12 +2,13 @@
   <div @click="goToDetail" class="group block h-full cursor-pointer">
     <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col border border-gray-100/50">
       
-      <div class="relative aspect-[16/10] overflow-hidden">
+      <div class="relative aspect-[16/10] overflow-hidden bg-gray-100">
         <img
           :src="imageUrl"
           :alt="title"
           class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           referrerpolicy="no-referrer"
+          @error="(e) => (e.target as HTMLImageElement).src = 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image'"
         />
         
         <div 
@@ -18,17 +19,34 @@
           {{ statusText }}
         </div>
 
-        <div class="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-bold text-gray-800 shadow-sm border border-gray-100 z-10">
-          <Star class="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-          <span>4.8</span>
-        </div>
+        <button 
+          @click.stop="toggleSaveRoom" 
+          class="absolute top-4 right-4 p-2 rounded-full bg-white/50 backdrop-blur-md hover:bg-white hover:scale-110 transition-all duration-200 shadow-sm z-20 group/btn"
+          title="Lưu phòng này"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            :class="['w-5 h-5 transition-colors', isSaved ? 'fill-red-500 text-red-500' : 'fill-transparent text-gray-800 group-hover/btn:text-red-500']" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor" 
+            stroke-width="2"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
       </div>
 
-      <div class="flex-grow flex flex-col p-6">
+      <div class="flex-grow flex flex-col p-5">
         
-        <h3 class="text-xl font-extrabold text-gray-950 mb-1.5 font-['Playfair_Display'] line-clamp-1 group-hover:text-[#4A7055] transition-colors leading-tight">
-          {{ title }}
-        </h3>
+        <div class="flex justify-between items-start mb-2 gap-3">
+          <h3 class="text-xl font-extrabold text-gray-950 font-['Playfair_Display'] line-clamp-1 group-hover:text-[#4A7055] transition-colors leading-tight">
+            {{ title }}
+          </h3>
+          <div class="flex items-center gap-1 mt-1 text-sm font-bold text-gray-800 shrink-0">
+            <Star class="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            <span>4.8</span>
+          </div>
+        </div>
         
         <div class="flex items-center gap-1.5 text-gray-600 text-sm mb-5 font-['Inter']">
           <MapPin class="w-4 h-4 shrink-0 text-[#4A7055] opacity-80" />
@@ -36,7 +54,6 @@
         </div>
         
         <div class="mt-auto pt-4 border-t border-gray-100/70 flex items-center justify-between">
-          
           <div class="flex items-center gap-2">
             <div class="bg-gray-100 text-[#4A7055] p-2 rounded-full shadow-inner border border-gray-100">
               <HomeIcon class="w-4 h-4" />
@@ -47,23 +64,22 @@
           </div>
           
           <div class="text-right">
-            <div class="text-1.5xl font-extrabold text-[#4A7055] font-['Inter']">{{ price }}</div>
+            <div class="text-lg font-extrabold text-[#4A7055] font-['Inter']">{{ price }}</div>
           </div>
-
         </div>
+        
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed, onMounted } from 'vue'; 
 import { useRouter } from 'vue-router';
 import { MapPin, Star, Home as HomeIcon } from 'lucide-vue-next';
 
 const router = useRouter();
 
-// Sử dụng cú pháp Type-only props declaration của Vue 3 + TypeScript
 const props = defineProps<{
   id: string;
   title: string;
@@ -71,14 +87,45 @@ const props = defineProps<{
   type: string;
   price: string;
   imageUrl: string;
-  status?: string; // Khai báo thêm prop status (có thể undefined)
+  status?: string; 
 }>();
+
+const isSaved = ref(false);
 
 const goToDetail = () => {
   router.push(`/room/${props.id}`);
 };
 
-// Logic chuyển đổi chữ tiếng Anh sang tiếng Việt cho nhãn (Từ code của Hiếu)
+onMounted(() => {
+  try {
+    const savedRoomsList = JSON.parse(localStorage.getItem('saved_rooms') || '[]');
+    isSaved.value = savedRoomsList.some((room: any) => room.id === props.id);
+  } catch (e) {
+    console.error("Lỗi đọc dữ liệu saved_rooms", e);
+  }
+});
+
+const toggleSaveRoom = () => {
+  let savedRoomsList = JSON.parse(localStorage.getItem('saved_rooms') || '[]');
+  
+  if (isSaved.value) {
+    savedRoomsList = savedRoomsList.filter((room: any) => room.id !== props.id);
+    isSaved.value = false;
+  } else {
+    savedRoomsList.push({
+      id: props.id,
+      title: props.title,
+      location: props.location,
+      type: props.type,
+      price: props.price,
+      imageUrl: props.imageUrl
+    });
+    isSaved.value = true;
+  }
+  
+  localStorage.setItem('saved_rooms', JSON.stringify(savedRoomsList));
+};
+
 const statusText = computed(() => {
   switch (props.status) {
     case 'booked': return 'Đã đặt cọc';
@@ -88,13 +135,12 @@ const statusText = computed(() => {
   }
 });
 
-// Logic đổi màu nhãn tùy theo trạng thái (Từ code của Hiếu)
 const statusClass = computed(() => {
   switch (props.status) {
-    case 'booked': return 'bg-amber-500'; // Màu cam
-    case 'in_use': return 'bg-red-500'; // Màu đỏ
-    case 'maintenance': return 'bg-gray-500'; // Màu xám
-    default: return 'bg-[#4A7055]'; // Màu xanh chủ đạo của bạn
+    case 'booked': return 'bg-amber-500'; 
+    case 'in_use': return 'bg-red-500'; 
+    case 'maintenance': return 'bg-gray-500'; 
+    default: return 'bg-[#4A7055]'; 
   }
 });
 </script>

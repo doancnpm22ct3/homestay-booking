@@ -34,8 +34,8 @@
             </div>
             <h3 class="text-xl font-bold text-gray-900 mb-3 font-['Playfair_Display']">Thời gian</h3>
             <ul class="space-y-2 text-gray-600 text-sm">
-              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Nhận phòng: Từ 14:00</li>
-              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Trả phòng: Trước 12:00 trưa</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Nhận phòng: Có thể chủ động theo khách hàng</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Trả phòng: Trước 15 phút giờ đã hẹn</li>
               <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Hỗ trợ nhận phòng sớm (Tùy tình trạng trống)</li>
             </ul>
           </div>
@@ -46,7 +46,7 @@
             </div>
             <h3 class="text-xl font-bold text-gray-900 mb-3 font-['Playfair_Display']">Thanh toán</h3>
             <ul class="space-y-2 text-gray-600 text-sm">
-              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Cọc trước 50% khi đặt phòng</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Cọc trước 30% khi đặt phòng</li>
               <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Thanh toán 50% còn lại khi nhận phòng</li>
               <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Chấp nhận chuyển khoản & tiền mặt</li>
             </ul>
