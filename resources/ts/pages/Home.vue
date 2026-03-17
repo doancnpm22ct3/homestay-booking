@@ -437,7 +437,7 @@ onMounted(async () => {
         id: String(room.id),
         title: room.title,
         location: room.location,
-        type: room.rent_type === 'private_room' ? 'Phòng riêng' : 'Nguyên căn',
+        type: room.rent_type === 'private_room' ? 'Phòng riêng' : (room.rent_type === 'home' ? 'Phòng Home' : 'Nguyên căn'),
         price: Number(room.price).toLocaleString('vi-VN') + ' VNĐ/đêm', 
         imageUrl: thumb, 
         status: room.status,

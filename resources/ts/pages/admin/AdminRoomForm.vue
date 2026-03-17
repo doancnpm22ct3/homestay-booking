@@ -34,39 +34,52 @@
         >
           <LayoutGrid class="w-5 h-5" /> Thêm Phòng Riêng
         </button>
+        <button 
+          type="button"
+          @click="rentMode = 'home'"
+          :class="[
+            'flex-1 py-3 px-4 rounded-lg font-bold transition-all flex items-center justify-center gap-2',
+            rentMode === 'home' ? 'bg-white text-emerald-700 shadow-sm' : 'text-emerald-600/70 hover:bg-white/50'
+          ]"
+        >
+          <HomeIcon class="w-5 h-5" /> Thêm Phòng Home
+        </button>
       </div>
 
       <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <h2 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">
-          {{ rentMode === 'whole_house' ? 'Thông tin Nguyên Căn' : 'Thông tin Phòng Riêng' }}
+          {{ rentMode === 'whole_house' ? 'Thông tin Nguyên Căn' : (rentMode === 'home' ? 'Thông tin Phòng Home (Đơn lẻ)' : 'Thông tin Phòng Riêng') }}
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div :class="rentMode === 'whole_house' ? 'md:col-span-2' : ''">
+          <div :class="(rentMode === 'whole_house' || rentMode === 'home') ? 'md:col-span-2' : ''">
             <label class="block text-sm font-medium text-gray-700 mb-1">
-              {{ rentMode === 'whole_house' ? 'Tên Nguyên Căn / Homestay *' : 'Tên phòng (VD: Phòng 101) *' }}
+              {{ (rentMode === 'whole_house' || rentMode === 'home') ? 'Tên Nguyên Căn / Homestay / Phòng Home *' : 'Tên phòng (VD: Phòng 101) *' }}
             </label>
             <input v-model="form.title" type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
           </div>
 
           <div v-if="rentMode === 'private_room'">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Thuộc Homestay *</label>
-            <select v-model="form.parent_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-white">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Thuộc Homestay (Không bắt buộc)</label>
+            <select v-model="form.parent_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-white">
               <option value="">-- Chọn Homestay cơ sở --</option>
               <option v-for="h in homestays" :key="h.id" :value="h.id">{{ h.title }}</option>
             </select>
           </div>
 
-          <div v-if="rentMode === 'private_room'">
+          <div v-if="rentMode === 'private_room' || rentMode === 'home'">
             <label class="block text-sm font-medium text-gray-700 mb-1">Loại phòng *</label>
             <select v-model="roomTypeStandard" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-white">
               <option value="standard">Phòng Tiêu Chuẩn (2 Người lớn + 1 Trẻ em)</option>
               <option value="family">Phòng Gia Đình (4 Người lớn + 2 Trẻ em)</option>
             </select>
+            <div v-if="roomTypeStandard" class="mt-2 p-3 bg-emerald-50 rounded-lg border border-emerald-100 text-xs text-emerald-800 italic">
+              💡 Khách hàng sẽ thấy: Tối đa {{ form.max_guests }} người lớn + {{ form.max_children }} trẻ em.
+            </div>
           </div>
 
-          <div v-if="rentMode === 'whole_house'" class="md:col-span-2">
+          <div v-if="rentMode === 'whole_house' || rentMode === 'home' || (rentMode === 'private_room' && !form.parent_id)" class="md:col-span-2">
             <label class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ cụ thể (Đà Nẵng) *</label>
-            <input v-model="form.location" type="text" required placeholder="Nhập địa chỉ của nguyên căn này..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
+            <input v-model="form.location" type="text" :required="rentMode === 'whole_house' || rentMode === 'home' || !form.parent_id" placeholder="Nhập địa chỉ..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái hiện tại</label>
@@ -168,7 +181,7 @@ const router = useRouter();
 const isEdit = ref(route.path.includes('edit'));
 const isLoadingData = ref(false);
 
-const rentMode = ref<'whole_house' | 'private_room'>('whole_house');
+const rentMode = ref<'whole_house' | 'private_room' | 'home'>('whole_house');
 const homestays = ref<any[]>([]); // Danh sách homestay cha
 const roomTypeStandard = ref('standard');
 
@@ -191,6 +204,11 @@ watch(rentMode, (newMode) => {
     form.value.max_guests = 20;
     form.value.max_children = 99;
     form.value.parent_id = '';
+  } else if (newMode === 'home') {
+    form.value.type = 'room';
+    form.value.rent_type = 'home';
+    form.value.parent_id = '';
+    updatePrivateRoomCapacity();
   } else {
     form.value.type = 'room';
     form.value.rent_type = 'private_room';
@@ -210,7 +228,7 @@ const updatePrivateRoomCapacity = () => {
 };
 
 watch(roomTypeStandard, () => {
-  if (rentMode.value === 'private_room') updatePrivateRoomCapacity();
+  if (rentMode.value === 'private_room' || rentMode.value === 'home') updatePrivateRoomCapacity();
 });
 
 const selectedFiles = ref<File[]>([]);
@@ -260,8 +278,14 @@ onMounted(async () => {
       form.value.max_children = data.max_children || 0;
 
       // Xác định rentMode và roomTypeStandard
-      rentMode.value = form.value.rent_type === 'private_room' ? 'private_room' : 'whole_house';
-      if (rentMode.value === 'private_room') {
+      if (form.value.rent_type === 'private_room') {
+        rentMode.value = 'private_room';
+      } else if (form.value.rent_type === 'home') {
+        rentMode.value = 'home';
+      } else {
+        rentMode.value = 'whole_house';
+      }
+      if (rentMode.value === 'private_room' || rentMode.value === 'home') {
         roomTypeStandard.value = form.value.max_guests <= 2 ? 'standard' : 'family';
       }
       

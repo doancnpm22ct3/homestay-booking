@@ -10,7 +10,16 @@
     <div v-else-if="room" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
       
       <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2 font-['Playfair_Display']">{{ room.title }} - {{ room.location }}</h1>
+        <div class="flex flex-wrap items-center gap-4 mb-2">
+          <h1 class="text-3xl font-bold text-gray-900 font-['Playfair_Display']">{{ room.title }} - {{ room.location }}</h1>
+          <div 
+            v-if="room.status && room.status !== 'available'" 
+            class="px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm font-['Inter'] tracking-wide"
+            :class="statusClass"
+          >
+            {{ statusText }}
+          </div>
+        </div>
         <div class="flex items-center gap-4 text-sm text-gray-600 font-['Inter']">
           <div class="flex items-center gap-1">
             <Star class="w-4 h-4 fill-amber-400 text-amber-400" />
@@ -91,11 +100,22 @@
                 <h3 class="font-bold text-gray-900 mb-3 text-lg flex items-center gap-2">
                   <Users class="w-5 h-5 text-[#4A7055]" /> Quy định số lượng khách
                 </h3>
-                <div class="space-y-2 text-gray-600 text-sm">
-                  <p>📍 <strong>Phòng 1-2 người:</strong> Tối đa 2 người lớn. Hỗ trợ ở ghép tối đa 1 trẻ em (dưới 10 tuổi).</p>
-                  <p>📍 <strong>Phòng 1-4 người:</strong> Tối đa 4 người lớn. Hỗ trợ ở ghép tối đa 2 trẻ em (dưới 10 tuổi).</p>
-                  <p>📍 <strong>Nguyên căn:</strong> Tối đa 20 người lớn. <strong class="text-[#4A7055]">Miễn phí và không giới hạn số lượng trẻ em đi kèm.</strong></p>
-                  <p class="text-red-500 italic mt-2">* Khách đoàn từ 5 người lớn trở lên vui lòng thuê 2 phòng hoặc chọn Nguyên căn.</p>
+                <div class="space-y-4 text-gray-600">
+                  <div v-if="room.rent_type === 'whole_house' || room.rent_type === 'home'" class="flex items-start gap-3 p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0"></div>
+                    <div>
+                      <p class="font-bold text-emerald-900">Quy định thuê nguyên căn / standalone:</p>
+                      <p class="text-sm">Tối đa {{ room.max_guests || 20 }} người lớn. <span class="text-emerald-700 font-medium">Miễn phí và không giới hạn số lượng trẻ em đi kèm.</span></p>
+                    </div>
+                  </div>
+                  <div v-else class="flex items-start gap-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
+                    <div class="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
+                    <div>
+                      <p class="font-bold text-blue-900">Quy định phòng riêng này:</p>
+                      <p class="text-sm">Tối đa {{ room.max_guests }} người lớn. Hỗ trợ ở ghép tối đa {{ room.max_children }} trẻ em (dưới 10 tuổi).</p>
+                    </div>
+                  </div>
+                  <p class="text-red-500 italic text-xs mt-2">* Khách đoàn từ 5 người lớn trở lên vui lòng cân nhắc thuê nhiều phòng hoặc chọn Nguyên căn.</p>
                 </div>
               </div>
 
@@ -194,9 +214,9 @@
             <button 
               @click="handleBook"
               class="w-full bg-[#4A7055] hover:bg-[#3b5a44] text-white py-4 rounded-xl font-bold text-lg transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-              :disabled="!checkIn || !checkOut"
+              :disabled="!checkIn || !checkOut || room?.status !== 'available'"
             >
-              Đặt phòng ngay
+              {{ room?.status === 'available' ? 'Đặt phòng ngay' : statusText }}
             </button>
 
             <div class="mt-4 text-center text-sm font-medium text-gray-500">
@@ -219,7 +239,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { MapPin, Star, Clock, CreditCard, Users, AlertTriangle, Home as HomeIcon } from 'lucide-vue-next';
 
@@ -233,6 +253,8 @@ interface RoomData {
   description: string;
   max_guests: number;
   max_children: number;
+  rent_type?: string; 
+  status?: string;
   images?: any[];
   amenities?: any[]; // <--- Sửa ở đây để khớp với Backend
   amenity_list?: any[]; // Giữ lại để template không bị lỗi
@@ -303,6 +325,27 @@ onMounted(async () => {
     console.error(error);
   } finally {
     loading.value = false;
+  }
+});
+
+const statusText = computed(() => {
+  if (!room.value) return '';
+  switch (room.value.status) {
+    case 'booked': return 'Đã đặt cọc';
+    case 'in_use': return 'Đang có khách';
+    case 'maintenance': return 'Bảo trì';
+    case 'available': return 'Sẵn sàng';
+    default: return '';
+  }
+});
+
+const statusClass = computed(() => {
+  if (!room.value) return '';
+  switch (room.value.status) {
+    case 'booked': return 'bg-amber-500';
+    case 'in_use': return 'bg-red-500';
+    case 'maintenance': return 'bg-gray-500';
+    default: return 'bg-[#4A7055]';
   }
 });
 

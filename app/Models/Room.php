@@ -78,6 +78,7 @@ class Room extends Model
         if ($this->rent_type === 'private_room' && (empty($value) || $value === 'null')) {
             return $this->parentHomestay ? $this->parentHomestay->location : $value;
         }
+        // Đối với 'home' hoặc 'whole_house', location được lưu trực tiếp tại record này
         return $value;
     }
 }
