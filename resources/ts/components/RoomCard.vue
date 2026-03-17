@@ -90,13 +90,9 @@ import { MapPin, Star, Home as HomeIcon } from 'lucide-vue-next';
 
 const router = useRouter();
 
-<<<<<<< HEAD
-=======
-// Define emits
+// Khai báo sự kiện emit để TypeScript không cằn nhằn
 defineEmits(['filterByParent']);
 
-// Sử dụng cú pháp Type-only props declaration của Vue 3 + TypeScript
->>>>>>> f269415056b64dd1590ffc8432100467a4fab9f2
 const props = defineProps<{
   id: string;
   title: string;
@@ -105,11 +101,9 @@ const props = defineProps<{
   price: string;
   imageUrl: string;
   status?: string; 
-<<<<<<< HEAD
-=======
+  // 2 biến này được khai báo để fix lỗi gạch đỏ:
   parentTitle?: string;
   parentId?: number | string;
->>>>>>> f269415056b64dd1590ffc8432100467a4fab9f2
 }>();
 
 const isSaved = ref(false);
