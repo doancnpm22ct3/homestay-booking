@@ -210,6 +210,7 @@ const form = ref({
 
 // LOGIC CẬP NHẬT MÔ HÌNH THUÊ
 watch(rentMode, (newMode) => {
+  if (isLoadingData.value) return;
   form.value.rent_type = newMode;
   if (newMode === 'whole_house') {
     form.value.type = 'house';
@@ -220,7 +221,8 @@ watch(rentMode, (newMode) => {
     form.value.type = 'room';
     form.value.rent_type = 'home';
     form.value.parent_id = '';
-    form.value.max_children = 99; // Miễn phí và không giới hạn trẻ em cho Phòng Home
+    // Không force max_children = 99 ở đây nếu là đang sửa hoặc muốn nhập thủ công
+    if (!isEdit.value) form.value.max_children = 99; 
   } else {
     form.value.type = 'room';
     form.value.rent_type = 'private_room';
@@ -240,7 +242,9 @@ const updatePrivateRoomCapacity = () => {
 };
 
 watch(roomTypeStandard, () => {
-  if (rentMode.value === 'private_room' || rentMode.value === 'home') updatePrivateRoomCapacity();
+  if (isLoadingData.value) return;
+  // CHỈ cập nhật tự động cho Phòng Riêng (tab 2), còn Phòng Home (tab 3) cho phép sửa tay
+  if (rentMode.value === 'private_room') updatePrivateRoomCapacity();
 });
 
 const selectedFiles = ref<File[]>([]);

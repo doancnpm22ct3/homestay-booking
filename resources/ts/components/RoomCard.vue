@@ -70,9 +70,6 @@
             </div>
             <div class="text-sm text-gray-500 font-['Inter']">
               <span class="font-medium text-gray-900">{{ type }}</span>
-              <span v-if="rent_type === 'home' || rent_type === 'whole_house'" class="block text-[11px] text-[#4A7055] font-bold mt-0.5">
-                Sức chứa: {{ max_guests }} NL + {{ max_children || 0 }} TE (<10t)
-              </span>
             </div>
           </div>
           

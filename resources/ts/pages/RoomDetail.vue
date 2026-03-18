@@ -150,7 +150,7 @@
                     <div class="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0"></div>
                     <div>
                       <p class="font-bold text-emerald-900">Quy định thuê nguyên căn / standalone:</p>
-                      <p class="text-sm">Tối đa {{ room.max_guests || 20 }} người lớn. <span class="text-emerald-700 font-medium">Miễn phí và không giới hạn số lượng trẻ em đi kèm.</span></p>
+                      <p class="text-sm">Tối đa {{ room.max_guests }} người lớn và {{ room.max_children }} trẻ em đi kèm.</p>
                     </div>
                   </div>
                   <div v-else class="flex items-start gap-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
