@@ -11,7 +11,7 @@
       
       <div class="mb-6">
         <div class="flex flex-wrap items-center gap-4 mb-2">
-          <h1 class="text-3xl font-bold text-gray-900 font-['Playfair_Display']">{{ room.title }} - {{ room.location }}</h1>
+          <h1 class="text-3xl font-bold text-gray-900 font-['Playfair_Display']">{{ room.title }}</h1>
           <div 
             v-if="room.status && room.status !== 'available'" 
             class="px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm font-['Inter'] tracking-wide"
@@ -34,21 +34,63 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12 h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-sm">
-        <div class="md:col-span-2 h-full">
-          <img :src="mainImage" alt="Main" class="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" referrerpolicy="no-referrer" />
+        
+        <div class="md:col-span-2 h-full relative group">
+          <img @click="openGallery(0)" :src="allImages[0] || 'https://picsum.photos/seed/roommain/1200/800'" alt="Main" class="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" referrerpolicy="no-referrer" />
+          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none"></div>
         </div>
+        
         <div class="hidden md:grid grid-rows-2 gap-4 h-full">
-          <img :src="subImages[0] || 'https://picsum.photos/seed/room2/600/400'" alt="Room" class="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" referrerpolicy="no-referrer" />
-          <img :src="subImages[1] || 'https://picsum.photos/seed/room3/600/400'" alt="Room" class="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" referrerpolicy="no-referrer" />
+          <div class="relative group h-full">
+            <img @click="openGallery(1)" :src="allImages[1] || 'https://picsum.photos/seed/room2/600/400'" alt="Room" class="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" referrerpolicy="no-referrer" />
+          </div>
+          <div class="relative group h-full">
+            <img @click="openGallery(2)" :src="allImages[2] || 'https://picsum.photos/seed/room3/600/400'" alt="Room" class="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" referrerpolicy="no-referrer" />
+          </div>
         </div>
+        
         <div class="hidden md:grid grid-rows-2 gap-4 h-full">
-          <img :src="subImages[2] || 'https://picsum.photos/seed/room4/600/400'" alt="Room" class="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" referrerpolicy="no-referrer" />
-          <div class="relative h-full">
-            <img :src="subImages[3] || 'https://picsum.photos/seed/room5/600/400'" alt="Room" class="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" referrerpolicy="no-referrer" />
+          <div class="relative group h-full">
+            <img @click="openGallery(3)" :src="allImages[3] || 'https://picsum.photos/seed/room4/600/400'" alt="Room" class="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" referrerpolicy="no-referrer" />
+          </div>
+          <div class="relative h-full group" @click="openGallery(0)">
+            <img :src="allImages[4] || 'https://picsum.photos/seed/room5/600/400'" alt="Room" class="w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer" referrerpolicy="no-referrer" />
             <div class="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer hover:bg-black/50 transition-colors">
-              <span class="text-white font-bold text-lg font-['Inter'] tracking-wide">Xem tất cả ảnh</span>
+              <span class="text-white font-bold text-lg font-['Inter'] tracking-wide">Xem tất cả {{ allImages.length }} ảnh</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div v-if="showGallery" class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex flex-col" @keydown.esc="closeGallery" tabindex="0">
+        <div class="flex justify-between items-center p-6 text-white shrink-0">
+          <div class="font-medium text-sm">{{ currentImageIndex + 1 }} / {{ allImages.length }}</div>
+          <button @click="closeGallery" class="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors">
+            <X class="w-6 h-6" />
+          </button>
+        </div>
+        
+        <div class="flex-1 flex items-center justify-center relative px-12 overflow-hidden">
+          <button @click="prevImage" class="absolute left-6 p-4 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors">
+            <ChevronLeft class="w-8 h-8" />
+          </button>
+          
+          <img :src="allImages[currentImageIndex]" class="max-h-full max-w-full object-contain rounded-lg shadow-2xl transition-transform duration-300" />
+          
+          <button @click="nextImage" class="absolute right-6 p-4 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors">
+            <ChevronRight class="w-8 h-8" />
+          </button>
+        </div>
+        
+        <div class="h-24 shrink-0 p-4 flex justify-center gap-2 overflow-x-auto">
+          <img 
+            v-for="(img, index) in allImages" 
+            :key="index"
+            :src="img" 
+            @click="currentImageIndex = index"
+            class="h-full w-24 object-cover rounded-md cursor-pointer transition-all duration-200"
+            :class="index === currentImageIndex ? 'border-2 border-white opacity-100 scale-105' : 'opacity-40 hover:opacity-70'"
+          />
         </div>
       </div>
 
@@ -239,11 +281,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { MapPin, Star, Clock, CreditCard, Users, AlertTriangle, Home as HomeIcon } from 'lucide-vue-next';
+import { MapPin, Star, Clock, CreditCard, Users, AlertTriangle, Home as HomeIcon, X, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 
-// 1. Định nghĩa Interface khớp chuẩn với dữ liệu API trả về
 interface RoomData {
   id: number | string;
   title: string;
@@ -256,8 +297,8 @@ interface RoomData {
   rent_type?: string; 
   status?: string;
   images?: any[];
-  amenities?: any[]; // <--- Sửa ở đây để khớp với Backend
-  amenity_list?: any[]; // Giữ lại để template không bị lỗi
+  amenities?: any[]; 
+  amenity_list?: any[]; 
 }
 
 const route = useRoute();
@@ -265,14 +306,46 @@ const router = useRouter();
 
 const loading = ref(true);
 const room = ref<RoomData | null>(null);
-const mainImage = ref('');
-const subImages = ref<string[]>([]);
+
+// Mảng chứa TẤT CẢ url ảnh đã được xử lý chuẩn (http / storage)
+const allImages = ref<string[]>([]);
+
+// State cho Modal Xem Ảnh
+const showGallery = ref(false);
+const currentImageIndex = ref(0);
 
 const checkIn = ref('');
 const checkOut = ref('');
 const adults = ref(1);
 const children = ref(0);
 const errorMessage = ref('');
+
+// --- CÁC HÀM ĐIỀU KHIỂN GALLERY ---
+const openGallery = (index: number) => {
+  if(allImages.value.length === 0) return;
+  currentImageIndex.value = index;
+  showGallery.value = true;
+  document.body.style.overflow = 'hidden'; // Chống cuộn trang phía sau
+};
+
+const closeGallery = () => {
+  showGallery.value = false;
+  document.body.style.overflow = ''; 
+};
+
+const nextImage = () => {
+  currentImageIndex.value = (currentImageIndex.value + 1) % allImages.value.length;
+};
+
+const prevImage = () => {
+  currentImageIndex.value = (currentImageIndex.value - 1 + allImages.value.length) % allImages.value.length;
+};
+
+// Đóng modal khi component bị destroy
+onUnmounted(() => {
+  document.body.style.overflow = '';
+});
+
 
 onMounted(async () => {
   try {
@@ -285,11 +358,10 @@ onMounted(async () => {
     
     const data = await response.json();
     
-    // Đảm bảo template nhận được dữ liệu tiện nghi dù biến tên là gì
     data.amenity_list = data.amenities || [];
     room.value = data;
 
-    // Handler format imageURL
+    // Hàm chuẩn hóa URL Ảnh
     const formatImageUrl = (url: string) => {
       if (!url) return '';
       if (!url.startsWith('http') && !url.startsWith('/storage/') && !url.startsWith('data:')) {
@@ -298,23 +370,25 @@ onMounted(async () => {
       return url;
     };
 
-    // Xử lý hình ảnh dự phòng cực kỳ chắc chắn
+    // XỬ LÝ LẤY TOÀN BỘ ẢNH VÀO MẢNG CHUNG
     if (data.images && data.images.length > 0) {
+      // Tìm ảnh primary (nếu có)
       const primaryImg = data.images.find((img: any) => img.is_primary);
-      mainImage.value = formatImageUrl(primaryImg ? primaryImg.image_url : data.images[0].image_url);
+      const primaryUrl = primaryImg ? primaryImg.image_url : data.images[0].image_url;
       
-      // Nếu chỉ có 1 ảnh thì dùng chung cho ảnh phụ để giao diện không bị thủng
-      subImages.value = data.images
-          .filter((img: any) => img.image_url !== (primaryImg ? primaryImg.image_url : data.images[0].image_url))
-          .map((img: any) => formatImageUrl(img.image_url));
-          
-      // Lấp đầy mảng ảnh phụ nếu thiếu
-      while (subImages.value.length < 4) {
-          subImages.value.push('https://picsum.photos/seed/fallback' + subImages.value.length + '/600/400');
-      }
+      // Đẩy ảnh chính vào vị trí số 0
+      allImages.value.push(formatImageUrl(primaryUrl));
+      
+      // Đẩy các ảnh còn lại vào theo sau
+      data.images.forEach((img: any) => {
+        if(img.image_url !== primaryUrl) {
+           allImages.value.push(formatImageUrl(img.image_url));
+        }
+      });
     } else {
-      mainImage.value = 'https://picsum.photos/seed/fallback/1200/800';
-      subImages.value = [
+      // Nếu phòng không có ảnh nào trong DB, tạo 5 ảnh mặc định để UI không bị vỡ
+      allImages.value = [
+        'https://picsum.photos/seed/fallback/1200/800',
         'https://picsum.photos/seed/fallback1/600/400',
         'https://picsum.photos/seed/fallback2/600/400',
         'https://picsum.photos/seed/fallback3/600/400',
@@ -349,13 +423,11 @@ const statusClass = computed(() => {
   }
 });
 
-// Logic kiểm tra đặt phòng của bạn được giữ nguyên, chỉ sửa lại điều kiện type
 const validateCapacity = () => {
   errorMessage.value = ''; 
   if (!room.value) return false;
 
   const type = room.value.type;
-  // Đảm bảo max_guests luôn có giá trị (mặc định là 2 nếu bị rỗng)
   const max = room.value.max_guests || 2; 
 
   if(!checkIn.value || !checkOut.value) {
@@ -375,7 +447,6 @@ const validateCapacity = () => {
       errorMessage.value = 'Nguyên căn chỉ chứa tối đa 20 người lớn. Vui lòng liên hệ hotline để được hỗ trợ.';
       return false;
     }
-    // Trẻ em không giới hạn cho nguyên căn
   } else {
     if (adults.value > max) {
         errorMessage.value = `Phòng này chỉ chứa tối đa ${max} người lớn. Vui lòng chọn phòng lớn hơn.`;
@@ -392,7 +463,6 @@ const validateCapacity = () => {
   return true;
 };
 
-// HÀM XỬ LÝ KHI BẤM NÚT ĐẶT PHÒNG
 const handleBook = () => {
   if (validateCapacity()) {
     router.push({

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Room;
 use App\Models\RoomImage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage; // Đã thêm thư viện này để hỗ trợ xóa file ảnh
 
 class RoomController extends Controller
 {
@@ -97,6 +98,7 @@ class RoomController extends Controller
 
         return response()->json($rooms);
     }
+
     public function show($id)
     {
         $room = Room::with(['images', 'childRooms.images'])->find($id);
@@ -125,6 +127,7 @@ class RoomController extends Controller
 
         return response()->json($room);
     }
+
     public function update(Request $request, $id)
     {
         try {
@@ -184,7 +187,7 @@ class RoomController extends Controller
                 if (!in_array($oldImg->image_url, $retainedUrls)) {
                     // Xóa file vật lý trong storage (Lấy path tương đối sau /storage/)
                     $filePath = str_replace('/storage/', '', $oldImg->image_url);
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($filePath);
+                    Storage::disk('public')->delete($filePath);
                     // Xóa record trong DB
                     $oldImg->delete();
                 }
@@ -210,14 +213,15 @@ class RoomController extends Controller
             return response()->json(['error' => 'Lỗi khi cập nhật: ' . $e->getMessage()], 500);
         }
     }
+
     public function getAmenities()
     {
         // Kéo toàn bộ 7 tiện nghi từ DB lên
         $amenities = DB::table('amenities')->get();
         return response()->json($amenities);
     }
+
     // HÀM THỐNG KÊ SỐ LƯỢNG PHÒNG CHO ADMIN
-// HÀM THỐNG KÊ SỐ LƯỢNG PHÒNG CHO ADMIN
     public function stats()
     {
         // ĐẾM CHỈ CÁC PHÒNG CỐ ĐỊNH (Phòng đơn, Phòng Home, Nguyên căn)
@@ -240,20 +244,51 @@ class RoomController extends Controller
             'maintenance' => $maintenance
         ]);
     }
-    // HÀM XÓA PHÒNG
+
+    // HÀM XÓA PHÒNG (ĐÃ ĐƯỢC CẬP NHẬT ĐỂ XÓA CẢ PHÒNG CON)
     public function destroy($id)
     {
-        $room = \App\Models\Room::find($id);
-        
-        if (!$room) {
-            return response()->json(['message' => 'Không tìm thấy phòng này!'], 404);
+        try {
+            DB::beginTransaction();
+            
+            $room = Room::find($id);
+            
+            if (!$room) {
+                return response()->json(['message' => 'Không tìm thấy phòng này!'], 404);
+            }
+
+            // 1. TÌM VÀ XÓA TẤT CẢ PHÒNG CON (Nếu phòng này là phòng cha)
+            $childRooms = Room::where('parent_id', $room->id)->get();
+            foreach ($childRooms as $child) {
+                // Xóa ảnh vật lý của phòng con trong storage
+                $childImages = RoomImage::where('room_id', $child->id)->get();
+                foreach ($childImages as $img) {
+                    $filePath = str_replace('/storage/', '', $img->image_url);
+                    Storage::disk('public')->delete($filePath);
+                }
+                // Xóa dữ liệu phòng con
+                $child->delete();
+            }
+
+            // 2. XÓA ẢNH CỦA CHÍNH PHÒNG CHA TRONG STORAGE
+            $roomImages = RoomImage::where('room_id', $room->id)->get();
+            foreach ($roomImages as $img) {
+                $filePath = str_replace('/storage/', '', $img->image_url);
+                Storage::disk('public')->delete($filePath);
+            }
+
+            // 3. Xóa phòng cha khỏi Database
+            $room->delete();
+
+            DB::commit();
+            return response()->json(['message' => 'Xóa phòng thành công!']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Lỗi khi xóa: ' . $e->getMessage()], 500);
         }
-
-        // Xóa phòng khỏi Database
-        $room->delete();
-
-        return response()->json(['message' => 'Xóa phòng thành công!']);
     }
+
     public function store(Request $request)
     {
         try {

@@ -246,16 +246,18 @@ const handlePayment = async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        // Gửi kèm Token nếu API yêu cầu xác thực user đang đăng nhập
+        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
       },
       body: JSON.stringify({
         room_id: room.value?.id,
-        room_name: room.value?.title,      // Thêm tên phòng (code bạn kia cần)
-        customer_name: customerInfo.value.name, // Thêm tên KH (code bạn kia cần)
-        customer_email: customerInfo.value.email, // Thêm email (code bạn kia cần)
-        customer_phone: customerInfo.value.phone, // Thêm phone (code bạn kia cần)
-        total_price: totalPrice.value,     // Thêm total_price (code bạn kia)
-        deposit_amount: depositAmount,     // Thêm deposit_amount (code bạn kia)
+        room_name: room.value?.title,      // Thêm tên phòng 
+        customer_name: customerInfo.value.name, // Thêm tên KH 
+        customer_email: customerInfo.value.email, // Thêm email 
+        customer_phone: customerInfo.value.phone, // Thêm phone 
+        total_price: totalPrice.value,     // Thêm total_price 
+        deposit_amount: depositAmount,     // Thêm deposit_amount 
         check_in_date: checkIn.value,
         check_out_date: checkOut.value,
         adults: adults.value,
@@ -266,8 +268,13 @@ const handlePayment = async () => {
     if (response.ok) {
       alert('🎉 Đặt phòng thành công! (Giả lập thanh toán cọc)');
       
-      // Chuyển sang trang Success 
-      router.push('/payment-success'); 
+      const resData = await response.json();
+      
+      // Tìm id của booking vừa tạo (tùy thuộc vào controller backend trả về key là booking hay data)
+      const newBookingId = resData.booking ? resData.booking.id : (resData.data ? resData.data.id : resData.id);
+      
+      // Chuyển sang trang Success kèm ID
+      router.push(`/payment-success?id=${newBookingId}`); 
     } else {
       const data = await response.json();
       alert('Lỗi: ' + (data.message || 'Không thể đặt phòng lúc này.'));

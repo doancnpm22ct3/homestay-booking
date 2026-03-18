@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col min-h-screen bg-[#FAF9F5]">
     
-    <section class="relative pt-16 pb-24 bg-[#FAF9F5]">
+    <section class="relative pt-16 pb-24 bg-[#FFF9E5]">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col md:flex-row items-center justify-between gap-12">
           
@@ -437,7 +437,8 @@ onMounted(async () => {
         id: String(room.id),
         title: room.title,
         location: room.location,
-        type: room.rent_type === 'private_room' ? 'Phòng riêng' : (room.rent_type === 'home' ? 'Phòng Home' : 'Nguyên căn'),
+        // Đồng bộ hoàn toàn với Listing.vue: rent_type là 'home' hoặc 'whole_house' đều tính là Nguyên căn
+        type: room.rent_type === 'whole_house' || room.rent_type === 'home' ? 'Nguyên căn' : 'Phòng riêng',
         price: Number(room.price).toLocaleString('vi-VN') + ' VNĐ/đêm', 
         imageUrl: thumb, 
         status: room.status,

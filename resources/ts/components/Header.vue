@@ -20,19 +20,13 @@
 
       <div v-else class="hidden md:flex items-center space-x-6 relative">
         
-        <router-link 
-          v-if="isAdmin" 
-          to="/admin/rooms"
-          class="flex items-center gap-2 bg-[#FCFAF6] border border-[#4A7055] text-[#4A7055] px-4 py-2 rounded-lg hover:bg-[#4A7055] hover:text-white transition-all duration-300 font-medium shadow-sm"
-        >
-          <LayoutDashboard class="w-4 h-4" />
-          <span class="hidden sm:inline">Vào trang Quản trị</span>
-        </router-link>
-
-        <div @click="router.push('/profile')" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+        <div @click="handleAvatarClick" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
           <div class="text-right">
             <div class="font-bold text-gray-900 text-sm">{{ user.name }}</div>
-            <div class="text-xs text-gray-500">Đà Nẵng, Việt Nam</div>
+            <div class="text-xs text-gray-500">
+              <span v-if="isAdmin" class="text-[#4A7055] font-semibold">Quản trị viên</span>
+              <span v-else>Đà Nẵng, Việt Nam</span>
+            </div>
           </div>
           <img src="https://i.pravatar.cc/150?img=11" alt="Avatar" class="w-10 h-10 rounded-full border border-[#4A7055] object-cover" />
         </div>
@@ -73,7 +67,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { LayoutDashboard, Bell, LogOut, Menu } from 'lucide-vue-next';
+// Mình đã bỏ import LayoutDashboard vì không dùng nút cũ nữa
+import { Bell, LogOut, Menu } from 'lucide-vue-next';
 
 const router = useRouter();
 
@@ -89,7 +84,7 @@ onMounted(() => {
     if (userInfoString) {
       user.value = JSON.parse(userInfoString); // Lấy thông tin user để hiển thị Avatar
       
-      // Bật nút Admin nếu role là admin
+      // Bật cờ Admin nếu role là admin
       if (user.value && user.value.role === 'admin') {
         isAdmin.value = true;
       }
@@ -98,6 +93,17 @@ onMounted(() => {
     console.error("Lỗi đọc dữ liệu user:", error);
   }
 });
+
+// Hàm xử lý luồng đi khi bấm vào Avatar
+const handleAvatarClick = () => {
+  if (isAdmin.value) {
+    // Nếu là admin thì bay thẳng vào trang quản trị
+    router.push('/admin/rooms'); 
+  } else {
+    // Khách bình thường thì vào trang thông tin cá nhân
+    router.push('/profile');
+  }
+};
 
 // Phục hồi hàm đăng xuất
 const handleLogout = () => {

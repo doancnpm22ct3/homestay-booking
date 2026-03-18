@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col min-h-screen bg-[#FAF9F5]">
     
-    <section class="relative pt-16 pb-24 bg-[#FAF9F5]">
+    <section class="relative pt-16 pb-24 bg-[#FFF9E5]">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col md:flex-row items-center justify-between gap-12">
           <div class="flex-1 md:pr-10">
@@ -150,7 +150,6 @@
 
     <div id="room-list-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow scroll-mt-32">
       
-      <!-- Banner lọc theo Homestay -->
       <div v-if="filterByParentId" class="mb-10 bg-[#4A7055]/10 border border-[#4A7055]/20 p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-4 text-[#4A7055]">
           <div class="bg-[#4A7055] text-white p-3 rounded-2xl shadow-md">
@@ -166,47 +165,27 @@
         </button>
       </div>
       
-      <div v-if="isSearching" class="mb-16">
-        <div class="flex justify-between items-end mb-8">
-          <div>
-            <h2 class="text-3xl font-bold text-gray-900 font-['Playfair_Display']">
-              Kết quả tìm kiếm ({{ filteredRooms.length }})
-            </h2>
-            <p class="text-sm text-[#4A7055] mt-1 font-medium">
-              {{ location || 'Mọi nơi' }} <span v-if="type">• {{ type }}</span> <span v-if="guests">• {{ guests }} khách</span>
-            </p>
-          </div>
-          <button @click="resetSearch" class="text-sm text-gray-500 hover:text-[#4A7055] font-medium underline">
-            Xóa bộ lọc
-          </button>
+      <div v-if="isSearching" class="flex justify-between items-end mb-8">
+        <div>
+          <h2 class="text-3xl font-bold text-gray-900 font-['Playfair_Display']">
+            Kết quả tìm kiếm ({{ filteredRooms.length }})
+          </h2>
+          <p class="text-sm text-[#4A7055] mt-1 font-medium">
+            {{ location || 'Mọi nơi' }} <span v-if="type">• {{ type }}</span> <span v-if="guests">• {{ guests }} khách</span>
+          </p>
         </div>
+        <button @click="resetSearch" class="text-sm text-gray-500 hover:text-[#4A7055] font-medium underline">
+          Xóa bộ lọc
+        </button>
+      </div>
 
-        <div v-if="filteredRooms.length === 0" class="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
-          <MapPin class="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h3 class="text-lg font-bold text-gray-900">Không tìm thấy homestay phù hợp</h3>
-          <p class="text-gray-500">Thử thay đổi địa điểm hoặc loại hình thuê nhé.</p>
-        </div>
-
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <RoomCard 
-            v-for="room in filteredRooms" 
-            :key="room.id" 
-            :id="room.id" 
-            :title="room.title" 
-            :location="room.location" 
-            :type="room.type" 
-            :price="room.price" 
-            :imageUrl="room.imageUrl" 
-            :status="room.status"
-            :parentTitle="room.parentTitle"
-            :parentId="room.parentId"
-            @filterByParent="setParentFilter"
-          />
-        </div>
+      <div v-if="filteredRooms.length === 0" class="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
+        <MapPin class="w-12 h-12 text-gray-300 mx-auto mb-4" />
+        <h3 class="text-lg font-bold text-gray-900">Không tìm thấy homestay phù hợp</h3>
+        <p class="text-gray-500">Thử thay đổi địa điểm hoặc loại hình thuê nhé.</p>
       </div>
 
       <div v-else>
-        
         <div class="mb-20" v-if="houseRooms.length > 0">
           <div class="flex justify-between items-end mb-8">
             <div>
@@ -216,8 +195,8 @@
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <RoomCard 
-              v-for="(room, index) in houseRooms" 
-              :key="'house-'+index" 
+              v-for="room in houseRooms" 
+              :key="'house-'+room.id" 
               :id="room.id" 
               :title="room.title" 
               :location="room.location" 
@@ -241,8 +220,8 @@
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <RoomCard 
-              v-for="(room, index) in privateRooms" 
-              :key="'room-'+index" 
+              v-for="room in privateRooms" 
+              :key="'room-'+room.id" 
               :id="room.id" 
               :title="room.title" 
               :location="room.location" 
@@ -256,8 +235,8 @@
             />
           </div>
         </div>
-
       </div>
+      
     </div>
   </div>
 </template>
@@ -379,17 +358,13 @@ const selectType = (selectedType: string) => {
 const allRooms = ref<Room[]>([]);
 const filteredRooms = ref<Room[]>([]); 
 
-// --- 3 MỤC DANH SÁCH (Không duplication nữa) ---
-const popularRooms = computed(() => {
-  return allRooms.value.slice(0, 6);
-});
-
+// Phân loại phòng trực tiếp từ mảng đã lọc (filteredRooms) thay vì mảng gốc (allRooms)
 const houseRooms = computed(() => {
-  return allRooms.value.filter(room => room.rawType === 'whole_house' || room.rawType === 'home');
+  return filteredRooms.value.filter(room => room.rawType === 'whole_house' || room.rawType === 'home');
 });
 
 const privateRooms = computed(() => {
-  return allRooms.value.filter(room => room.rawType === 'private_room');
+  return filteredRooms.value.filter(room => room.rawType === 'private_room');
 });
 
 onMounted(async () => {
@@ -418,7 +393,7 @@ onMounted(async () => {
         title: room.title,
         location: room.location,
         rawType: rawType, 
-        type: rawType === 'whole_house' ? 'Nguyên căn' : 'Phòng riêng',
+        type: (rawType === 'whole_house' || rawType === 'home') ? 'Nguyên căn' : 'Phòng riêng',
         price: Number(room.price).toLocaleString('vi-VN') + ' VNĐ/đêm',
         imageUrl: thumb,
         status: room.status,
@@ -430,8 +405,9 @@ onMounted(async () => {
     if (route.query.location || route.query.type || route.query.guests) {
       location.value = (route.query.location as string) || '';
       
-      if (route.query.type === 'house') type.value = 'Nguyên căn';
-      else if (route.query.type === 'room') type.value = 'Phòng riêng';
+      // Đồng bộ từ khóa query param với nhãn hiển thị
+      if (route.query.type === 'house' || route.query.type === 'Nguyên căn') type.value = 'Nguyên căn';
+      else if (route.query.type === 'room' || route.query.type === 'Phòng riêng') type.value = 'Phòng riêng';
       else type.value = (route.query.type as string) || '';
 
       guests.value = (route.query.guests as string) || '';
@@ -467,7 +443,7 @@ const executeSearch = () => {
 
   filteredRooms.value = allRooms.value.filter(room => {
     const matchLocation = location.value === '' || room.location.includes(location.value);
-    const matchType = type.value === '' || room.type === type.value;
+    const matchType = type.value === '' || room.type === type.value; // Lọc theo label hiển thị
     const matchParent = !filterByParentId.value || room.parentId == filterByParentId.value || room.id == filterByParentId.value;
     return matchLocation && matchType && matchParent;
   });
@@ -475,7 +451,7 @@ const executeSearch = () => {
   router.replace({
     query: {
       location: location.value || undefined,
-      type: type.value === 'Nguyên căn' ? ['whole_house', 'home'] : (type.value === 'Phòng riêng' ? 'private_room' : undefined),
+      type: type.value || undefined, 
       guests: guests.value ? String(guests.value) : undefined
     }
   });
