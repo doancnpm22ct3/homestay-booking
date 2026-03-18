@@ -165,24 +165,46 @@
         </button>
       </div>
       
-      <div v-if="isSearching" class="flex justify-between items-end mb-8">
-        <div>
-          <h2 class="text-3xl font-bold text-gray-900 font-['Playfair_Display']">
-            Kết quả tìm kiếm ({{ filteredRooms.length }})
-          </h2>
-          <p class="text-sm text-[#4A7055] mt-1 font-medium">
-            {{ location || 'Mọi nơi' }} <span v-if="type">• {{ type }}</span> <span v-if="guests">• {{ guests }} khách</span>
-          </p>
+      <div v-if="isSearching">
+        <div class="flex justify-between items-end mb-8">
+          <div>
+            <h2 class="text-3xl font-bold text-gray-900 font-['Playfair_Display']">
+              Kết quả tìm kiếm ({{ filteredRooms.length }})
+            </h2>
+            <p class="text-sm text-[#4A7055] mt-1 font-medium">
+              {{ location || 'Mọi nơi' }} <span v-if="type">• {{ type }}</span> <span v-if="guests">• {{ guests }} khách</span>
+            </p>
+          </div>
+          <button @click="resetSearch" class="text-sm text-gray-500 hover:text-[#4A7055] font-medium underline">
+            Xóa bộ lọc
+          </button>
         </div>
-        <button @click="resetSearch" class="text-sm text-gray-500 hover:text-[#4A7055] font-medium underline">
-          Xóa bộ lọc
-        </button>
-      </div>
 
-      <div v-if="filteredRooms.length === 0" class="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
-        <MapPin class="w-12 h-12 text-gray-300 mx-auto mb-4" />
-        <h3 class="text-lg font-bold text-gray-900">Không tìm thấy homestay phù hợp</h3>
-        <p class="text-gray-500">Thử thay đổi địa điểm hoặc loại hình thuê nhé.</p>
+        <div v-if="filteredRooms.length === 0" class="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
+          <MapPin class="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <h3 class="text-lg font-bold text-gray-900">Không tìm thấy homestay phù hợp</h3>
+          <p class="text-gray-500">Thử thay đổi địa điểm hoặc loại hình thuê nhé.</p>
+        </div>
+
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <RoomCard 
+            v-for="room in filteredRooms" 
+            :key="room.id" 
+            :id="room.id" 
+            :title="room.title" 
+            :location="room.location" 
+            :type="room.type" 
+            :price="room.price" 
+            :imageUrl="room.imageUrl" 
+            :status="room.status"
+            :parentTitle="room.parentTitle"
+            :parentId="room.parentId"
+            :rent_type="room.rent_type"
+            :max_guests="room.max_guests"
+            :max_children="room.max_children"
+            @filterByParent="setParentFilter"
+          />
+        </div>
       </div>
 
       <div v-else>
@@ -236,7 +258,6 @@
           </div>
         </div>
       </div>
-      
     </div>
   </div>
 </template>
@@ -258,6 +279,9 @@ interface Room {
   status: string;
   parentTitle?: string;
   parentId?: number | string;
+  rent_type?: string;
+  max_guests?: number | string;
+  max_children?: number | string;
 }
 
 const route = useRoute();
@@ -398,7 +422,10 @@ onMounted(async () => {
         imageUrl: thumb,
         status: room.status,
         parentTitle: room.parent_title,
-        parentId: room.parent_id
+        parentId: room.parent_id,
+        rent_type: rawType,
+        max_guests: room.max_guests,
+        max_children: room.max_children
       };
     });
 

@@ -43,6 +43,8 @@ Route::get('/rooms', function (Request $request) {
             'price' => $room->price,
             'status' => $room->status,
             'is_visible' => $room->is_visible,
+            'max_guests' => $room->max_guests,
+            'max_children' => $room->max_children,
             'image' => $primaryImage ? $primaryImage->image_url : null
         ];
     });
@@ -81,6 +83,7 @@ Route::post('/register', [App\Http\Controllers\Api\AuthController::class, 'regis
 Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login']);
 Route::post('/profile/update', [App\Http\Controllers\Api\AuthController::class, 'updateProfile']);
 Route::post('/check-status', [App\Http\Controllers\Api\AuthController::class, 'checkStatus']);
+Route::middleware('auth:sanctum')->post('/logout', [App\Http\Controllers\Api\AuthController::class, 'logout']);
 
 // --- QUẢN LÝ TIỆN NGHI ---
 Route::get('/amenities', [App\Http\Controllers\Api\RoomController::class, 'getAmenities']);

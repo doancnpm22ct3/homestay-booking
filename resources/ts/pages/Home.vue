@@ -178,6 +178,9 @@
             :status="room.status"
             :parentTitle="room.parentTitle"
             :parentId="room.parentId"
+            :rent_type="room.rent_type"
+            :max_guests="room.max_guests"
+            :max_children="room.max_children"
           />
         </div>
         <div class="mt-8 text-center sm:hidden">
@@ -321,6 +324,9 @@ interface Room {
   status: string;
   parentTitle?: string;
   parentId?: number | string;
+  rent_type?: string;
+  max_guests?: number | string;
+  max_children?: number | string;
 }
 
 const bannerImages = ref([
@@ -443,7 +449,10 @@ onMounted(async () => {
         imageUrl: thumb, 
         status: room.status,
         parentTitle: room.parent_title,
-        parentId: room.parent_id
+        parentId: room.parent_id,
+        rent_type: room.rent_type,
+        max_guests: room.max_guests,
+        max_children: room.max_children
       };
     }).slice(0, 6); 
     

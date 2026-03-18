@@ -105,11 +105,38 @@ const handleAvatarClick = () => {
   }
 };
 
-// Phục hồi hàm đăng xuất
-const handleLogout = () => {
-  localStorage.removeItem('user_info');
-  user.value = null;
-  isAdmin.value = false;
-  router.push('/login');
+const handleLogout = async () => {
+  try {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      // Gọi API logout để hủy token ở server
+      await fetch('/api/logout', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Lỗi link logout:', error);
+  } finally {
+    // Xóa token và thông tin user khỏi localStorage
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_info');
+
+    // Reset state
+    user.value = null;
+    isAdmin.value = false; 
+    showNotifications.value = false;
+
+    alert('Đăng xuất thành công!');
+    router.push('/');
+    
+    // Force reload để xóa triệt để cache/state cũ
+    setTimeout(() => {
+        window.location.reload();
+    }, 100);
+  }
 };
 </script>

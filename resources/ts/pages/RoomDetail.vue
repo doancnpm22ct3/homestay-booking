@@ -19,6 +19,9 @@
           >
             {{ statusText }}
           </div>
+          <div v-if="room.rent_type === 'home' || room.rent_type === 'whole_house'" class="bg-[#4A7055] text-white px-3 py-1 rounded-full text-xs font-bold font-['Inter'] shadow-sm">
+            Sức chứa: {{ room.max_guests }} NL + {{ room.max_children || 0 }} TE (<10t)
+          </div>
         </div>
         <div class="flex items-center gap-4 text-sm text-gray-600 font-['Inter']">
           <div class="flex items-center gap-1">
