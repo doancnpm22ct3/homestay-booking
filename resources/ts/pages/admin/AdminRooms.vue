@@ -75,28 +75,21 @@
           :class="['flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium border transition-all', 
                    filterType === 'room_based' ? 'bg-purple-600 text-white border-purple-600 shadow-sm' : 'bg-purple-50 text-purple-700 border-purple-100 hover:bg-purple-100']"
         >
-          <LayoutGrid class="w-3.5 h-3.5" /> Tòa nhà/Cơ sở
+          <LayoutGrid class="w-3.5 h-3.5" /> Phòng riêng
         </button>
         <button 
           @click="filterType = 'whole_house'"
           :class="['flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium border transition-all', 
                    filterType === 'whole_house' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100']"
         >
-          <HomeIcon class="w-3.5 h-3.5" /> Nguyên căn
+          <HomeIcon class="w-3.5 h-3.5" /> Nhà nguyên căn
         </button>
         <button 
           @click="filterType = 'home'"
           :class="['flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium border transition-all', 
                    filterType === 'home' ? 'bg-amber-600 text-white border-amber-600 shadow-sm' : 'bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100']"
         >
-          <HomeIcon class="w-3.5 h-3.5" /> Phòng Home
-        </button>
-        <button 
-          @click="filterType = 'private_room_standalone'"
-          :class="['flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium border transition-all', 
-                   filterType === 'private_room_standalone' ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' : 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100']"
-        >
-          <LayoutGrid class="w-3.5 h-3.5" /> Phòng riêng (Độc lập)
+          <HomeIcon class="w-3.5 h-3.5" /> Homestay Liên kết / Đối tác
         </button>
       </div>
     </div>
@@ -110,7 +103,7 @@
             <th class="p-4 font-semibold">Tên phòng/Homestay</th>
             <th class="p-4 font-semibold">Loại</th>
             <th class="p-4 font-semibold">Giá / đêm</th>
-            <th class="p-4 font-semibold">Trạng thái/Quy mô</th>
+            <th class="p-4 font-semibold">Trạng thái</th>
             <th class="p-4 font-semibold text-center w-36">Thao tác</th>
           </tr>
         </thead>
@@ -134,24 +127,18 @@
             <td class="p-4 font-medium text-gray-900">{{ room.title }}</td>
             <td class="p-4 text-gray-600">
               <div v-if="room.rent_type === 'whole_house'" class="flex items-center gap-1.5 text-blue-600 font-medium">
-                <HomeIcon class="w-4 h-4" /> Nguyên căn
+                <HomeIcon class="w-4 h-4" /> Nhà nguyên căn
               </div>
               <div v-else-if="room.rent_type === 'room_based'" class="flex items-center gap-1.5 text-purple-600 font-medium">
-                <LayoutGrid class="w-4 h-4" /> Đang dơn lẻ
+                <LayoutGrid class="w-4 h-4" /> Phòng riêng
               </div>
               <div v-else-if="room.rent_type === 'home'" class="flex items-center gap-1.5 text-amber-600 font-medium">
-                <HomeIcon class="w-4 h-4" /> Phòng Home
-              </div>
-              <div v-else class="flex items-center gap-1.5 text-emerald-600 font-medium">
-                <LayoutGrid class="w-4 h-4" /> Phòng riêng (Độc lập)
+                <HomeIcon class="w-4 h-4" /> Homestay Liên kết / Đối tác
               </div>
             </td>
             <td class="p-4 text-emerald-600 font-semibold">{{ Number(room.price).toLocaleString('vi-VN') }}đ</td>
             <td class="p-4">
-              <span v-if="room.rent_type === 'room_based'" class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold border border-purple-200">
-                🏢 Tòa nhà ({{ room.child_rooms_count }} phòng)
-              </span>
-              <template v-else>
+              <template v-if="room.rent_type === 'room_based' || room.rent_type === 'home' || room.rent_type === 'whole_house'">
                 <span v-if="room.status === 'available'" class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-medium">Trống / Sẵn sàng</span>
                 <span v-else-if="room.status === 'booked'" class="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-xs font-medium">Đã đặt cọc</span>
                 <span v-else-if="room.status === 'in_use'" class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">Đang sử dụng</span>

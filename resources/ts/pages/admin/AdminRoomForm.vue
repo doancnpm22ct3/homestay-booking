@@ -42,18 +42,18 @@
             rentMode === 'home' ? 'bg-white text-emerald-700 shadow-sm' : 'text-emerald-600/70 hover:bg-white/50'
           ]"
         >
-          <HomeIcon class="w-5 h-5" /> Thêm Phòng Home
+          <HomeIcon class="w-5 h-5" /> Thêm Homestay Liên kết
         </button>
       </div>
 
       <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <h2 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">
-          {{ rentMode === 'whole_house' ? 'Thông tin Nguyên Căn' : (rentMode === 'home' ? 'Thông tin Phòng Home (Đơn lẻ)' : 'Thông tin Phòng Riêng') }}
+          {{ rentMode === 'whole_house' ? 'Thông tin Nguyên Căn' : (rentMode === 'home' ? 'Thông tin Homestay Liên kết' : 'Thông tin Phòng Riêng') }}
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div :class="(rentMode === 'whole_house' || rentMode === 'home') ? 'md:col-span-2' : ''">
             <label class="block text-sm font-medium text-gray-700 mb-1">
-              {{ (rentMode === 'whole_house' || rentMode === 'home') ? 'Tên Nguyên Căn / Homestay / Phòng Home *' : 'Tên phòng (VD: Phòng 101) *' }}
+              {{ (rentMode === 'whole_house' || rentMode === 'home') ? 'Tên Nguyên Căn / Homestay Đối tác *' : 'Tên phòng (VD: Phòng 101) *' }}
             </label>
             <input v-model="form.title" type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
           </div>
@@ -80,12 +80,12 @@
           <!-- SỨC CHỨA (CHỈ HIỆN CHO NGUYÊN CĂN & PHÒNG HOME) -->
           <div v-if="rentMode === 'whole_house' || rentMode === 'home'">
             <label class="block text-sm font-medium text-gray-700 mb-1">Sức chứa (Người lớn) *</label>
-            <input v-model="form.max_guests" type="number" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
+            <input v-model.number="form.max_guests" type="number" min="1" max="50" @keydown="(e) => { if(['-','e','+'].includes(e.key)) e.preventDefault() }" @input="form.max_guests = Math.min(50, Math.max(1, form.max_guests || 1))" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
           </div>
 
           <div v-if="rentMode === 'whole_house' || rentMode === 'home'">
             <label class="block text-sm font-medium text-gray-700 mb-1">Sức chứa (Trẻ em < 10 tuổi) *</label>
-            <input v-model="form.max_children" type="number" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
+            <input v-model.number="form.max_children" type="number" min="0" max="99" @keydown="(e) => { if(['-','e','+'].includes(e.key)) e.preventDefault() }" @input="form.max_children = Math.min(99, Math.max(0, form.max_children || 0))" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
             <p class="mt-1 text-xs text-gray-500 italic">Gợi ý: Nhập 99 nếu không giới hạn trẻ em.</p>
           </div>
 
@@ -102,7 +102,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Giá thuê / Đêm (VNĐ) *</label>
-            <input v-model="form.price" type="number" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
+            <input v-model.number="form.price" type="number" min="0" @keydown="(e) => { if(['-','e','+'].includes(e.key)) e.preventDefault() }" @input="form.price = Math.max(0, form.price || 0)" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" />
           </div>
           
           <div class="md:col-span-2 mt-2 bg-emerald-50 border border-emerald-100 p-4 rounded-lg flex items-center gap-3">
