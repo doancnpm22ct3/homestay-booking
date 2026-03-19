@@ -12,6 +12,16 @@ class BookingController extends Controller
     // HÀM LƯU ĐƠN ĐẶT PHÒNG TỪ KHÁCH
     public function store(Request $request)
     {
+        $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'room_id' => 'required|exists:rooms,id',
+            'check_in_date' => 'required|date|after_or_equal:today',
+            'check_out_date' => 'required|date|after:check_in_date',
+        ], [
+            'check_in_date.after_or_equal' => 'Ngày nhận phòng không thể chọn ở trong quá khứ.',
+            'check_out_date.after' => 'Ngày trả phòng phải sau ngày nhận phòng.'
+        ]);
+
         $booking = Booking::create([
             'booking_code' => 'HD-' . strtoupper(uniqid()), // Tạo mã hóa đơn ngẫu nhiên (VD: HD-64A1B...)
             'customer_name' => $request->customer_name,

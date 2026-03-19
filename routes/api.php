@@ -74,8 +74,8 @@ Route::get('/rooms/{id}', function ($id) {
 });
 
 // --- QUẢN LÝ PHÒNG ---
-Route::post('/rooms', [RoomController::class, 'store']);
-Route::put('/rooms/{id}', [RoomController::class, 'update']);
+Route::post('/admin/rooms', [RoomController::class, 'store']);
+Route::put('/admin/rooms/{id}', [RoomController::class, 'update']);
 Route::delete('/admin/rooms/{id}', [RoomController::class, 'destroy']);
 
 // --- AUTH & PROFILE ---

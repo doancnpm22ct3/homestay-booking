@@ -249,7 +249,21 @@ class BookingController extends Controller
     {
         $booking = Booking::findOrFail($id);
         if ($booking->status !== 'checked_in') return response()->json(['message'=>'Booking phải ở Checked-in'],422);
-        
+
+        // Kiểm tra ngày: nếu chưa đến ngày check-out thì phải xác nhận trả sớm
+        $checkoutDate = \Carbon\Carbon::parse($booking->check_out_date)->startOfDay();
+        $today        = \Carbon\Carbon::today();
+        $isEarly      = $today->lt($checkoutDate);
+
+        if ($isEarly && !$request->boolean('early_checkout')) {
+            return response()->json([
+                'message'      => 'Khách chưa đến ngày trả phòng. Vui lòng xác nhận trả phòng sớm.',
+                'is_early'     => true,
+                'checkout_date'=> $checkoutDate->toDateString(),
+                'today'        => $today->toDateString(),
+            ], 422);
+        }
+
         $request->validate([
             'additional_fee' => 'nullable|numeric|min:0',
             'additional_note'=> 'nullable|string',

@@ -44,15 +44,13 @@ class AdminBookingController extends Controller
                 $booking->total_price = $booking->total_amount;
                 $booking->deposit_amount = $booking->paid_amount;
                 
-                // Map trạng thái thanh toán từ status của booking nếu payment_status rỗng
-                if (empty($booking->payment_status)) {
-                    if ($booking->status === 'checked_out' || $booking->paid_amount >= $booking->total_amount) {
-                        $booking->payment_status = 'completed';
-                    } elseif ($booking->paid_amount > 0) {
-                        $booking->payment_status = 'deposited';
-                    } else {
-                        $booking->payment_status = 'pending';
-                    }
+                // Luôn tính lại payment_status theo trạng thái thực tế (bỏ qua giá trị cũ trong DB)
+                if ($booking->status === 'checked_out' || $booking->paid_amount >= $booking->total_amount) {
+                    $booking->payment_status = 'completed';
+                } elseif ($booking->paid_amount > 0) {
+                    $booking->payment_status = 'deposited';
+                } else {
+                    $booking->payment_status = 'pending';
                 }
                 
                 return $booking;

@@ -356,7 +356,9 @@ function isToday(d: string) {
 }
 function nightsCount(ci: string, co: string) {
   if (!ci || !co) return 0;
-  return Math.round((new Date(co).getTime() - new Date(ci).getTime()) / 86400000);
+  const [cy,cm,cd] = ci.slice(0,10).split('-').map(Number);
+  const [oy,om,od] = co.slice(0,10).split('-').map(Number);
+  return Math.round((new Date(oy,om-1,od).getTime() - new Date(cy,cm-1,cd).getTime()) / 86400000);
 }
 function paymentBadge(b: any) {
   const rem = (b.total_amount ?? 0) - (b.paid_amount ?? 0);

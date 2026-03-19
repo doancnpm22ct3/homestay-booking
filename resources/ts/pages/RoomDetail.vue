@@ -218,11 +218,11 @@
                 <div class="flex border-b border-gray-200">
                   <div class="flex-1 p-3 border-r border-gray-200">
                     <label class="block text-[10px] font-extrabold text-gray-900 uppercase mb-1">Nhận phòng</label>
-                    <input type="date" v-model="checkIn" class="w-full outline-none text-sm text-gray-600 bg-transparent cursor-pointer" />
+                    <input type="date" v-model="checkIn" :min="minDate" class="w-full outline-none text-sm text-gray-600 bg-transparent cursor-pointer" />
                   </div>
                   <div class="flex-1 p-3">
                     <label class="block text-[10px] font-extrabold text-gray-900 uppercase mb-1">Trả phòng</label>
-                    <input type="date" v-model="checkOut" class="w-full outline-none text-sm text-gray-600 bg-transparent cursor-pointer" />
+                    <input type="date" v-model="checkOut" :min="checkIn || minDate" class="w-full outline-none text-sm text-gray-600 bg-transparent cursor-pointer" />
                   </div>
                 </div>
                 
@@ -322,6 +322,9 @@ const checkOut = ref('');
 const adults = ref(1);
 const children = ref(0);
 const errorMessage = ref('');
+
+const todayObj = new Date();
+const minDate = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, '0')}-${String(todayObj.getDate()).padStart(2, '0')}`;
 
 // --- CÁC HÀM ĐIỀU KHIỂN GALLERY ---
 const openGallery = (index: number) => {

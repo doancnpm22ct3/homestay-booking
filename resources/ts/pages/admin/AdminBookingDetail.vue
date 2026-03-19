@@ -237,10 +237,16 @@ async function removeService(sid: number) {
 }
 
 // Helpers
-function fmtDate(d: string)     { if(!d) return '—'; const [y,m,day]=d.split('-'); return `${day}/${m}/${y}`; }
+function fmtDate(d: string)     { if(!d) return '—'; const [y,m,day]=d.slice(0, 10).split('-'); return `${day}/${m}/${y}`; }
 function fmtDateTime(d: string) { if(!d) return '—'; return new Date(d).toLocaleString('vi-VN'); }
 function fmtMoney(n: number)    { return new Intl.NumberFormat('vi-VN').format(n??0)+'đ'; }
-function nightsCount(ci:string,co:string){ return Math.round((new Date(co).getTime()-new Date(ci).getTime())/86400000); }
+function nightsCount(ci:string,co:string){
+  if(!ci||!co) return 0;
+  const [cy,cm,cd]=ci.slice(0,10).split('-').map(Number);
+  const [oy,om,od]=co.slice(0,10).split('-').map(Number);
+  const d1=new Date(cy,cm-1,cd), d2=new Date(oy,om-1,od);
+  return Math.round((d2.getTime()-d1.getTime())/86400000);
+}
 function sourceLabel(src:string){ return {website:'Website',booking_com:'Booking.com',agoda:'Agoda',walkin:'Walk-in',phone:'Điện thoại',other:'Khác'}[src]??src; }
 function paymentTypeLabel(t:string){ return {deposit:'Cọc',balance:'Thanh toán',refund:'Hoàn tiền'}[t]??t; }
 function methodLabel(m:string){ return {cash:'Tiền mặt',transfer:'Chuyển khoản',card:'Thẻ'}[m]??m; }
