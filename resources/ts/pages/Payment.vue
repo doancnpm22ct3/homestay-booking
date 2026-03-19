@@ -266,7 +266,7 @@ const handlePayment = async () => {
     });
 
     if (response.ok) {
-      alert('🎉 Đặt phòng thành công! (Giả lập thanh toán cọc)');
+      alert(' Đặt phòng thành công!');
       
       const resData = await response.json();
       

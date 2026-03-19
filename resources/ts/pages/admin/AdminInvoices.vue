@@ -1,9 +1,35 @@
 <template>
   <div class="p-6 relative">
-    <div class="flex justify-between items-center mb-6">
+    
+    <div class="mb-6 space-y-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Quản lý Thanh toán & Hóa đơn</h1>
-        <p class="text-gray-500 text-sm mt-1">Kiểm soát dòng tiền cọc và lịch sử checkout</p>
+        <h1 class="text-2xl font-bold text-gray-900">Quản lý Hóa đơn</h1>
+        <p class="text-gray-500 text-sm mt-1">Lịch sử hóa đơn và các giao dịch thanh toán</p>
+      </div>
+
+      <div class="flex items-center gap-3 w-full max-w-md">
+        <div class="relative flex-1">
+          <input 
+            v-model="searchQuery" 
+            type="text" 
+            placeholder="Tìm mã HĐ, khách hàng..." 
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all shadow-sm"
+          >
+          <div class="absolute left-3 top-2.5 text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+        <button 
+          @click="fetchBookings" 
+          class="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-100 transition-colors shadow-sm border border-emerald-100"
+          title="Tải lại"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
       </div>
     </div>
 
@@ -56,14 +82,6 @@
                 </button>
 
                 <button 
-                  v-if="booking.payment_status === 'deposited'" 
-                  @click="handleCheckout(booking.id)" 
-                  class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-emerald-700 transition-colors shadow-sm whitespace-nowrap"
-                >
-                  Checkout
-                </button>
-                
-                <button 
                   @click="deleteBooking(booking.id)" 
                   class="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-red-100 transition-colors whitespace-nowrap"
                 >
@@ -73,7 +91,9 @@
             </td>
           </tr>
           <tr v-if="bookings.length === 0">
-            <td colspan="7" class="p-8 text-center text-gray-500">Chưa có hóa đơn nào trong hệ thống.</td>
+            <td colspan="7" class="p-8 text-center text-gray-500">
+              {{ searchQuery ? 'Không tìm thấy hóa đơn nào phù hợp.' : 'Chưa có hóa đơn nào trong hệ thống.' }}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -165,7 +185,13 @@
           <button @click="closeInvoiceModal" class="flex-1 py-2.5 px-4 bg-white border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors">
             Đóng
           </button>
-          <button class="flex-1 py-2.5 px-4 bg-gray-800 text-white rounded-xl font-medium hover:bg-gray-900 transition-colors">
+          <button 
+            @click="printInvoice"
+            class="flex-1 py-2.5 px-4 bg-gray-800 text-white rounded-xl font-medium hover:bg-gray-900 transition-colors flex items-center justify-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
             In {{ selectedBooking.payment_status === 'deposited' ? 'Phiếu Cọc' : 'Hóa Đơn' }}
           </button>
         </div>
@@ -175,11 +201,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 
 const bookings = ref<any[]>([]);
 const isModalOpen = ref(false);
 const selectedBooking = ref<any>(null);
+const searchQuery = ref('');
+let searchTimer: any = null;
 
 const openInvoiceModal = (booking: any) => {
   selectedBooking.value = booking;
@@ -193,7 +221,10 @@ const closeInvoiceModal = () => {
 
 const fetchBookings = async () => {
   try {
-    const response = await fetch('/api/admin/invoices');
+    const url = searchQuery.value 
+      ? `/api/admin/invoices?search=${encodeURIComponent(searchQuery.value)}`
+      : '/api/admin/invoices';
+    const response = await fetch(url);
     if (response.ok) {
       bookings.value = await response.json();
     }
@@ -202,22 +233,15 @@ const fetchBookings = async () => {
   }
 };
 
-const handleCheckout = async (id: number) => {
-  if (confirm('Khách đã thanh toán phần còn lại? Bấm OK để chốt Checkout và gửi hóa đơn cho khách!')) {
-    try {
-      const response = await fetch(`/api/admin/invoices/${id}/checkout`, { method: 'PUT' });
-      const data = await response.json();
-      
-      if (response.ok) {
-        alert(data.message); 
-        fetchBookings(); 
-      } else {
-        alert('Lỗi: ' + data.message);
-      }
-    } catch (error) {
-      alert('Lỗi kết nối đến máy chủ!');
-    }
-  }
+watch(searchQuery, () => {
+  if (searchTimer) clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    fetchBookings();
+  }, 500);
+});
+
+const printInvoice = () => {
+  window.print();
 };
 
 const deleteBooking = async (id: number) => {

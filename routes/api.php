@@ -93,7 +93,6 @@ Route::delete('/amenities/{id}', [App\Http\Controllers\Api\RoomController::class
 // --- ĐẶT PHÒNG & HÓA ĐƠN ---
 Route::post('/bookings', [App\Http\Controllers\Api\BookingController::class, 'store']);
 Route::get('/admin/invoices', [App\Http\Controllers\Api\AdminBookingController::class, 'index']);
-Route::put('/admin/invoices/{id}/checkout', [App\Http\Controllers\Api\AdminBookingController::class, 'checkout']);
 Route::delete('/admin/invoices/{id}', [App\Http\Controllers\Api\AdminBookingController::class, 'destroy']);
 
 // --- QUẢN LÝ NGƯỜI DÙNG (ADMIN) ---
