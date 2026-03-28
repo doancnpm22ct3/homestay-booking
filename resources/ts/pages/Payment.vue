@@ -236,28 +236,30 @@ const formatPrice = (price: number) => {
 };
 
 // Gửi thanh toán
+// Gửi thanh toán
 const handlePayment = async () => {
   if(isSubmitting.value) return;
   isSubmitting.value = true;
   
   try {
-    const depositAmount = totalPrice.value * 0.3;
+    const depositAmount = totalPrice.value * 0.3; // Tiền cọc 30%
+    
+    // BƯỚC 1: TẠO BOOKING VÀO DATABASE TRƯỚC
     const response = await fetch('/api/bookings', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        // Gửi kèm Token nếu API yêu cầu xác thực user đang đăng nhập
         'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
       },
       body: JSON.stringify({
         room_id: room.value?.id,
-        room_name: room.value?.title,      // Thêm tên phòng 
-        customer_name: customerInfo.value.name, // Thêm tên KH 
-        customer_email: customerInfo.value.email, // Thêm email 
-        customer_phone: customerInfo.value.phone, // Thêm phone 
-        total_price: totalPrice.value,     // Thêm total_price 
-        deposit_amount: depositAmount,     // Thêm deposit_amount 
+        room_name: room.value?.title,      
+        customer_name: customerInfo.value.name, 
+        customer_email: customerInfo.value.email, 
+        customer_phone: customerInfo.value.phone, 
+        total_price: totalPrice.value,     
+        deposit_amount: depositAmount,     
         check_in_date: checkIn.value,
         check_out_date: checkOut.value,
         adults: adults.value,
@@ -266,22 +268,55 @@ const handlePayment = async () => {
     });
 
     if (response.ok) {
-      alert(' Đặt phòng thành công!');
-      
       const resData = await response.json();
       
-      // Tìm id của booking vừa tạo (tùy thuộc vào controller backend trả về key là booking hay data)
+      // Tìm id của booking vừa tạo để gửi cho VNPay
       const newBookingId = resData.booking ? resData.booking.id : (resData.data ? resData.data.id : resData.id);
       
-      // Chuyển sang trang Success kèm ID
-      router.push(`/payment-success?id=${newBookingId}`); 
+      // BƯỚC 2: KIỂM TRA PHƯƠNG THỨC THANH TOÁN
+      if (paymentMethod.value === 'ewallet') {
+        // NẾU CHỌN VNPAY (Ví điện tử): Gọi API tạo link thanh toán
+        try {
+            const vnpayResponse = await fetch('/api/payment/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    amount: depositAmount, // Truyền tiền cọc 30% vào VNPay
+                    booking_id: newBookingId // Mã đơn hàng vừa tạo
+                })
+            });
+
+            const vnpayData = await vnpayResponse.json();
+
+            if (vnpayData.status === 'success') {
+                // Phóng thẳng sang trang giao diện của VNPay
+                window.location.href = vnpayData.payment_url; 
+            } else {
+                alert('Có lỗi khi kết nối với cổng thanh toán VNPay!');
+                isSubmitting.value = false;
+            }
+        } catch (vnpayError) {
+            console.error(vnpayError);
+            alert('Lỗi khi khởi tạo thanh toán VNPay.');
+            isSubmitting.value = false;
+        }
+
+      } else {
+         // NẾU CHỌN CHUYỂN KHOẢN NGÂN HÀNG: Làm như cũ
+         alert('Đặt phòng thành công! Vui lòng thực hiện chuyển khoản.');
+         router.push(`/payment-success?id=${newBookingId}`); 
+      }
+
     } else {
       const data = await response.json();
       alert('Lỗi: ' + (data.message || 'Không thể đặt phòng lúc này.'));
+      isSubmitting.value = false;
     }
   } catch (error) {
     alert('Lỗi kết nối máy chủ!');
-  } finally {
     isSubmitting.value = false;
   }
 };

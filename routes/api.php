@@ -10,6 +10,10 @@ use App\Http\Controllers\Api\Admin\BookingController;
 use App\Http\Controllers\Api\Admin\BookingPaymentController;
 use App\Http\Controllers\Api\Admin\BookingServiceController;
 use App\Http\Controllers\Api\Admin\RoomAvailabilityController;
+use App\Http\Controllers\Api\PaymentController;
+
+Route::post('/payment/create', [PaymentController::class, 'createPayment']);
+Route::get('/payment/vnpay-return', [PaymentController::class, 'vnpayReturn']);
 
 // --- GHI ĐÈ API LẤY DANH SÁCH PHÒNG (TRẢ VỀ KÈM ẢNH) ---
 Route::get('/rooms', function (Request $request) {
