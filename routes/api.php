@@ -11,7 +11,9 @@ use App\Http\Controllers\Api\Admin\BookingPaymentController;
 use App\Http\Controllers\Api\Admin\BookingServiceController;
 use App\Http\Controllers\Api\Admin\RoomAvailabilityController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\Admin\DashboardController;
 
+Route::get('/admin/dashboard/statistics', [DashboardController::class, 'getStatistics']);
 Route::post('/payment/create', [PaymentController::class, 'createPayment']);
 Route::get('/payment/vnpay-return', [PaymentController::class, 'vnpayReturn']);
 

@@ -20,8 +20,10 @@
     },
     "dependencies": {
         "@google/genai": "^1.44.0",
+        "chart.js": "^4.5.1",
         "lucide-vue-next": "^0.577.0",
         "motion": "^12.35.1",
+        "vue-chartjs": "^5.3.3",
         "vue-router": "^5.0.3"
     }
 }
