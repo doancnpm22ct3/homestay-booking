@@ -13,7 +13,8 @@ use App\Http\Controllers\Api\Admin\RoomAvailabilityController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\Admin\DashboardController;
 
-Route::get('/admin/dashboard/statistics', [DashboardController::class, 'getStatistics']);
+// Đã cắt route /admin/dashboard/statistics mang xuống dưới
+
 Route::post('/payment/create', [PaymentController::class, 'createPayment']);
 Route::get('/payment/vnpay-return', [PaymentController::class, 'vnpayReturn']);
 
@@ -119,7 +120,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // ══════════════════════════════════════════
 // QUẢN LÝ BOOKING – ADMIN
 // ══════════════════════════════════════════
-Route::prefix('admin')->group(function () {
+// ĐÃ SỬA: Thêm middleware auth:sanctum để bảo vệ toàn bộ các route admin trong này
+Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
+    
+    // MỚI: API Thống kê đã được chuyển vào đây và được bảo vệ an toàn
+    Route::get('/dashboard/statistics', [DashboardController::class, 'getStatistics']);
+
     // Stats & calendar
     Route::get('/bookings/stats',    [BookingController::class, 'stats']);
     Route::get('/bookings/calendar', [BookingController::class, 'calendar']);
@@ -149,10 +155,10 @@ Route::prefix('admin')->group(function () {
     Route::patch('/rooms/{id}/status', [RoomAvailabilityController::class, 'updateStatus']);
     Route::patch('/rooms/{id}/toggle-maintenance', [RoomAvailabilityController::class, 'toggleMaintenance']);
 
-    // Mới: Lấy danh sách homestay và chuyển đổi mô hình
+    // Lấy danh sách homestay và chuyển đổi mô hình
     Route::get('/rooms/homestays', [RoomController::class, 'getHomestays']);
     Route::post('/rooms/{id}/convert-to-room-based', [RoomController::class, 'convertToRoomBased']);
     
-    // Mới: Danh sách hiển thị riêng cho Admin (có phân cấp)
+    // Danh sách hiển thị riêng cho Admin (có phân cấp)
     Route::get('/rooms', [RoomController::class, 'adminIndex']);
 });

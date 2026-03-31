@@ -10,9 +10,7 @@
       <div class="mb-8 flex items-center gap-4">
         <label class="font-bold text-gray-700">Chọn năm:</label>
         <select v-model="selectedYear" @change="fetchStatistics" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-[#4A7055] outline-none">
-          <option value="2025">2025</option>
-          <option value="2026">2026</option>
-          <option value="2027">2027</option>
+           <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
         </select>
       </div>
 
@@ -28,7 +26,7 @@
         </div>
 
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-orange-500">
-          <p class="text-gray-500 font-medium mb-1">Tỷ Lệ Phòng Trống</p>
+          <p class="text-gray-500 font-medium mb-1">Tỷ Lệ Phòng Trống(Hiện tại)</p>
           <h3 class="text-3xl font-bold text-orange-500">{{ overview.vacancy_rate }}</h3>
         </div>
       </div>
@@ -74,6 +72,16 @@ const chartOptions = {
 const formatMoney = (amount) => {
   return Number(amount).toLocaleString('vi-VN') + 'đ';
 };
+
+// Thêm vào dưới phần khai báo các biến (bên dưới const selectedYear = ...)
+const startYear = 2024;
+const currentYear = new Date().getFullYear();
+// Tạo mảng động: [2024, 2025, 2026, 2027...]
+const availableYears = ref(Array.from(
+  { length: currentYear - startYear + 2 }, 
+  (value, index) => startYear + index
+));
+
 
 const fetchStatistics = async () => {
   isLoading.value = true;
