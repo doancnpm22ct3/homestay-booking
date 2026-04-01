@@ -148,7 +148,7 @@ const openModal = (user = null) => {
   showModal.value = true;
 };
 
-// 3. Thêm / Sửa
+// 3. Thêm / cập nhập 
 const saveUser = async () => {
   const url = isEditing.value ? `/api/admin/users/${editId.value}` : '/api/admin/users';
   const method = isEditing.value ? 'PUT' : 'POST';

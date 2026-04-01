@@ -15,20 +15,18 @@ class AuthController extends Controller
     {
         // Thêm "Bộ lọc thép" Regex và tùy chỉnh câu báo lỗi bằng tiếng Việt
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            // Mảng validate cho Email: Bắt buộc đuôi @gmail.com
+            'name' => 'required|string|max:255',   
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/i'],
-            // Mảng validate cho SĐT: Bắt buộc đầu số VN (03, 05, 07, 08, 09) và đúng 10 số
             'phone' => ['required', 'string', 'unique:users', 'regex:/^(0|\+84)[3|5|7|8|9][0-9]{8}$/'],
             'password' => 'required|string|min:6',
         ], [
-            // Tùy chỉnh câu chửi cho mượt mà nếu nhập sai
+
             'email.regex' => 'Hệ thống hiện chỉ hỗ trợ đăng ký bằng đuôi @gmail.com!',
             'phone.regex' => 'Số điện thoại không hợp lệ (Phải là số Việt Nam, VD: 09..., 03... và đủ 10 số)!',
             'email.unique' => 'Email này đã có người sử dụng!',
             'phone.unique' => 'Số điện thoại này đã có người sử dụng!',
         ]);
-
+// kiểm tra xem có lỗi không
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
@@ -49,7 +47,6 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            // Chặn ngay từ cửa nếu cố tình đăng nhập bằng mail khác
             'email' => ['required', 'email', 'regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/i'],
             'password' => 'required',
         ], [
@@ -73,8 +70,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Đăng nhập thành công',
-            'access_token' => $token,
-            'user' => $user
+            'access_token' => $token, // gọi token vue8;/j  cv         'user' => $user // gọi user
         ]);
     }
     // HÀM KIỂM TRA TRẠNG THÁI NGẦM

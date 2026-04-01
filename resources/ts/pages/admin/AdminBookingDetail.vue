@@ -58,10 +58,18 @@
                     <td class="py-2 text-right font-medium">{{ fmtMoney(booking.room?.price * nightsCount(booking.check_in_date, booking.check_out_date)) }}</td>
                   </tr>
                   <tr v-for="svc in booking.services" :key="svc.id" class="border-b border-gray-50">
-                    <td class="py-2 text-gray-500 pl-4">+ {{ svc.service_name }} × {{ svc.quantity }}</td>
-                    <td class="py-2 text-right">{{ fmtMoney(svc.total_price) }}
+                    <td class="py-2 text-gray-500 pl-4">+ {{ svc.service_name }} × {{ svc.quantity }}
+                      <span v-if="svc.is_paid" class="ml-2 text-xs text-white bg-green-500 px-1.5 py-0.5 rounded-full inline-block">Đã thu tiền</span>
+                    </td>
+                    <td class="py-2 text-right">
+                      <span v-if="svc.is_paid" class="line-through text-gray-400 mr-2">{{ fmtMoney(svc.total_price) }}</span>
+                      <span v-else>{{ fmtMoney(svc.total_price) }}</span>
                       <button @click="removeService(svc.id)" class="text-red-400 hover:text-red-600 ml-2 text-xs">✕</button>
                     </td>
+                  </tr>
+                  <tr v-if="booking.additional_fee > 0" class="border-b border-gray-50">
+                    <td class="py-2 text-gray-500 pl-4">+ Phụ thu khi Check-out: {{ booking.additional_note || 'Không ghi chú' }}</td>
+                    <td class="py-2 text-right">{{ fmtMoney(booking.additional_fee) }}</td>
                   </tr>
                   <tr v-if="booking.discount_amount > 0" class="text-green-600 border-b border-gray-50">
                     <td class="py-2">Giảm giá</td>
@@ -69,11 +77,11 @@
                   </tr>
                   <tr class="font-bold">
                     <td class="py-2">Tổng cộng</td>
-                    <td class="py-2 text-right text-emerald-700">{{ fmtMoney(booking.total_amount) }}</td>
+                    <td class="py-2 text-right text-emerald-700">{{ fmtMoney(Number(booking.total_amount) || 0) }}</td>
                   </tr>
                   <tr class="text-gray-500">
-                    <td class="py-2">Đã thanh toán</td>
-                    <td class="py-2 text-right text-green-600">{{ fmtMoney(booking.paid_amount) }}</td>
+                    <td class="py-2">Đã thanh toán (Cọc + Thu trực tiếp)</td>
+                    <td class="py-2 text-right text-green-600">{{ fmtMoney(Number(booking.paid_amount) || 0) }}</td>
                   </tr>
                   <tr v-if="(booking.remaining_amount ?? 0) > 0" class="text-red-600 font-semibold">
                     <td class="py-2">Còn lại</td>
@@ -81,15 +89,32 @@
                   </tr>
                 </tbody>
               </table>
-              <!-- Add service -->
               <div class="mt-3 flex gap-2">
-                <button @click="showAddService = !showAddService" class="text-sm text-emerald-600 hover:underline">+ Thêm dịch vụ</button>
+                <button @click="showAddService = !showAddService" class="text-sm text-emerald-600 hover:underline">+ Thêm dịch vụ/phụ thu</button>
               </div>
-              <div v-if="showAddService" class="mt-2 flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg">
-                <input v-model="newSvc.service_name" placeholder="Tên dịch vụ" class="input-sm flex-1" />
-                <input v-model.number="newSvc.unit_price" type="number" placeholder="Đơn giá" class="input-sm w-28" />
-                <input v-model.number="newSvc.quantity" type="number" placeholder="SL" class="input-sm w-16" min="1" />
-                <button @click="addService" class="px-3 py-1.5 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-700 transition-colors">Thêm</button>
+              <div v-if="showAddService" class="mt-2 p-3 bg-gray-50 rounded-lg space-y-3">
+                <div class="flex flex-wrap gap-2">
+                  <!-- Preset Surcharges Dropdown -->
+                  <select v-model="selectedPreset" @change="onPresetChange" class="input-sm w-40">
+                    <option value="">-- Chọn dịch vụ --</option>
+                    <option v-for="preset in presetServices" :key="preset.name" :value="preset.name">
+                      {{ preset.name }} ({{ fmtMoney(preset.price) }})
+                    </option>
+                    <option value="other">Phụ thu khác...</option>
+                  </select>
+                  
+                  <!-- Custom Service Name (only show if 'other' is selected) -->
+                  <input v-if="selectedPreset === 'other' || !selectedPreset" v-model="newSvc.service_name" placeholder="Tên dịch vụ" class="input-sm flex-1" />
+                  
+                  <input v-model.number="newSvc.unit_price" type="number" placeholder="Đơn giá" class="input-sm w-28" />
+                  <input v-model.number="newSvc.quantity" type="number" placeholder="SL" class="input-sm w-16" min="1" />
+                  <button @click="addService" class="px-3 py-1.5 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-700 transition-colors">Thêm</button>
+                </div>
+                
+                <label class="flex items-center gap-2 cursor-pointer mt-2 select-none">
+                  <input type="checkbox" v-model="newSvc.is_paid" class="w-4 h-4 accent-emerald-600" />
+                  <span class="text-sm font-medium text-gray-700">Khách đã trả tiền mặt món này (Đưa vào két ngay)</span>
+                </label>
               </div>
             </section>
 
@@ -199,7 +224,30 @@ const showPayment  = ref(false);
 const showAddService = ref(false);
 const internalNote = ref('');
 const guestNote    = ref('');
-const newSvc       = ref({ service_name:'', unit_price:0, quantity:1 });
+const newSvc       = ref({ service_name:'', unit_price:0, quantity:1, is_paid: false });
+const selectedPreset = ref('');
+
+const presetServices = [
+  { name: 'Giặt ủi', price: 60000 },
+  { name: 'Nước suối', price: 10000 },
+  { name: 'Mì tôm', price: 15000 },
+  { name: 'Bò húc', price: 20000 },
+  { name: 'Nước ngọt', price: 15000 }
+];
+
+function onPresetChange() {
+  if (selectedPreset.value && selectedPreset.value !== 'other') {
+    const preset = presetServices.find(p => p.name === selectedPreset.value);
+    if (preset) {
+      newSvc.value.service_name = preset.name;
+      newSvc.value.unit_price = preset.price;
+      newSvc.value.quantity = 1; // reset quantity
+    }
+  } else {
+    newSvc.value.service_name = '';
+    newSvc.value.unit_price = 0;
+  }
+}
 
 async function refetch() {
   loading.value = true;
@@ -227,13 +275,26 @@ async function addService() {
     method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token()}`},
     body: JSON.stringify(newSvc.value),
   });
-  if (res.ok) { newSvc.value = { service_name:'', unit_price:0, quantity:1 }; showAddService.value=false; refetch(); }
+  if (res.ok) { 
+    newSvc.value = { service_name:'', unit_price:0, quantity:1, is_paid: false }; 
+    selectedPreset.value = '';
+    showAddService.value=false; 
+    refetch(); 
+  } else {
+    const d = await res.json();
+    alert(d.message || "Lỗi thêm dịch vụ");
+  }
 }
 
 async function removeService(sid: number) {
   if (!confirm('Xóa dịch vụ này?')) return;
-  await fetch(`${API}/bookings/${props.bookingId}/services/${sid}`, { method:'DELETE', headers:{ Authorization:`Bearer ${token()}` } });
-  refetch();
+  const res = await fetch(`${API}/bookings/${props.bookingId}/services/${sid}`, { method:'DELETE', headers:{ Authorization:`Bearer ${token()}` } });
+  if (res.ok) {
+    refetch();
+  } else {
+    const d = await res.json();
+    alert(d.message || "Lỗi khi xóa dịch vụ");
+  }
 }
 
 // Helpers

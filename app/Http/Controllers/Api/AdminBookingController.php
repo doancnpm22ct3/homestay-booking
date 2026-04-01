@@ -14,7 +14,7 @@ class AdminBookingController extends Controller
     {
         $search = $request->query('search');
 
-        $query = Booking::with(['customer', 'room', 'payments']);
+        $query = Booking::with(['customer', 'room', 'payments', 'services']);
 
         if (!empty($search)) {
             $query->where(function($q) use ($search) {

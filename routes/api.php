@@ -150,3 +150,13 @@ Route::prefix('admin')->group(function () {
     // Mới: Danh sách hiển thị riêng cho Admin (có phân cấp)
     Route::get('/rooms', [RoomController::class, 'adminIndex']);
 });
+
+// GET /admin/users (Lấy danh sách)
+
+// POST /admin/users (Thêm mới)
+
+// PUT /admin/users/{id} (Cập nhật)
+
+// DELETE /admin/users/{id} (Xóa)
+
+// PUT /admin/users/{id}/status (Đổi trạng thái)

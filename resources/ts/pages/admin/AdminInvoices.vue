@@ -146,6 +146,7 @@
             </div>
           </div>
 
+          <!-- CẤU TRÚC HÓA ĐƠN CHI TIẾT TƯƠNG TỰ CHI TIẾT BOOKING -->
           <div class="bg-gray-50 rounded-xl p-4 space-y-3 border border-gray-100">
             <template v-if="selectedBooking.payment_status === 'deposited'">
               <div class="flex justify-between text-sm">
@@ -158,25 +159,51 @@
                   {{ Number(selectedBooking.deposit_amount).toLocaleString('vi-VN') }}đ
                 </span>
               </div>
-              <p class="text-xs text-center text-amber-600 mt-2 italic">Khách hàng sẽ thanh toán phần còn lại khi nhận phòng.</p>
+              <p class="text-xs text-center text-amber-600 mt-2 italic">Khách hàng chưa Check-out, Hóa đơn có thể phát sinh thêm.</p>
             </template>
 
             <template v-else>
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Tổng tiền phòng:</span>
-                <span class="font-semibold text-gray-900">{{ Number(selectedBooking.total_price).toLocaleString('vi-VN') }}đ</span>
-              </div>
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Đã trừ tiền cọc:</span>
-                <span class="font-medium text-gray-500">- {{ Number(selectedBooking.deposit_amount).toLocaleString('vi-VN') }}đ</span>
-              </div>
-              <div class="flex justify-between text-sm pt-3 border-t border-gray-200">
-                <span class="font-bold text-gray-900">SỐ TIỀN ĐÃ THANH TOÁN THÊM:</span>
-                <span class="font-extrabold text-emerald-600 text-lg">
+              <table class="w-full text-sm">
+                <tbody>
+                  <tr class="border-b border-gray-200">
+                    <td class="py-2 text-gray-600">Phòng ({{ nightsCount(selectedBooking.check_in_date, selectedBooking.check_out_date) }} đêm × {{ Number(selectedBooking.room?.price || 0).toLocaleString('vi-VN') }}đ)</td>
+                    <td class="py-2 text-right font-semibold text-gray-900">{{ Number((selectedBooking.room?.price || 0) * nightsCount(selectedBooking.check_in_date, selectedBooking.check_out_date)).toLocaleString('vi-VN') }}đ</td>
+                  </tr>
+                  
+                  <tr v-for="svc in selectedBooking.services" :key="svc.id" class="border-b border-gray-200">
+                    <td class="py-2 text-gray-600 pl-4">+ {{ svc.service_name }} × {{ svc.quantity }}
+                      <span v-if="svc.is_paid" class="ml-2 text-[10px] text-white bg-green-500 px-1.5 py-0.5 rounded-full inline-block">Đã thu tiền</span>
+                    </td>
+                    <td class="py-2 text-right">
+                      <span v-if="svc.is_paid" class="line-through text-gray-400 font-medium">{{ Number(svc.total_price).toLocaleString('vi-VN') }}đ</span>
+                      <span v-else class="font-semibold text-gray-900">{{ Number(svc.total_price).toLocaleString('vi-VN') }}đ</span>
+                    </td>
+                  </tr>
+
+                  <tr v-if="selectedBooking.discount_amount > 0" class="border-b border-gray-200 text-green-600">
+                    <td class="py-2 pl-4">Khuyến mãi / Giảm giá</td>
+                    <td class="py-2 text-right font-semibold">-{{ Number(selectedBooking.discount_amount).toLocaleString('vi-VN') }}đ</td>
+                  </tr>
+
+                  <tr class="font-bold">
+                    <td class="py-3 text-gray-900">TỔNG CỘNG</td>
+                    <td class="py-3 text-right text-emerald-700 text-lg">{{ Number(selectedBooking.total_price).toLocaleString('vi-VN') }}đ</td>
+                  </tr>
+
+                  <tr class="text-gray-600">
+                    <td class="py-2">Đã thanh toán (Cọc + Thu trực tiếp)</td>
+                    <td class="py-2 text-right font-semibold">{{ Number(selectedBooking.deposit_amount).toLocaleString('vi-VN') }}đ</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div v-if="(selectedBooking.total_price - selectedBooking.deposit_amount) > 0" class="flex justify-between text-sm pt-3 border-t border-gray-200">
+                <span class="font-bold text-red-600">SỐ TIỀN CÒN NỢ:</span>
+                <span class="font-extrabold text-red-600 text-lg">
                   {{ Number(selectedBooking.total_price - selectedBooking.deposit_amount).toLocaleString('vi-VN') }}đ
                 </span>
               </div>
-              <p class="text-xs text-center text-emerald-600 mt-2 font-bold">✓ Khách đã thanh toán đủ 100% hóa đơn.</p>
+              <p v-else class="text-xs text-center text-emerald-600 mt-4 font-bold bg-emerald-50 py-2 rounded-lg">✓ KHÁCH ĐÃ THANH TOÁN ĐỦ 100%</p>
             </template>
           </div>
         </div>
@@ -260,4 +287,12 @@ const deleteBooking = async (id: number) => {
 onMounted(() => {
   fetchBookings();
 });
+
+function nightsCount(ci:string,co:string){
+  if(!ci||!co) return 0;
+  const [cy,cm,cd]=ci.slice(0,10).split('-').map(Number);
+  const [oy,om,od]=co.slice(0,10).split('-').map(Number);
+  const d1=new Date(cy,cm-1,cd), d2=new Date(oy,om-1,od);
+  return Math.max(1, Math.round((d2.getTime()-d1.getTime())/86400000));
+}
 </script>

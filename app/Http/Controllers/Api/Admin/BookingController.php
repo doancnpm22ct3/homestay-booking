@@ -274,11 +274,19 @@ class BookingController extends Controller
         try {
             $addFee = (float)($request->additional_fee ?? 0);
             
-            // Tính final_paid (Lưu ý tổng tiền booking->total_amount đã được update nếu thêm services)
-            // Nếu update additional_fee:
             if ($addFee > 0) {
+                // Tạo service thay vì chỉ cộng tiền
+                $note = $request->additional_note ?: 'Phụ thu khi trả phòng';
+                $booking->services()->create([
+                    'service_name' => $note,
+                    'unit_price' => $addFee,
+                    'quantity' => 1,
+                    'total_price' => $addFee,
+                    'is_paid' => false,
+                ]);
                 $booking->increment('total_amount', (int)$addFee);
                 $booking->increment('subtotal', (int)$addFee);
+                $booking->logActivity('service_added', "Thêm dịch vụ lúc check-out: {$note}");
             }
             
             $final_paid = $booking->total_amount - $booking->paid_amount;
@@ -299,8 +307,6 @@ class BookingController extends Controller
                 'status' => 'checked_out',
                 'checked_out_by' => auth('sanctum')->id(),
                 'paid_at' => now(),
-                'additional_fee' => $addFee,
-                'additional_note' => $request->additional_note
             ]);
 
             // Cập nhật trạng thái Room thành maintenance
