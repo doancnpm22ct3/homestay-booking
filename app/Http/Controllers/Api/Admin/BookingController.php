@@ -8,6 +8,7 @@ use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use App\Notifications\BookingStatusUpdated;
 
 class BookingController extends Controller
 {
@@ -219,6 +220,12 @@ class BookingController extends Controller
         if ($request->status==='confirmed') $booking->update(['confirmed_by'=>auth('sanctum')->id()]);
         $labels = ['pending'=>'Chờ xác nhận','confirmed'=>'Đã xác nhận','checked_in'=>'Đã check-in','checked_out'=>'Đã check-out','cancelled'=>'Đã hủy','no_show'=>'No-show'];
         $booking->logActivity('status_changed',"Trạng thái: {$labels[$old]} → {$labels[$request->status]}",['status'=>$old],['status'=>$request->status]);
+        
+        // Notify Customer
+        if ($booking->customer) {
+            $booking->customer->notify(new BookingStatusUpdated($booking, "Đơn đặt phòng #{$booking->booking_code} của bạn đã chuyển sang trạng thái: {$labels[$request->status]}"));
+        }
+
         return response()->json(['message'=>'OK','booking'=>$booking]);
     }
 
@@ -239,6 +246,12 @@ class BookingController extends Controller
             // Theo yêu cầu: cập nhật trạng thái Room thành in_use
             $booking->room()->update(['status'=>'in_use','room_status'=>'occupied','room_status_updated_by'=>auth('sanctum')->id()]);
             $booking->logActivity('checkin','Khách đã check-in thành công');
+            
+            // Notify Customer
+            if ($booking->customer) {
+                $booking->customer->notify(new BookingStatusUpdated($booking, "Bạn đã nhận phòng (Check-in) thành công cho đơn đặt phòng #{$booking->booking_code}."));
+            }
+
             DB::commit();
             return response()->json(['message'=>'Check-in thành công','booking'=>$booking->fresh(['customer','room'])]);
         } catch (\Exception $e) { DB::rollBack(); return response()->json(['message'=>$e->getMessage()],500); }
@@ -314,6 +327,12 @@ class BookingController extends Controller
             dispatch(new \App\Jobs\CleanRoomJob($booking->room_id))->delay(now()->addHour());
 
             $booking->logActivity('checkout','Khách đã check-out. Phòng chuyển sang bảo trì/dọn dẹp.');
+            
+            // Notify Customer
+            if ($booking->customer) {
+                $booking->customer->notify(new BookingStatusUpdated($booking, "Bạn đã trả phòng (Check-out) thành công cho đơn đặt phòng #{$booking->booking_code}."));
+            }
+
             DB::commit();
             return response()->json(['message'=>'Check-out thành công','booking'=>$booking->fresh(['customer','room','payments'])]);
         } catch (\Exception $e) { DB::rollBack(); return response()->json(['message'=>$e->getMessage()],500); }
@@ -342,6 +361,12 @@ class BookingController extends Controller
             ]);
 
             $booking->logActivity('cancelled',"Booking hủy: {$request->cancel_reason}");
+            
+            // Notify Customer
+            if ($booking->customer) {
+                $booking->customer->notify(new BookingStatusUpdated($booking, "Đơn đặt phòng #{$booking->booking_code} của bạn đã bị hủy. Lý do: {$request->cancel_reason}"));
+            }
+
             DB::commit();
             return response()->json(['message'=>'Hủy thành công','booking'=>$booking->fresh()]);
         } catch (\Exception $e) { DB::rollBack(); return response()->json(['message'=>$e->getMessage()],500); }

@@ -91,7 +91,6 @@ Route::post('/amenities', [App\Http\Controllers\Api\RoomController::class, 'stor
 Route::delete('/amenities/{id}', [App\Http\Controllers\Api\RoomController::class, 'deleteAmenity']);
 
 // --- ĐẶT PHÒNG & HÓA ĐƠN ---
-Route::post('/bookings', [App\Http\Controllers\Api\BookingController::class, 'store']);
 Route::get('/admin/invoices', [App\Http\Controllers\Api\AdminBookingController::class, 'index']);
 Route::delete('/admin/invoices/{id}', [App\Http\Controllers\Api\AdminBookingController::class, 'destroy']);
 
@@ -106,8 +105,19 @@ Route::put('/admin/users/{id}/status', [AdminUserController::class, 'toggleStatu
 Route::get('/admin/rooms/stats', [App\Http\Controllers\Api\RoomController::class, 'stats']);
 
 // --- USER HIỆN TẠI ---
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+    Route::get('/my-bookings', [App\Http\Controllers\Api\BookingController::class, 'myHistory']);
+    Route::post('/bookings', [App\Http\Controllers\Api\BookingController::class, 'store']);
+    Route::get('/notifications', function (Request $request) {
+        return $request->user()->unreadNotifications;
+    });
+    Route::post('/notifications/mark-as-read', function (Request $request) {
+        $request->user()->unreadNotifications->markAsRead();
+        return response()->json(['message' => 'Đã đánh dấu tất cả là đã đọc']);
+    });
 });
 
 // ══════════════════════════════════════════
