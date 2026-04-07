@@ -14,7 +14,7 @@ class AdminUserController extends Controller
     {
         $query = User::query();
         
-        // Tìm theo Tên, Email hoặc Số điện thoại
+        
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
             $query->where('name', 'LIKE', "%{$search}%")

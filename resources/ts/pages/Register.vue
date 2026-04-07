@@ -162,9 +162,9 @@ const router = useRouter();
 const form = ref({
   name: '',
   email: '',
-  phone: '', // Thêm trường phone
+  phone: '', 
   password: '',
-  password_confirmation: '', // Thêm trường xác nhận mật khẩu
+  password_confirmation: '', 
   terms: false
 });
 
@@ -173,14 +173,14 @@ const validationErrors = ref<Record<string, string[]>>({});
 const isProcessing = ref(false);
 
 const handleRegister = async () => {
-  // Validate cơ bản ở Frontend
+  // mật khẩu gõ 2 lần có giống nhau không
   if (form.value.password !== form.value.password_confirmation) {
     alert('Mật khẩu xác nhận không khớp!');
     return;
   }
 
   isProcessing.value = true;
-  validationErrors.value = {}; // Reset lỗi cũ
+  validationErrors.value = {}; 
 
   try {
     const response = await fetch('/api/register', {

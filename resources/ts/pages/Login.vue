@@ -158,11 +158,10 @@ const handleLogin = async () => {
 
     alert('Đăng nhập thành công!');
 
-    // PHÂN LUỒNG ROLE VÀ CHUYỂN TRANG
     if (data.user.role === 'admin') {
       window.location.href = '/admin/rooms'; // Dùng window.location.href để reload app và vào thẳng admin
     } else {
-      window.location.href = '/'; // Về trang chủ cho khách
+      window.location.href = '/';
     }
 
   } catch (error) {

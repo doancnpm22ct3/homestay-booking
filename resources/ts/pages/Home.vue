@@ -57,99 +57,153 @@
         </div>
       </div>
 
-      <div class="relative mt-16 w-full">
-        <div class="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-[1px] bg-[#4A7055]/30 z-0"></div>
-        <div class="relative z-10 bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-2 flex flex-col md:flex-row items-center max-w-5xl mx-auto border border-[#4A7055]/10">
-          
-          <div class="flex-1 w-full relative">
-            <button @click="toggleDropdown('location')" class="flex items-center justify-between px-6 py-3 w-full hover:bg-gray-50 rounded-full transition-colors border-b md:border-b-0 md:border-r border-gray-100">
-              <div class="flex items-center gap-3">
-                <MapPin class="text-[#4A7055] opacity-60 w-5 h-5 shrink-0" />
-                <div class="text-left">
-                  <div class="text-sm font-medium text-gray-700">Địa điểm</div>
-                  <div class="text-xs" :class="location ? 'text-[#4A7055] font-bold' : 'text-gray-400'">
+      <div class="relative mt-8 w-full max-w-5xl mx-auto px-4 sm:px-0">
+        <div class="bg-white rounded-[32px] shadow-2xl p-6 md:p-8 border border-[#4A7055]/10 backdrop-blur-sm bg-white/95">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-4 gap-y-4 mb-4">
+            <div class="lg:col-span-3 relative group">
+              <label class="block text-[10px] font-bold text-[#4A7055] uppercase tracking-wider mb-1 ml-2">Tìm kiếm</label>
+              <div class="relative">
+                <Search class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 group-focus-within:text-[#4A7055] transition-colors" />
+                <input 
+                  v-model="nameSearch" 
+                  type="text" 
+                  placeholder="Tên homestay..." 
+                  class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:border-[#4A7055] outline-none transition-all text-xs"
+                />
+              </div>
+            </div>
+
+            <div class="lg:col-span-3 relative group">
+              <label class="block text-[10px] font-bold text-[#4A7055] uppercase tracking-wider mb-1 ml-2">Địa điểm</label>
+              <button @click="toggleDropdown('location')" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:border-[#4A7055]/30 transition-all text-left">
+                <div class="flex items-center gap-2 truncate">
+                  <MapPin class="text-[#4A7055] w-4 h-4 shrink-0" />
+                  <span class="text-xs font-semibold truncate" :class="location ? 'text-gray-900' : 'text-gray-400'">
                     {{ location || 'Bạn muốn đi đâu?' }}
-                  </div>
+                  </span>
                 </div>
-              </div>
-              <ChevronDown class="text-gray-400 w-4 h-4 hidden lg:block" />
-            </button>
-            <div v-if="activeDropdown === 'location'" class="absolute top-full left-0 mt-4 w-72 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden">
-              <div class="p-2 max-h-60 overflow-y-auto">
-                <button v-for="loc in daNangDistricts" :key="loc" @click="selectLocation(loc)" class="w-full text-left px-2 py-3 hover:bg-gray-50 rounded-xl text-sm font-medium text-gray-700 transition-colors">
-                  <MapPin class="inline-block w-4 h-4 mr-2 text-gray-400" />
-                  {{ loc }}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex-1 w-full relative">
-            <div class="flex items-center justify-between px-6 py-3 w-full rounded-full border-b md:border-b-0 md:border-r border-gray-100 hover:bg-gray-50 transition-colors">
-              <div class="flex items-center gap-3 w-full">
-                <Calendar class="text-[#4A7055] opacity-60 w-5 h-5 shrink-0" />
-                <div class="flex flex-col w-full">
-                  <div class="text-sm font-medium text-gray-700 mb-0.5">Nhận - Trả phòng</div>
-
-                  <div class="flex items-center gap-1 w-full mt-0.25">
-                    <div class="relative flex-1 cursor-pointer group">
-                      <div class="text-xs group-hover:text-[#4A7055] transition-colors" :class="checkIn ? 'text-[#4A7055] font-bold' : 'text-gray-400'">
-                        {{ checkIn ? formatDate(checkIn) : 'Ngày nhận' }}
+                <ChevronDown class="text-gray-400 w-4 h-4" />
+              </button>
+              
+              <div v-if="activeDropdown === 'location'" class="absolute top-full left-0 mt-2 w-full min-w-[280px] bg-white rounded-2xl shadow-2xl border border-gray-100 z-[60] overflow-hidden">
+                <div class="p-2 max-h-60 overflow-y-auto custom-scrollbar">
+                  <div v-if="availableLocations.length === 0" class="p-4 text-center text-gray-500 text-sm italic">Đang tải...</div>
+                  <button v-for="loc in availableLocations" :key="loc.id" @click="selectLocation(loc.location)" class="w-full text-left px-3 py-2.5 hover:bg-emerald-50 rounded-xl transition-colors group">
+                    <div class="flex items-start gap-3">
+                      <div class="mt-1 p-1 bg-emerald-100 text-emerald-600 rounded group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <MapPin class="w-3 h-3" />
                       </div>
-                      <input type="date" v-model="checkIn" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer date-overlay" />
-                    </div>
-                    <span class="text-xs text-gray-300">-</span>
-                    <div class="relative flex-1 cursor-pointer group">
-                      <div class="text-xs group-hover:text-[#4A7055] transition-colors" :class="checkOut ? 'text-[#4A7055] font-bold' : 'text-gray-400'">
-                        {{ checkOut ? formatDate(checkOut) : 'Ngày trả' }}
+                      <div>
+                        <div class="text-xs font-bold text-gray-900 group-hover:text-emerald-700">{{ loc.title }}</div>
+                        <div class="text-[10px] text-gray-500 line-clamp-1 italic">{{ loc.location }}</div>
                       </div>
-                      <input type="date" v-model="checkOut" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer date-overlay" />
                     </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="lg:col-span-4 relative">
+              <label class="block text-[10px] font-bold text-[#4A7055] uppercase tracking-wider mb-1 ml-2">Thời gian</label>
+              <div class="flex items-center gap-1 w-full bg-gray-50/50 rounded-xl border border-gray-100 px-4 py-2.5 hover:bg-white hover:border-[#4A7055]/30 transition-all relative">
+                <Calendar class="text-[#4A7055] w-4 h-4 shrink-0" />
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                  <div class="relative flex-1 flex items-center" @click="openDatePicker">
+                    <div class="text-xs font-semibold truncate pointer-events-none" :class="checkIn ? 'text-gray-900' : 'text-gray-400'">
+                      {{ checkIn ? formatDate(checkIn) : 'Từ ngày' }}
+                    </div>
+                    <input type="date" v-model="checkIn" :min="todayStr" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                  </div>
+                  <span class="text-gray-300">-</span>
+                  <div class="relative flex-1 flex items-center" @click="openDatePicker">
+                    <div class="text-xs font-semibold truncate pointer-events-none" :class="checkOut ? 'text-gray-900' : 'text-gray-400'">
+                      {{ checkOut ? formatDate(checkOut) : 'Đến ngày' }}
+                    </div>
+                    <input type="date" v-model="checkOut" :min="checkIn || todayStr" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
                   </div>
                 </div>
               </div>
-              <ChevronDown class="text-gray-400 w-4 h-4 hidden lg:block ml-2 shrink-0 pointer-events-none" />
             </div>
-          </div>
 
-          <div class="flex-1 w-full relative">
-            <button @click="toggleDropdown('type')" class="flex items-center justify-between px-6 py-3 w-full hover:bg-gray-50 rounded-full transition-colors border-b md:border-b-0 md:border-r border-gray-100">
-              <div class="flex items-center gap-3">
-                <HomeIcon class="text-[#4A7055] opacity-60 w-5 h-5 shrink-0" />
-                <div class="text-left">
-                  <div class="text-sm font-medium text-gray-700">Loại hình thuê</div>
-                  <div class="text-xs" :class="type ? 'text-[#4A7055] font-bold' : 'text-gray-400'">
-                    {{ type || 'Phòng / Nguyên căn' }}
+            <div class="lg:col-span-2 relative">
+              <label class="block text-[10px] font-bold text-[#4A7055] uppercase tracking-wider mb-1 ml-2">Khách</label>
+              <div class="flex items-center gap-2 bg-gray-50/50 rounded-xl border border-gray-100 px-3 py-2.5 hover:bg-white hover:border-[#4A7055]/30 transition-all">
+                <Users class="text-[#4A7055] w-3 h-3 shrink-0" />
+                <div class="flex items-center gap-2 text-[10px] font-bold">
+                  <div class="flex flex-col">
+                    <input type="number" v-model="adults" min="1" class="bg-transparent outline-none w-6 text-center" />
+                  </div>
+                  <div class="w-px h-6 bg-gray-200"></div>
+                  <div class="flex flex-col">
+                    <input type="number" v-model="children" min="0" class="bg-transparent outline-none w-6 text-center" />
                   </div>
                 </div>
               </div>
-              <ChevronDown class="text-gray-400 w-4 h-4 hidden lg:block" />
-            </button>
-            <div v-if="activeDropdown === 'type'" class="absolute top-full left-0 mt-4 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
-              <div class="flex flex-col">
-                <button @click="selectType('Phòng')" class="text-left px-5 py-3 hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors border-b border-gray-50">Phòng</button>
-                <button @click="selectType('Nguyên căn')" class="text-left px-5 py-3 hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors">Nguyên căn</button>
-              </div>
             </div>
           </div>
 
-          <div class="flex-1 w-full relative">
-            <div class="flex items-center justify-between px-6 py-3 w-full rounded-full transition-colors">
-              <div class="flex items-center gap-3 w-full">
-                <Users class="text-[#4A7055] opacity-60 w-5 h-5 shrink-0" />
-                <div class="flex flex-col w-full">
-                  <div class="text-sm font-medium text-gray-700">Số lượng người</div>
-                  <input type="number" v-model="guests" min="1" placeholder="Thêm khách" class="hide-arrows text-xs text-gray-500 bg-transparent outline-none w-full mt-0.5" />
+          <div class="flex flex-col lg:flex-row items-center justify-between gap-6 pt-4 border-t border-gray-100">
+            <div class="flex-1 w-full flex flex-wrap items-center gap-6">
+              
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Khoảng giá</p>
+                <div class="flex items-center gap-2">
+                  <input 
+                    v-model.number="minPrice" 
+                    type="number" 
+                    placeholder="Từ" 
+                    class="w-20 px-3 py-2 text-[11px] rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:border-[#4A7055] outline-none"
+                  />
+                  <span class="text-gray-400">-</span>
+                  <input 
+                    v-model.number="maxPrice" 
+                    type="number" 
+                    placeholder="Đến" 
+                    class="w-20 px-3 py-2 text-[11px] rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:border-[#4A7055] outline-none"
+                  />
                 </div>
               </div>
-              <ChevronDown class="text-gray-400 w-4 h-4 hidden lg:block ml-2 shrink-0" />
+
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Loại phòng</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <button 
+                    v-for="sub in ['Tất cả', 'Đơn', 'Đôi', 'VIP']" 
+                    :key="sub"
+                    @click="roomSubtype = sub"
+                    :class="['px-3 py-2 rounded-xl text-[10px] font-bold border transition-all whitespace-nowrap', 
+                             roomSubtype === sub ? 'bg-[#4A7055] text-white border-[#4A7055]' : 'bg-white text-gray-600 border-gray-100 opacity-80']"
+                  >
+                    {{ sub }}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Hình thức</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <button 
+                    v-for="t in [ {label: 'Tất cả', value: ''}, {label: 'Riêng', value: 'Phòng riêng'}, {label: 'Nguyên căn', value: 'Nguyên căn'} ]"
+                    :key="t.label"
+                    @click="selectType(t.value)" 
+                    :class="['px-3 py-2 rounded-xl text-[10px] font-bold border transition-all whitespace-nowrap', 
+                             type === t.value ? 'bg-[#4A7055] text-white border-[#4A7055]' : 'bg-white text-gray-600 border-gray-100 opacity-80']"
+                  >{{ t.label }}</button>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="shrink-0">
+              <button 
+                @click="handleSearch" 
+                class="bg-[#4A7055] hover:bg-[#3b5a44] text-white px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-[#4A7055]/20"
+              >
+                <Search class="w-4 h-4" />
+                <span>Tìm Homestay</span>
+              </button>
             </div>
           </div>
-
-          <button @click="handleSearch" class="bg-[#4A7055] hover:bg-[#3b5a44] text-white p-4 rounded-full transition-colors w-full md:w-14 md:h-14 flex justify-center items-center shrink-0 ml-2 shadow-md">
-            <Search class="w-5 h-5" />
-            <span class="md:hidden ml-2 font-medium">Tìm kiếm</span>
-          </button>
         </div>
       </div>
     </section>
@@ -370,25 +424,55 @@ onUnmounted(() => {
 const location = ref('');
 const checkIn = ref('');
 const checkOut = ref('');
-const guests = ref<string | number>('');
+const adults = ref<number | string>(2);
+const children = ref<number | string>(0);
 const type = ref('');
 const activeDropdown = ref<string | null>(null);
 
+// Mới thêm: Đồng bộ với Listing.vue
+const nameSearch = ref('');
+const minPrice = ref<number | null>(null);
+const maxPrice = ref<number | null>(null);
+const roomSubtype = ref('Tất cả');
+
+const todayStr = new Date().toISOString().split('T')[0];
+
 const formatDate = (dateStr: string) => {
   if (!dateStr) return '';
-  const [year, month, day] = dateStr.split('-');
-  return `${day}/${month}/${year}`;
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('vi-VN');
+  } catch (e) {
+    return '';
+  }
 };
 
-const daNangDistricts = [
-  'Quận Hải Châu, Đà Nẵng',
-  'Quận Sơn Trà, Đà Nẵng',
-  'Quận Ngũ Hành Sơn, Đà Nẵng',
-  'Quận Cẩm Lệ, Đà Nẵng',
-  'Quận Thanh Khê, Đà Nẵng',
-  'Quận Liên Chiểu, Đà Nẵng',
-  'Huyện Hòa Vang, Đà Nẵng'
-];
+const openDatePicker = (e: Event) => {
+  // Tìm input type="date" gần nhất với phần tử được click
+  const input = (e.currentTarget as HTMLElement).querySelector('input[type="date"]') as HTMLInputElement;
+  if (input) {
+    if (typeof (input as any).showPicker === 'function') {
+      (input as any).showPicker();
+    } else {
+      input.focus();
+      input.click();
+    }
+  }
+};
+
+const availableLocations = ref<{id: number, title: string, location: string}[]>([]);
+
+const fetchAvailableLocations = async () => {
+  try {
+    const response = await fetch('/api/locations/available');
+    if (response.ok) {
+      availableLocations.value = await response.json();
+    }
+  } catch (error) {
+    console.error('Lỗi khi tải danh sách địa điểm:', error);
+  }
+};
 
 const toggleDropdown = (menuName: string) => {
   activeDropdown.value = activeDropdown.value === menuName ? null : menuName;
@@ -402,17 +486,27 @@ const selectLocation = (loc: string) => {
 const selectType = (selectedType: string) => {
   type.value = selectedType;
   activeDropdown.value = null;
+  // Khi đổi sang loại hình khác thì reset quy mô phòng
+  roomSubtype.value = 'Tất cả';
 };
 
 const handleSearch = () => {
+  const minV = (minPrice.value !== null && minPrice.value !== undefined) ? Number(minPrice.value) : null;
+  const maxV = (maxPrice.value !== null && maxPrice.value !== undefined) ? Number(maxPrice.value) : null;
+
   router.push({
     path: '/listing',
     query: {
-      location: location.value,
-      type: type.value,
-      guests: guests.value,
-      checkIn: checkIn.value,
-      checkOut: checkOut.value
+      name: nameSearch.value || undefined,
+      location: location.value || undefined,
+      type: type.value || undefined,
+      adults: adults.value || undefined,
+      children: children.value || undefined,
+      checkIn: checkIn.value || undefined,
+      checkOut: checkOut.value || undefined,
+      minPrice: minV !== null ? String(minV) : undefined,
+      maxPrice: maxV !== null ? String(maxV) : undefined,
+      subtype: roomSubtype.value !== 'Tất cả' ? roomSubtype.value : undefined
     }
   });
 };
@@ -421,14 +515,15 @@ const popularRooms = ref<Room[]>([]);
 
 onMounted(async () => {
   startInterval(); 
+  fetchAvailableLocations();
 
   try {
     const response = await fetch('/api/rooms');
     const data = await response.json();
     
-    // Lọc an toàn: Kiểm tra is_visible (có thể là số 1, chuỗi "1" hoặc true)
+    // Lọc: Chỉ lấy những phòng đang TRỐNG và ĐƯỢC HIỆN THỊ
     const visibleRooms = data.filter((room: any) => 
-        room.status !== 'hidden' && 
+        room.status === 'available' && 
         (room.is_visible == 1 || room.is_visible === true)
     ); 
 
@@ -443,7 +538,6 @@ onMounted(async () => {
         id: String(room.id),
         title: room.title,
         location: room.location,
-        // Đồng bộ hoàn toàn với Listing.vue: rent_type là 'home' hoặc 'whole_house' đều tính là Nguyên căn
         type: room.rent_type === 'whole_house' || room.rent_type === 'home' ? 'Nguyên căn' : 'Phòng riêng',
         price: Number(room.price).toLocaleString('vi-VN') + ' VNĐ/đêm', 
         imageUrl: thumb, 

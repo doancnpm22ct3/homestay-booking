@@ -78,7 +78,7 @@ class RoomController extends Controller
     public function index()
     {
         // Lấy tất cả phòng, sắp xếp mới nhất lên đầu, kèm theo hình ảnh
-        $rooms = Room::with('images')->orderBy('id', 'desc')->get()->map(function($room) {
+        $rooms = Room::with(['images', 'parent'])->orderBy('id', 'desc')->get()->map(function($room) {
             
             // Tìm ảnh bìa (is_primary = 1), nếu không có thì lấy tạm ảnh đầu tiên
             $primaryImage = $room->images->where('is_primary', true)->first() 
@@ -88,10 +88,16 @@ class RoomController extends Controller
             return [
                 'id' => $room->id,
                 'title' => $room->title,
+                'location' => $room->location,
+                'rent_type' => $room->rent_type,
                 'type' => $room->type,
                 'price' => $room->price,
                 'status' => $room->status,
                 'is_visible' => $room->is_visible,
+                'max_guests' => $room->max_guests,
+                'max_children' => $room->max_children,
+                'parent_id' => $room->parent_id,
+                'parent_title' => $room->parent ? $room->parent->title : null,
                 'image' => $primaryImage ? $primaryImage->image_url : 'https://picsum.photos/seed/fallback/100/100'
             ];
         });
@@ -393,5 +399,21 @@ class RoomController extends Controller
 
         $room->update(['rent_type' => 'room_based']);
         return response()->json(['message' => 'Đã chuyển đổi sang mô hình cho thuê phòng lẻ thành công!', 'room' => $room]);
+    }
+
+    public function getAvailableLocations()
+    {
+        // Lấy danh sách các phòng/homestay đang trống để gợi ý cụ thể
+        $suggestions = Room::where('status', 'available')
+                         ->where('is_visible', true)
+                         ->where('rent_type', '!=', 'room_based')
+                         ->whereNotNull('location')
+                         ->where('location', '!=', '')
+                         ->select('id', 'title', 'location')
+                         ->latest()
+                         ->limit(15)
+                         ->get();
+                         
+        return response()->json($suggestions);
     }
 }

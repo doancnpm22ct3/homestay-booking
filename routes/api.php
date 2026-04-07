@@ -52,6 +52,9 @@ Route::get('/rooms', function (Request $request) {
     return response()->json($rooms);
 });
 
+// Lấy danh sách địa điểm có phòng đang trống
+Route::get('/locations/available', [RoomController::class, 'getAvailableLocations']);
+
 // --- GHI ĐÈ API LẤY CHI TIẾT 1 PHÒNG (ĐỂ XEM CHI TIẾT KHÔNG BỊ LỖI) ---
 Route::get('/rooms/{id}', function ($id) {
     $room = DB::table('rooms')->where('id', $id)->first();
@@ -150,3 +153,13 @@ Route::prefix('admin')->group(function () {
     // Mới: Danh sách hiển thị riêng cho Admin (có phân cấp)
     Route::get('/rooms', [RoomController::class, 'adminIndex']);
 });
+
+// GET /admin/users (Lấy danh sách)
+
+// POST /admin/users (Thêm mới)
+
+// PUT /admin/users/{id} (Cập nhật)
+
+// DELETE /admin/users/{id} (Xóa)
+
+// PUT /admin/users/{id}/status (Đổi trạng thái)
