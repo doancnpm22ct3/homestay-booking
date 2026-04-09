@@ -37,18 +37,31 @@
         <div class="relative">
           <button @click="showNotifications = !showNotifications" class="relative text-[#4A7055] hover:text-[#3b5a44] transition-colors flex items-center justify-center mt-1">
             <Bell class="w-6 h-6 fill-current" />
-            <span class="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+            <span v-if="notifications.length > 0" class="absolute -top-0.5 -right-0.5 flex h-3 w-3">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
             </span>
           </button>
 
-          <div v-if="showNotifications" class="absolute right-0 mt-6 w-[450px] bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden z-50">
-            <div class="px-6 py-5 border-b border-gray-100 bg-white">
-              <h3 class="text-lg font-bold text-center text-gray-900">Thông báo của bạn</h3>
+          <div v-if="showNotifications" class="absolute right-0 mt-6 w-[450px] bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div class="px-6 py-5 border-b border-gray-100 bg-white flex justify-between items-center">
+              <h3 class="text-lg font-bold text-gray-900">Thông báo</h3>
+              <button v-if="notifications.length > 0" @click="markAsRead" class="text-xs text-[#4A7055] hover:underline font-medium">Đánh dấu tất cả là đã đọc</button>
             </div>
-            <div class="p-5 flex gap-4 hover:bg-gray-50 transition-colors cursor-pointer">
-              <p class="text-sm">Bạn chưa có thông báo mới.</p>
+            <div class="max-h-[400px] overflow-y-auto">
+              <div v-if="notifications.length === 0" class="p-10 text-center">
+                <p class="text-gray-400 text-sm">Bạn không có thông báo mới.</p>
+              </div>
+              <div v-else v-for="notif in notifications" :key="notif.id" @click="router.push('/profile')" class="p-5 flex gap-4 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-50 last:border-0">
+                <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center shrink-0">
+                  <component :is="getStatusIcon(notif.data.status)" :class="['w-5 h-5', getIconColor(notif.data.status)]" />
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-bold text-gray-900 mb-0.5">{{ notif.data.title || 'Thông báo mới' }}</p>
+                  <p class="text-xs text-gray-600 leading-relaxed">{{ notif.data.message }}</p>
+                  <p class="text-[10px] text-gray-400 mt-2 font-medium">{{ new Date(notif.created_at).toLocaleString('vi-VN') }}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -68,33 +81,84 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
-// Mình đã bỏ import LayoutDashboard vì không dùng nút cũ nữa
-import { Bell, LogOut, Menu } from 'lucide-vue-next';
+import axios from 'axios';
+import { Bell, LogOut, Menu, Info, CheckCircle, XCircle, Clock } from 'lucide-vue-next';
 
 const router = useRouter();
 
-// Phục hồi lại các biến quan trọng của web
 const user = ref<any>(null);
 const showNotifications = ref(false);
 const isAdmin = ref(false);
+const notifications = ref<any[]>([]);
 
-// Chạy hàm này khi load trang
+const fetchNotifications = async () => {
+  if (!user.value) return;
+  try {
+    const response = await axios.get('/api/notifications', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+      }
+    });
+    notifications.value = response.data;
+  } catch (err) {
+    console.error('Failed to fetch notifications:', err);
+  }
+};
+
+const markAsRead = async () => {
+  try {
+    await axios.post('/api/notifications/mark-as-read', {}, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+      }
+    });
+    notifications.value = [];
+  } catch (err) {
+    console.error('Failed to mark as read:', err);
+  }
+};
+
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case 'confirmed': return CheckCircle;
+    case 'cancelled': return XCircle;
+    case 'checked_in': return Clock;
+    case 'checked_out': return CheckCircle;
+    default: return Info;
+  }
+};
+
+const getIconColor = (status: string) => {
+  switch (status) {
+    case 'confirmed': return 'text-green-500';
+    case 'cancelled': return 'text-red-500';
+    case 'checked_in': return 'text-blue-500';
+    case 'checked_out': return 'text-gray-500';
+    default: return 'text-[#4A7055]';
+  }
+};
+
 onMounted(() => {
   try {
     const userInfoString = localStorage.getItem('user_info');
     if (userInfoString) {
-      user.value = JSON.parse(userInfoString); // Lấy thông tin user để hiển thị Avatar
-      
-      // Bật cờ Admin nếu role là admin
+      user.value = JSON.parse(userInfoString);
       if (user.value && user.value.role === 'admin') {
         isAdmin.value = true;
       }
+      fetchNotifications();
+      // Polling notifications every 60s
+      setInterval(fetchNotifications, 60000);
     }
   } catch (error) {
     console.error("Lỗi đọc dữ liệu user:", error);
   }
+});
+
+watch(showNotifications, (val) => {
+  if (val) fetchNotifications();
 });
 
 // Hàm xử lý luồng đi khi bấm vào Avatar

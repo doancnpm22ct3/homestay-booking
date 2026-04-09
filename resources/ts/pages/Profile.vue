@@ -97,25 +97,37 @@
         </div>
 
         <div v-if="activeTab === 'history'">
-          <div class="space-y-6 max-w-4xl font-['Inter']">
-            <div v-for="(room, index) in historyRooms" :key="'history-'+index" class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
+          <div v-if="loadingHistory" class="text-center py-20 text-[#4A7055]">
+            <p>Đang tải lịch sử...</p>
+          </div>
+          <div v-else-if="bookings.length === 0" class="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
+            <p class="text-gray-400">Bạn chưa có lịch sử đặt phòng nào.</p>
+          </div>
+          <div v-else class="space-y-6 max-w-4xl font-['Inter']">
+            <div v-for="booking in bookings" :key="booking.id" class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
               <div class="w-full md:w-56 h-36 shrink-0">
-                <img :src="room.imageUrl" :alt="room.title" class="w-full h-full object-cover rounded-2xl" referrerpolicy="no-referrer" />
+                <img :src="booking.room?.images?.[0]?.image_url || 'https://picsum.photos/seed/room/800/600'" class="w-full h-full object-cover rounded-2xl" referrerpolicy="no-referrer" />
               </div>
               <div class="flex-1 flex flex-col justify-between">
                 <div>
                   <div class="flex justify-between items-start mb-2">
-                    <h3 class="text-lg font-bold text-[#4A7055]">{{ room.status }}</h3>
-                    <span class="text-sm text-gray-400 font-medium whitespace-nowrap ml-4">{{ room.time }}</span>
+                    <span :class="['text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded', 
+                      booking.status === 'confirmed' ? 'bg-blue-50 text-blue-600' : 
+                      booking.status === 'checked_out' ? 'bg-gray-100 text-gray-600' :
+                      booking.status === 'cancelled' ? 'bg-red-50 text-red-600' : 'bg-orange-50 text-orange-600']">
+                      {{ booking.status_label || getStatusLabel(booking.status) }}
+                    </span>
+                    <span class="text-sm text-gray-400 font-medium whitespace-nowrap ml-4">{{ booking.time_vn || formatDate(booking.created_at) }}</span>
                   </div>
-                  <h4 class="font-bold text-gray-900 mb-1 line-clamp-1">{{ room.title }}</h4>
+                  <h4 class="font-bold text-gray-900 mb-1 line-clamp-1">Phòng {{ booking.room_name }}</h4>
                   <p class="text-gray-600 text-sm leading-relaxed mb-4">
-                    {{ room.message }}
+                    Thời gian: {{ formatDate(booking.check_in_date) }} đến {{ formatDate(booking.check_out_date) }} | Tổng: {{ formatMoney(booking.total_amount) }}
                   </p>
                 </div>
-                <button class="text-[#4A7055] font-bold text-sm hover:text-[#3b5a44] self-start underline transition-colors">
+                <router-link :to="`/payment-success?id=${booking.id}`" class="text-[#4A7055] font-bold text-sm hover:text-[#3b5a44] self-start underline transition-colors flex items-center gap-1">
                   Xem hóa đơn chi tiết
-                </button>
+                  <ChevronRight class="w-4 h-4" />
+                </router-link>
               </div>
             </div>
           </div>
@@ -137,8 +149,9 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 import RoomCard from '../components/RoomCard.vue';
-
+import { ChevronRight } from 'lucide-vue-next';
 
 // Khai báo Interface cho User
 interface User {
@@ -155,8 +168,11 @@ const router = useRouter();
 // State
 const activeTab = ref('account');
 const user = ref<User | null>(null);
+const bookings = ref<any[]>([]);
+const loadingHistory = ref(false);
+const savedRooms = ref<any[]>([]);
 
-// Form thông tin (Đồng bộ tên biến với data của User)
+// Form thông tin
 const accountInfo = ref({
   name: '',
   email: '',
@@ -164,21 +180,56 @@ const accountInfo = ref({
   password: ''
 });
 
-// KHI TRANG VỪA TẢI LÊN
-onMounted(() => {
-  const userInfo = localStorage.getItem('user_info');
-  
-  if (userInfo) {
-    user.value = JSON.parse(userInfo) as User;
-    // Đổ dữ liệu vào form
-    accountInfo.value.name = user.value.name;
-    accountInfo.value.email = user.value.email;
-    accountInfo.value.phone = user.value.phone || '';
-  } else {
-    // Chưa đăng nhập -> Đuổi về Login
-    router.push('/login');
+// Hàm lấy lịch sử đặt phòng
+const fetchHistory = async () => {
+  if (bookings.value.length === 0) {
+    loadingHistory.value = true;
+    try {
+      const response = await axios.get('/api/my-bookings', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      });
+      bookings.value = response.data;
+    } catch (err) {
+      console.error('Failed to fetch bookings:', err);
+    } finally {
+      loadingHistory.value = false;
+    }
   }
-});
+};
+
+// Hàm lấy phòng đã lưu
+const loadSavedRooms = () => {
+  const data = localStorage.getItem('saved_rooms');
+  if (data) {
+    savedRooms.value = JSON.parse(data);
+  } else {
+    savedRooms.value = [];
+  }
+};
+
+const getStatusLabel = (status: string) => {
+  switch(status) {
+    case 'pending': return 'Chờ xác nhận';
+    case 'confirmed': return 'Đã xác nhận';
+    case 'checked_in': return 'Đang ở';
+    case 'checked_out': return 'Đã trả phòng';
+    case 'cancelled': return 'Đã hủy';
+    default: return status;
+  }
+};
+
+const formatMoney = (amount: number | string) => {
+  if (!amount) return '0đ';
+  return Number(amount).toLocaleString('vi-VN') + 'đ';
+};
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('vi-VN');
+};
 
 // Hàm Đăng xuất
 const handleLogout = () => {
@@ -189,7 +240,7 @@ const handleLogout = () => {
   }
 };
 
-// Cập nhật thông tin (Chỉ cho sửa tên theo logic của Hiếu)
+// Cập nhật thông tin
 const handleUpdateAccount = async () => {
   if (!accountInfo.value.name.trim()) {
     alert('Tên không được để trống!');
@@ -204,9 +255,8 @@ const handleUpdateAccount = async () => {
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        email: accountInfo.value.email, // Dùng email để làm chìa khóa
-        name: accountInfo.value.name    // Gửi tên mới
-        // Password sẽ được xử lý riêng nếu cần
+        email: accountInfo.value.email,
+        name: accountInfo.value.name
       })
     });
 
@@ -214,12 +264,8 @@ const handleUpdateAccount = async () => {
 
     if (response.ok) {
       alert('Cập nhật thông tin thành công!');
-      
-      // Cập nhật lại localStorage
       localStorage.setItem('user_info', JSON.stringify(data.user));
       user.value = data.user as User;
-      
-      // Reload để Header ăn theo
       window.location.reload();
     } else {
       alert('Lỗi: ' + data.message);
@@ -230,40 +276,30 @@ const handleUpdateAccount = async () => {
   }
 };
 
-// DỮ LIỆU MẪU CỦA BẠN (Mình dùng lại component RoomCard để code ngắn gọn)
-// 1. Biến cục gạch thành đồ "sống" (reactive) và để trống ban đầu
-const savedRooms = ref<any[]>([]);
-
-// 2. Viết một hàm chuyên đi lục lọi bộ nhớ xem có lưu phòng nào không
-const loadSavedRooms = () => {
-  const data = localStorage.getItem('saved_rooms');
-  if (data) {
-    savedRooms.value = JSON.parse(data);
-  } else {
-    savedRooms.value = []; // Nếu chưa lưu gì thì trả về mảng rỗng
-  }
-};
-
-// 3. Chạy hàm này ngay khi vừa vào trang Profile
+// Life cycle & Watchers
 onMounted(() => {
-  // ... (Đoạn check user cũ của bạn ở trên cứ giữ nguyên nhé) ...
+  const userInfo = localStorage.getItem('user_info');
   
-  // Gọi hàm lấy phòng đã lưu
-  loadSavedRooms();
+  if (userInfo) {
+    user.value = JSON.parse(userInfo) as User;
+    accountInfo.value.name = user.value.name;
+    accountInfo.value.email = user.value.email;
+    accountInfo.value.phone = user.value.phone || '';
+  } else {
+    router.push('/login');
+    return;
+  }
+  
+  // Tải dữ liệu ban đầu dựa trên tab mặc định
+  if (activeTab.value === 'history') fetchHistory();
+  if (activeTab.value === 'saved') loadSavedRooms();
 });
 
 watch(activeTab, (newTab) => {
   if (newTab === 'saved') {
     loadSavedRooms();
+  } else if (newTab === 'history') {
+    fetchHistory();
   }
-});
-
-const historyRooms = Array(3).fill({
-  id: '1',
-  title: 'Phòng Mơ Màng, Số 10 Núi Thành - Cẩm Lệ',
-  imageUrl: 'https://picsum.photos/seed/room/800/600',
-  status: 'Đặt phòng thành công',
-  message: 'Bạn đã thanh toán thành công 30% tiền cọc và phòng bạn đặt đã được chấp nhận. Hóa đơn chi tiết đã gửi về mail của bạn.',
-  time: '1 ngày trước'
 });
 </script>

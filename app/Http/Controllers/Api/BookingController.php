@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\Room;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BookingConfirmed;
 
 class BookingController extends Controller
 {
@@ -65,16 +67,50 @@ class BookingController extends Controller
             }
 
             // Cộng điểm thưởng: 100.000 VNĐ = 1 điểm
-            // Giả sử cộng điểm dựa trên tổng giá trị đơn hàng (total_price)
             $earnedPoints = floor($request->total_price / 100000);
             if ($earnedPoints > 0) {
                 $user->increment('points', $earnedPoints);
             }
         }
 
+        // 4. Gửi email xác nhận đặt phòng
+        try {
+            Mail::to($booking->customer_email)->send(new BookingConfirmed($booking));
+        } catch (\Exception $e) {
+            \Log::error("Gửi mail thất bại: " . $e->getMessage());
+        }
+
         return response()->json([
-            'message' => '🎉 Đặt phòng và thanh toán cọc thành công!',
+            'message' => '🎉 Đặt phòng và thanh toán cọc thành công! Email xác nhận đã được gửi.',
             'booking' => $booking
         ], 201);
+    }
+
+    // LẤY LỊCH SỬ ĐẶT PHÒNG CỦA USER
+    public function myHistory()
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Vui lòng đăng nhập'], 401);
+        }
+
+        $bookings = Booking::where('customer_id', $user->id)
+            ->with(['room.images', 'payments'])
+            ->latest()
+            ->get()
+            ->map(function($booking) {
+                $booking->time_vn = $booking->created_at->format('d/m/Y');
+                $booking->status_label = match($booking->status) {
+                    'pending' => 'Chờ xác nhận',
+                    'confirmed' => 'Đã xác nhận',
+                    'checked_in' => 'Đang ở',
+                    'checked_out' => 'Đã trả phòng',
+                    'cancelled' => 'Đã hủy',
+                    default => $booking->status
+                };
+                return $booking;
+            });
+
+        return response()->json($bookings);
     }
 }
