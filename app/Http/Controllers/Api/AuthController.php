@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Voucher;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -31,14 +33,40 @@ class AuthController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        $referredById = null;
+        if ($request->has('ref_code')) {
+            $referrer = User::where('referral_code', $request->ref_code)->first();
+            if ($referrer) {
+                $referredById = $referrer->id;
+                // Thưởng điểm cho người giới thiệu (ví dụ 10 điểm = 100K VND mua voucher)
+                $referrer->increment('points', 10);
+            }
+        }
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'role' => 'customer', // Mặc định là khách
-            'status' => 'active'  // Mặc định là hoạt động
+            'role' => 'customer',
+            'status' => 'active',
+            'referral_code' => strtoupper(Str::random(8)),
+            'referred_by_id' => $referredById
         ]);
+
+        // Tặng Voucher Tân Thủ
+        $welcomeVoucher = Voucher::where('code', 'WELCOME100')->first();
+        if ($welcomeVoucher) {
+            $user->vouchers()->attach($welcomeVoucher->id);
+        }
+
+        // Nếu có người giới thiệu, tặng mã "Bạn Bè" cho user mới (Tuỳ chọn thêm)
+        if ($referredById) {
+            $refVoucher = Voucher::where('code', 'REF50')->first();
+            if ($refVoucher) {
+                $user->vouchers()->attach($refVoucher->id);
+            }
+        }
 
         return response()->json(['message' => 'Đăng ký thành công!'], 201);
     }
@@ -70,7 +98,8 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Đăng nhập thành công',
-            'access_token' => $token, // gọi token vue8;/j  cv         'user' => $user // gọi user
+            'access_token' => $token,
+            'user' => $user
         ]);
     }
     // HÀM KIỂM TRA TRẠNG THÁI NGẦM

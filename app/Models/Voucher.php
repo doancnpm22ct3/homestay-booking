@@ -11,8 +11,11 @@ class Voucher extends Model
 
     protected $fillable = [
         'code',
+        'title',
+        'description',
         'discount_type',
         'discount_value',
+        'points_required',
         'expires_at',
         'max_uses',
         'used_count',
@@ -28,6 +31,13 @@ class Voucher extends Model
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_vouchers')
+                    ->withPivot('is_used', 'used_at', 'id')
+                    ->withTimestamps();
     }
 
     public function isValid()

@@ -98,7 +98,11 @@
             <div class="space-y-4 mb-6 pb-6 border-b border-gray-100">
               <div class="flex justify-between">
                 <span class="text-gray-500 underline">{{ formatPrice(room.price) }} x {{ numberOfNights }} đêm</span>
-                <span class="font-medium text-gray-900">{{ formatPrice(room.price * numberOfNights) }}</span>
+                <span class="font-medium text-gray-900">{{ formatPrice(originalPrice) }}</span>
+              </div>
+              <div class="flex justify-between" v-if="appliedVoucher">
+                <span class="text-gray-500 underline">Voucher ({{ appliedVoucher.code }})</span>
+                <span class="font-medium text-red-500">-{{ formatPrice(voucherDiscountAmount) }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-500 underline">Phí dịch vụ</span>
@@ -106,14 +110,50 @@
               </div>
             </div>
 
+            <!-- VOUCHER SECTION -->
+            <div class="mb-6 pb-6 border-b border-gray-100">
+              <h4 class="font-bold text-gray-900 mb-3 text-sm flex justify-between items-center">
+                Mã giảm giá
+                <button v-if="appliedVoucher" @click="removeVoucher" class="text-xs text-red-500 hover:underline font-normal">Hủy bỏ</button>
+              </h4>
+              <div class="flex gap-2">
+                <input 
+                  type="text" 
+                  v-model="voucherCode" 
+                  placeholder="Nhập mã voucher" 
+                  class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-[#4A7055] focus:border-[#4A7055] outline-none text-sm uppercase placeholder-gray-400"
+                />
+                <button v-if="!voucherCode" @click.prevent="openVoucherModal" type="button" class="bg-[#4A7055]/10 hover:bg-[#4A7055]/20 text-[#4A7055] px-3 py-2 rounded-lg text-sm font-bold transition-colors whitespace-nowrap">
+                  Mã lưu
+                </button>
+                <button v-else @click.prevent="applyVoucher" type="button" class="bg-[#4A7055] hover:bg-[#3b5a44] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
+                  Áp dụng
+                </button>
+              </div>
+              <p v-if="appliedVoucher" class="text-xs text-[#4A7055] mt-2 font-medium flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                Đã áp dụng mã thành công!
+              </p>
+              <p v-if="voucherError" class="text-xs text-red-500 mt-2 flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                {{ voucherError }}
+              </p>
+            </div>
+
             <div class="flex justify-between items-center">
               <span class="font-bold text-gray-900 text-xl">Tổng tiền</span>
-              <span class="font-extrabold text-[#4A7055] text-2xl">{{ formatPrice(totalPrice) }}</span>
+              <div class="text-right">
+                <div v-if="appliedVoucher" class="text-sm text-gray-400 line-through mb-1">{{ formatPrice(originalPrice) }}</div>
+                <span class="font-extrabold text-[#4A7055] text-3xl">{{ formatPrice(totalPrice) }}</span>
+              </div>
             </div>
             
-            <div class="mt-4 bg-[#4A7055]/10 rounded-xl p-4 text-center">
-              <p class="text-sm text-gray-600 mb-1">Cọc trước (30%)</p>
-              <p class="font-bold text-lg text-gray-900">{{ formatPrice(totalPrice * 0.3) }}</p>
+            <div class="mt-4 bg-[#4A7055]/10 rounded-xl p-4 flex justify-between items-center">
+              <div>
+                <p class="text-sm text-gray-700 font-medium">Cọc trước (30%)</p>
+                <p class="text-xs text-gray-500 mt-1">Thanh toán phần còn lại khi nhận phòng</p>
+              </div>
+              <p class="font-extrabold text-xl text-gray-900">{{ formatPrice(totalPrice * 0.3) }}</p>
             </div>
 
           </div>
@@ -125,6 +165,48 @@
       </div>
     </div>
     
+    <!-- Voucher Modal -->
+    <div v-if="showVoucherModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 transition-opacity">
+      <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden flex flex-col max-h-[85vh] shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+        <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10 w-full">
+          <div>
+            <h3 class="font-bold text-xl text-gray-900">Voucher của bạn</h3>
+            <p class="text-sm text-gray-500 mt-1">Chọn mã để được giảm giá</p>
+          </div>
+          <button @click="showVoucherModal = false" class="text-gray-400 hover:text-gray-900 transition-colors bg-gray-50 p-2 rounded-full hover:bg-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+        
+        <div class="p-5 overflow-y-auto flex-1 space-y-4 bg-gray-50/50">
+          <div v-if="savedVouchers.length === 0" class="text-center py-8 text-gray-500">
+            Bạn chưa có voucher nào.
+          </div>
+          <div v-else v-for="v in savedVouchers" :key="v.code" 
+               @click="selectVoucher(v)"
+               class="bg-white border-2 border-dashed border-[#4A7055]/40 rounded-2xl p-4 cursor-pointer hover:border-[#4A7055] hover:bg-[#4A7055]/5 transition-all relative group shadow-sm">
+            <div class="flex justify-between items-start mb-3">
+              <div class="flex-1 pr-4">
+                <span class="inline-block bg-[#4A7055] text-white text-xs font-bold px-2.5 py-1 rounded-md mb-2 uppercase tracking-wide">{{ v.code }}</span>
+                <h4 class="font-bold text-gray-900 leading-tight">{{ v.title }}</h4>
+              </div>
+              <span class="text-[#4A7055] font-extrabold text-lg whitespace-nowrap bg-[#4A7055]/10 px-3 py-1 rounded-lg">
+                {{ v.discount_type === 'percent' ? v.discount_value + '%' : formatPrice(Number(v.discount_value)) }}
+              </span>
+            </div>
+            <p class="text-xs text-gray-500 flex items-center gap-1.5">
+               <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              HSD: {{ v.expires_at }}
+            </p>
+            
+            <!-- Hover Overlay -->
+            <div class="absolute inset-0 hidden group-hover:flex items-center justify-center bg-white/70 rounded-2xl backdrop-blur-[2px]">
+              <span class="bg-[#4A7055] text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg transform scale-95 group-hover:scale-100 transition-transform">Dùng ngay</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -175,11 +257,85 @@ const numberOfNights = computed(() => {
   return diffDays > 0 ? diffDays : 1;
 });
 
-// Tính tổng tiền
-const totalPrice = computed(() => {
+// Tính nguyên giá (chưa giảm)
+const originalPrice = computed(() => {
   if (!room.value) return 0;
   return room.value.price * numberOfNights.value;
 });
+
+// Tính số tiền giảm của Voucher
+const voucherDiscountAmount = computed(() => {
+  if (!appliedVoucher.value) return 0;
+  
+  const discountType = appliedVoucher.value.discount_type;
+  const discountValue = Number(appliedVoucher.value.discount_value);
+  
+  if (discountType === 'percent') {
+    return (originalPrice.value * discountValue) / 100;
+  }
+  return discountValue;
+});
+
+// Tính tổng tiền sau discount
+const totalPrice = computed(() => {
+  let basePrice = originalPrice.value;
+  basePrice -= voucherDiscountAmount.value;
+  if (basePrice < 0) basePrice = 0;
+  return basePrice;
+});
+
+// State cho mã giảm giá
+const voucherCode = ref('');
+const appliedVoucher = ref<any>(null);
+const voucherError = ref('');
+const showVoucherModal = ref(false);
+
+const savedVouchers = ref<any[]>([]);
+
+const fetchVouchers = async () => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) return;
+  
+  try {
+    const response = await fetch('/api/vouchers/my-vouchers', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (response.ok) {
+      savedVouchers.value = await response.json();
+    }
+  } catch (error) {
+    console.error('Lỗi tải voucher:', error);
+  }
+};
+
+const openVoucherModal = () => {
+  showVoucherModal.value = true;
+};
+
+const selectVoucher = (v: any) => {
+  voucherCode.value = v.code;
+  showVoucherModal.value = false;
+  applyVoucher();
+};
+
+const applyVoucher = () => {
+  voucherError.value = '';
+  if (!voucherCode.value) return;
+  
+  const found = savedVouchers.value.find(v => v.code === voucherCode.value.toUpperCase());
+  if (found) {
+    appliedVoucher.value = found;
+  } else {
+    appliedVoucher.value = null;
+    voucherError.value = 'Mã giảm giá không hợp lệ hoặc đã hết hạn';
+  }
+};
+
+const removeVoucher = () => {
+  appliedVoucher.value = null;
+  voucherCode.value = '';
+  voucherError.value = '';
+};
 
 // Load Data
 onMounted(async () => {
@@ -222,6 +378,8 @@ onMounted(async () => {
     customerInfo.value.email = user.email || '';
     customerInfo.value.phone = user.phone || '';
   }
+  
+  fetchVouchers();
 });
 
 // Helper Functions
@@ -261,7 +419,9 @@ const handlePayment = async () => {
         check_in_date: checkIn.value,
         check_out_date: checkOut.value,
         adults: adults.value,
-        children: children.value
+        children: children.value,
+        voucher_id: appliedVoucher.value ? appliedVoucher.value.id : null,
+        subtotal: originalPrice.value
       })
     });
 

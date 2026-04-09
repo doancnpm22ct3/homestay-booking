@@ -14,6 +14,7 @@ import Payment from './pages/Payment.vue';
 import PaymentSuccess from './pages/PaymentSuccess.vue';
 import Profile from './pages/Profile.vue';
 import AboutUs from './pages/AboutUs.vue';
+import Rewards from './pages/Rewards.vue';
 
 // --- CÁC TRANG CỦA ADMIN ---
 import AdminLayout from './pages/admin/AdminLayout.vue';
@@ -36,6 +37,7 @@ const router = createRouter({
     { path: '/payment-success', component: PaymentSuccess },
     { path: '/profile', component: Profile },
     { path: '/about', component: AboutUs },
+    { path: '/rewards', component: Rewards },
 
     // --- Route Admin ---
     {

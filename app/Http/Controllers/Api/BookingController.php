@@ -34,13 +34,14 @@ class BookingController extends Controller
             // Dữ liệu cho Module Quản Lý Booking:
             'customer_id' => auth()->id() ?? null,
             'room_id' => $request->room_id,
+            'voucher_id' => $request->voucher_id ?? null, // Thêm voucher_id
             'check_in_date' => $request->check_in_date,
             'check_out_date' => $request->check_out_date,
             'adults' => $request->adults ?? 1,
             'children' => $request->children ?? 0,
             'status' => 'pending', 
             'source' => 'website',
-            'subtotal' => $request->total_price,
+            'subtotal' => $request->subtotal ?? $request->total_price,
             'total_amount' => $request->total_price,
             'paid_amount' => $request->deposit_amount
         ]);
@@ -50,6 +51,25 @@ class BookingController extends Controller
         if ($room) {
             $room->status = 'booked';
             $room->save();
+        }
+
+        // 3. Xử lý Voucher và Điểm thưởng nếu đã đăng nhập
+        $user = auth()->user();
+        if ($user) {
+            // Đánh dấu voucher đã sử dụng trong bảng pivot
+            if ($request->voucher_id) {
+                $user->vouchers()->updateExistingPivot($request->voucher_id, [
+                    'is_used' => true,
+                    'used_at' => now()
+                ]);
+            }
+
+            // Cộng điểm thưởng: 100.000 VNĐ = 1 điểm
+            // Giả sử cộng điểm dựa trên tổng giá trị đơn hàng (total_price)
+            $earnedPoints = floor($request->total_price / 100000);
+            if ($earnedPoints > 0) {
+                $user->increment('points', $earnedPoints);
+            }
         }
 
         return response()->json([

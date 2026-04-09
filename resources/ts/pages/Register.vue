@@ -97,6 +97,19 @@
                 Xác nhận mật khẩu
               </label>
             </div>
+
+            <div class="relative">
+              <input
+                id="ref_code"
+                type="text"
+                v-model="form.ref_code"
+                class="peer w-full py-3 border-b border-gray-200 focus:outline-none focus:border-[#4A7055] focus:ring-0 text-gray-900 placeholder-transparent bg-transparent"
+                placeholder="Mã giới thiệu (Nếu có)"
+              />
+              <label for="ref_code" class="absolute left-0 -top-3.5 text-sm text-gray-600 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-[#4A7055]">
+                Mã giới thiệu (Nếu có)
+              </label>
+            </div>
           </div>
 
           <div class="flex items-center mt-4">
@@ -165,6 +178,7 @@ const form = ref({
   phone: '', 
   password: '',
   password_confirmation: '', 
+  ref_code: '',
   terms: false
 });
 
@@ -194,7 +208,8 @@ const handleRegister = async () => {
         email: form.value.email,
         phone: form.value.phone,
         password: form.value.password,
-        password_confirmation: form.value.password_confirmation
+        password_confirmation: form.value.password_confirmation,
+        ref_code: form.value.ref_code
       })
     });
 

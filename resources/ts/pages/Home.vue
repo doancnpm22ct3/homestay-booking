@@ -154,6 +154,29 @@
       </div>
     </section>
 
+    <!-- Banner Voucher -->
+    <section class="py-12 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-gradient-to-r from-[#4A7055] to-[#5B8C6A] rounded-[40px] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between shadow-xl relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
+          <div class="relative z-10 text-center md:text-left mb-8 md:mb-0">
+            <span class="inline-block bg-white/20 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-4">Ưu đãi giới hạn</span>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 font-['Playfair_Display']">Săn Deal Hè - Giảm Ngay 15%</h2>
+            <p class="text-white/80 text-lg mb-0 font-['Inter']">Sử dụng mã <span class="font-bold text-white underline">HE2024</span> cho tất cả các phòng tại Đà Nẵng.</p>
+          </div>
+          <div class="relative z-10">
+            <button 
+              @click="claimVoucher('HE2024')" 
+              class="bg-white text-[#4A7055] px-10 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all active:scale-95 flex items-center gap-2"
+            >
+              <Gift class="w-5 h-5" />
+              Lưu mã ngay
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="py-20 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-end mb-10">
@@ -309,7 +332,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { Search, MapPin, Calendar, Users, Home as HomeIcon, Star, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { Search, MapPin, Calendar, Users, Home as HomeIcon, Star, ChevronDown, ChevronLeft, ChevronRight, Gift } from 'lucide-vue-next';
 import RoomCard from '../components/RoomCard.vue'; 
 
 const router = useRouter();
@@ -415,6 +438,37 @@ const handleSearch = () => {
       checkOut: checkOut.value
     }
   });
+};
+
+const claimVoucher = async (code: string) => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) {
+    alert('Vui lòng đăng nhập để lưu mã ưu đãi!');
+    router.push('/login');
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/vouchers/claim', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ code })
+    });
+    const data = await response.json();
+    
+    if (response.ok) {
+      alert('Tuyệt vời! Mã ưu đãi đã được lưu vào ví của bạn.');
+    } else {
+      alert(data.message || 'Có lỗi xảy ra khi lưu mã.');
+    }
+  } catch (error) {
+    console.error('Lỗi khi lưu voucher:', error);
+    alert('Không thể kết nối đến máy chủ.');
+  }
 };
 
 const popularRooms = ref<Room[]>([]);

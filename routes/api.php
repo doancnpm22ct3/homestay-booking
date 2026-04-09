@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Admin\BookingController;
 use App\Http\Controllers\Api\Admin\BookingPaymentController;
 use App\Http\Controllers\Api\Admin\BookingServiceController;
 use App\Http\Controllers\Api\Admin\RoomAvailabilityController;
+use App\Http\Controllers\Api\VoucherController;
 
 // --- GHI ĐÈ API LẤY DANH SÁCH PHÒNG (TRẢ VỀ KÈM ẢNH) ---
 Route::get('/rooms', function (Request $request) {
@@ -108,6 +109,15 @@ Route::get('/admin/rooms/stats', [App\Http\Controllers\Api\RoomController::class
 // --- USER HIỆN TẠI ---
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+// --- QUẢN LÝ VOUCHER & ĐIỂM THƯỞNG ---
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/vouchers/my-vouchers', [VoucherController::class, 'myVouchers']);
+    Route::get('/vouchers/redeemable', [VoucherController::class, 'redeemable']);
+    Route::post('/vouchers/redeem/{id}', [VoucherController::class, 'redeem']);
+    Route::post('/vouchers/claim', [VoucherController::class, 'claim']);
+    Route::post('/vouchers/spin', [VoucherController::class, 'spin']);
 });
 
 // ══════════════════════════════════════════

@@ -19,6 +19,9 @@
       </div>
 
       <div v-else class="hidden md:flex items-center space-x-6 relative">
+        <router-link to="/rewards" class="text-gray-700 hover:text-[#4A7055] font-medium transition-colors">
+          Ưu đãi
+        </router-link>
         
         <div @click="handleAvatarClick" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
           <div class="text-right">

@@ -24,6 +24,9 @@ class User extends Authenticatable
         'phone',
         'role',
         'status',
+        'points',
+        'referral_code',
+        'referred_by_id'
     ];
 
     /**
@@ -44,4 +47,21 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function vouchers()
+    {
+        return $this->belongsToMany(Voucher::class, 'user_vouchers')
+                    ->withPivot('is_used', 'used_at', 'id')
+                    ->withTimestamps();
+    }
+
+    public function referrer()
+    {
+        return $this->belongsTo(User::class, 'referred_by_id');
+    }
+
+    public function referrals()
+    {
+        return $this->hasMany(User::class, 'referred_by_id');
+    }
 }
