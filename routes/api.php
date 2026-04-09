@@ -53,6 +53,9 @@ Route::get('/rooms', function (Request $request) {
     return response()->json($rooms);
 });
 
+// Lấy danh sách địa điểm có phòng đang trống
+Route::get('/locations/available', [RoomController::class, 'getAvailableLocations']);
+
 // --- GHI ĐÈ API LẤY CHI TIẾT 1 PHÒNG (ĐỂ XEM CHI TIẾT KHÔNG BỊ LỖI) ---
 Route::get('/rooms/{id}', function ($id) {
     $room = DB::table('rooms')->where('id', $id)->first();

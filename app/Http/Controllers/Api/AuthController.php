@@ -98,8 +98,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Đăng nhập thành công',
-            'access_token' => $token,
-            'user' => $user
+            'access_token' => $token, // gọi token vue8;/j  cv         'user' => $user // gọi user
         ]);
     }
     // HÀM KIỂM TRA TRẠNG THÁI NGẦM
