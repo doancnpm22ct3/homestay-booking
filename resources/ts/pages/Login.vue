@@ -6,44 +6,7 @@
         <img src="https://picsum.photos/seed/login/800/1000" alt="Login Background" class="w-full h-full object-cover" />
         <div class="absolute inset-0 bg-[#4A7055]/10 group-hover:bg-[#4A7055]/0 transition-colors"></div>
       </div>
-<<<<<<< HEAD
-=======
-      <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
-        <input type="hidden" name="remember" value="true" />
-        <div class="rounded-md shadow-sm space-y-4">
-          <div>
-            <label for="username" class="sr-only">Tên đăng nhập</label>
-            <input
-              <input
-                  v-model="username"
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                class="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300"
-/>
-          </div>
-          <div>
-            <label for="password" class="sr-only">Mật khẩu</label>
-           <input
-                v-model="password"
-                id="password"
-                name="password"
-                type="password"
-                required
-            class="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300"
-/>
-          </div>
-        </div>
 
-        <div class="flex items-center justify-between">
-          <div class="text-sm">
-            <router-link to="/forgot-password" class="font-medium text-emerald-600 hover:text-emerald-500">
-              Quên mật khẩu?
-            </router-link>
-          </div>
-        </div>
->>>>>>> feature/login
 
       <div class="md:w-1/2 p-10 md:p-14 flex flex-col justify-center w-full">
         <div>
@@ -150,7 +113,6 @@
 </template>
 
 <script setup lang="ts">
-<<<<<<< HEAD
 import { ref } from 'vue';
 
 // Khai báo form state
@@ -211,31 +173,3 @@ const handleLogin = async () => {
   }
 };
 </script>
-=======
-import { ref } from "vue"
-import axios from "axios"
-import { useRouter } from "vue-router"
-
-const router = useRouter()
-
-const username = ref("")
-const password = ref("")
-
-const handleLogin = async () => {
-  try {
-    const res = await axios.post("http://127.0.0.1:8000/login", {
-      username: username.value,
-      password: password.value
-    })
-
-    alert("Đăng nhập thành công")
-
-    router.push("/") // chuyển về trang chủ
-
-  } catch (error) {
-    alert("Sai tài khoản hoặc mật khẩu")
-  }
-}
-</script>
-
->>>>>>> feature/login
