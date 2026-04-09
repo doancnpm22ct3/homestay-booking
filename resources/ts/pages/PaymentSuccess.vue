@@ -1,61 +1,84 @@
 <template>
-  <div class="bg-[#FAF9F5] min-h-screen py-10 print:bg-white print:py-0">
-    <div class="max-w-4xl mx-auto px-4 print:px-0">
-      
-      <!-- Nút điều khiển (Ẩn khi in) -->
-      <div class="mb-6 flex justify-between items-center print:hidden">
-        <router-link to="/profile" class="flex items-center gap-2 text-gray-500 hover:text-[#4A7055] transition-colors font-bold">
-          <ChevronLeft class="w-5 h-5" />
-          Quay lại lịch sử
-        </router-link>
-        <button @click="handlePrint" class="bg-[#4A7055] text-white px-6 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-[#3b5a44] transition-all shadow-md">
-          <Printer class="w-5 h-5" />
-          In hóa đơn
-        </button>
-      </div>
-
-      <div v-if="isLoading" class="bg-white rounded-3xl p-20 text-center shadow-sm">
-        <div class="animate-spin rounded-full h-12 w-12 border-4 border-[#4A7055] border-t-transparent mx-auto mb-4"></div>
-        <p class="text-gray-500">Đang tải hóa đơn...</p>
-      </div>
-
-      <div v-else-if="booking" id="invoice-content" class="bg-white rounded-3xl shadow-xl overflow-hidden print:shadow-none print:rounded-none border border-gray-100 print:border-0 font-['Inter']">
-        <!-- Header Hóa đơn -->
-        <div class="bg-[#4A7055] text-white p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div>
-            <h1 class="text-4xl font-black uppercase tracking-tighter mb-2">HÓA ĐƠN</h1>
-            <p class="opacity-80 font-medium">Mã booking: #{{ booking.booking_code }}</p>
-          </div>
-          <div class="text-right md:text-right text-left">
-            <h2 class="text-xl font-bold">Duy Homestay</h2>
-            <p class="text-sm opacity-80">Số 10 Núi Thành, Cẩm Lệ, Đà Nẵng</p>
-            <p class="text-sm opacity-80">Hotline: 090 123 4567</p>
-          </div>
+  <div class="bg-[#FAF9F5] min-h-screen flex flex-col font-['Inter']">
+    <div class="flex-grow flex items-center justify-center py-12">
+      <div class="max-w-3xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div v-if="isLoading" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-12 text-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4A7055] mx-auto mb-4"></div>
+          <p class="text-gray-500 font-medium">Đang xử lý kết quả thanh toán...</p>
         </div>
 
-        <div class="p-10 space-y-10">
-          <!-- Thông tin khách hàng & Homestay -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-10 border-b border-gray-100 pb-10">
-            <div>
-              <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-[#4A7055] mb-4">KHÁCH HÀNG</h3>
-              <div class="space-y-1">
-                <p class="font-bold text-gray-900 text-lg">{{ booking.customer_name }}</p>
-                <p class="text-gray-500">{{ booking.customer_email }}</p>
-                <p class="text-gray-500">{{ booking.customer_phone }}</p>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-[#4A7055] mb-4">CHI TIẾT CHỖ NGHỈ</h3>
-              <div class="space-y-1">
-                <p class="font-bold text-gray-900 text-lg">{{ booking.room_name }}</p>
-                <p class="text-gray-500">{{ booking.room?.location || 'Đà Nẵng' }}</p>
-                <p class="text-gray-500">Check-in: {{ formatDate(booking.check_in_date) }} | Check-out: {{ formatDate(booking.check_out_date) }}</p>
-              </div>
-            </div>
+        <div v-else-if="errorMessage" class="bg-white rounded-3xl shadow-sm border border-red-100 p-12 text-center">
+          <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="text-red-500 text-4xl font-bold">!</span>
           </div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2 font-['Playfair_Display']">Giao dịch không thành công</h1>
+          <p class="text-red-500 font-medium mb-8">{{ errorMessage }}</p>
+          <button @click="$router.push('/')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-xl font-bold transition-colors">
+            Về trang chủ
+          </button>
+        </div>
 
-          <!-- Bảng kê khai giá -->
-          <div>
+        <div v-else-if="booking" class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+          
+          <div class="bg-[#4A7055]/5 p-8 text-center border-b border-[#4A7055]/10">
+            <div class="w-20 h-20 bg-[#4A7055]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle class="w-10 h-10 text-[#4A7055]" />
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2 font-['Playfair_Display']">Thanh toán thành công</h1>
+            <p class="text-[#3b5a44] font-medium">Mã đặt phòng: <span class="font-bold">{{ booking.booking_code || booking.id }}</span></p>
+          </div>
+          
+          <!-- Nút In hóa đơn -->
+          <div class="p-6 border-b border-gray-100 flex justify-between items-center print:hidden">
+             <router-link to="/profile" class="flex items-center gap-2 text-gray-500 hover:text-[#4A7055] transition-colors font-bold">
+              <ChevronLeft class="w-5 h-5" />
+              Quay lại lịch sử
+            </router-link>
+            <button @click="handlePrint" class="bg-[#4A7055] text-white px-6 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-[#3b5a44] transition-all shadow-md">
+              <Printer class="w-5 h-5" />
+              In hóa đơn
+            </button>
+          </div>
+          
+          <div class="p-8 md:p-12">
+            <div class="flex flex-col md:flex-row gap-8 mb-12 pb-12 border-b border-gray-100">
+              <img :src="roomImage" alt="Room" class="w-full md:w-1/3 h-48 object-cover rounded-2xl shadow-sm border border-gray-100" referrerpolicy="no-referrer" />
+              
+              <div class="flex-1">
+                <h3 class="text-xl font-bold text-gray-900 mb-2 leading-tight">Phòng {{ booking.room_name }}</h3>
+                <div class="text-[#4A7055] font-bold mb-6 text-sm">
+                  Cọc trước: {{ formatMoney(booking.deposit_amount) }}
+                </div>
+                
+                <div class="grid grid-cols-2 gap-y-5 gap-x-8 text-sm">
+                  <div>
+                    <div class="text-gray-500 mb-1">Thời gian</div>
+                    <div class="font-bold text-gray-900">{{ formatDate(booking.check_in_date) }} - {{ formatDate(booking.check_out_date) }}</div>
+                  </div>
+                  <div>
+                    <div class="text-gray-500 mb-1">Số đêm</div>
+                    <div class="font-bold text-gray-900">{{ getNights(booking.check_in_date, booking.check_out_date) }} đêm</div>
+                  </div>
+                  <div>
+                    <div class="text-gray-500 mb-1">Khách</div>
+                    <div class="font-bold text-gray-900">
+                      {{ booking.adults }} Lớn <span v-if="booking.children > 0">, {{ booking.children }} Trẻ em</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="text-gray-500 mb-1">Người đặt</div>
+                    <div class="font-bold text-gray-900">{{ booking.customer_name }}</div>
+                  </div>
+                  <div>
+                    <div class="text-gray-500 mb-1">Tổng thanh toán</div>
+                    <div class="font-extrabold text-[#4A7055] text-lg">{{ formatMoney(booking.total_amount) }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bảng kê khai giá -->
             <table class="w-full text-left">
               <thead>
                 <tr class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-gray-100">
@@ -75,7 +98,6 @@
                   <td class="py-6 text-right text-gray-900">{{ formatMoney(booking.total_amount) }}</td>
                   <td class="py-6 text-right text-gray-900 font-bold">{{ formatMoney(booking.total_amount) }}</td>
                 </tr>
-                <!-- Các phụ phí nếu có -->
                 <tr>
                   <td class="py-4 text-gray-500">Phụ thu (nếu có)</td>
                   <td class="py-4 text-center">0</td>
@@ -84,52 +106,52 @@
                 </tr>
               </tbody>
             </table>
-          </div>
 
-          <!-- Tổng cộng -->
-          <div class="flex justify-end pt-6">
-            <div class="w-full md:w-80 space-y-3">
-              <div class="flex justify-between text-gray-500">
-                <span>Tạm tính</span>
-                <span>{{ formatMoney(booking.total_amount) }}</span>
-              </div>
-              <div class="flex justify-between text-[#4A7055] font-bold">
-                <span>Đã cọc trước (30%)</span>
-                <span>- {{ formatMoney(booking.deposit_amount) }}</span>
-              </div>
-              <div class="flex justify-between pt-3 border-t-2 border-[#4A7055] text-xl font-black text-gray-900">
-                <span>CÒN LẠI</span>
-                <span>{{ formatMoney(booking.total_amount - booking.deposit_amount) }}</span>
+            <!-- Tổng cộng -->
+            <div class="flex justify-end pt-6">
+              <div class="w-full md:w-80 space-y-3">
+                <div class="flex justify-between text-gray-500">
+                  <span>Tạm tính</span>
+                  <span>{{ formatMoney(booking.total_amount) }}</span>
+                </div>
+                <div class="flex justify-between text-[#4A7055] font-bold">
+                  <span>Đã cọc trước (30%)</span>
+                  <span>- {{ formatMoney(booking.deposit_amount) }}</span>
+                </div>
+                <div class="flex justify-between pt-3 border-t-2 border-[#4A7055] text-xl font-black text-gray-900">
+                  <span>CÒN LẠI</span>
+                  <span>{{ formatMoney(booking.total_amount - booking.deposit_amount) }}</span>
+                </div>
               </div>
             </div>
           </div>
+
+          <!-- Footer Hóa đơn -->
+          <div class="p-10 bg-gray-50 text-center text-sm text-gray-400 border-t border-gray-100">
+            <p class="mb-1">Cảm ơn bạn đã tin tưởng Duy Homestay!</p>
+            <p>Hóa đơn này được tạo tự động và có giá trị thanh toán tại quầy khi nhận phòng.</p>
+          </div>
         </div>
 
-        <!-- Footer Hóa đơn -->
-        <div class="p-10 bg-gray-50 text-center text-sm text-gray-400 border-t border-gray-100">
-          <p class="mb-1">Cảm ơn bạn đã tin tưởng Duy Homestay!</p>
-          <p>Hóa đơn này được tạo tự động và có giá trị thanh toán tại quầy khi nhận phòng.</p>
-        </div>
       </div>
-
-      <div v-else-if="errorMessage" class="bg-white rounded-3xl p-12 text-center shadow-sm border border-red-50">
-        <p class="text-red-500 font-medium">{{ errorMessage }}</p>
-        <button @click="window.location.reload()" class="mt-4 text-[#4A7055] font-bold underline">Thử lại</button>
-      </div>
-
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { Printer, ChevronLeft, CheckCircle } from 'lucide-vue-next';
 
 const route = useRoute();
+const router = useRouter();
 const booking = ref<any>(null);
 const isLoading = ref(true);
 const errorMessage = ref('');
+
+const roomImage = computed(() => {
+  return 'https://picsum.photos/seed/room/800/600';
+});
 
 const formatMoney = (amount: number | string) => {
   if (!amount) return '0đ';
@@ -155,17 +177,30 @@ const handlePrint = () => {
 };
 
 onMounted(async () => {
-  const bookingId = route.query.id;
+  // Lấy params từ VNPay trả về
+  const status = route.query.status as string;
+  const bookingId = route.query.booking_id || route.query.id;
+
+  // KIỂM TRA TRẠNG THÁI VNPAY TRƯỚC
+  if (status === 'failed') {
+    errorMessage.value = "Thanh toán bị hủy hoặc không thành công. Vui lòng thử lại.";
+    isLoading.value = false;
+    return;
+  }
+  if (status === 'invalid_signature') {
+    errorMessage.value = "Dữ liệu thanh toán không hợp lệ (Lỗi bảo mật).";
+    isLoading.value = false;
+    return;
+  }
+
   if (!bookingId) {
-    errorMessage.value = "Không tìm thấy thông tin đơn hàng.";
+    errorMessage.value = "Không tìm thấy mã đơn hàng.";
     isLoading.value = false;
     return;
   }
 
   try {
     const token = localStorage.getItem('auth_token');
-    // Vì /api/admin/bookings yêu cầu quyền admin, ta nên tạo route riêng hoặc dùng logic fetch phù hợp
-    // Tuy nhiên theo code cũ của bạn đang gọi vào đây. Mình sẽ giữ nguyên và mong là Backend đã phân quyền.
     const response = await fetch(`/api/admin/bookings/${bookingId}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -180,7 +215,7 @@ onMounted(async () => {
     booking.value = await response.json();
   } catch (error) {
     console.error("Lỗi fetch booking:", error);
-    errorMessage.value = "Hết phiên đăng nhập hoặc không có quyền xem hóa đơn này.";
+    errorMessage.value = "Lỗi khi tải dữ liệu đơn hàng. Vui lòng kiểm tra lại trong mục Lịch sử đặt phòng.";
   } finally {
     isLoading.value = false;
   }
@@ -195,12 +230,6 @@ onMounted(async () => {
   }
   body {
     background: white !important;
-  }
-  #invoice-content {
-    border: none !important;
-    box-shadow: none !important;
-    width: 100% !important;
-    margin: 0 !important;
   }
 }
 </style>

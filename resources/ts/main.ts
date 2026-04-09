@@ -23,6 +23,7 @@ import AdminRooms from './pages/admin/AdminRooms.vue';
 import AdminRoomForm from './pages/admin/AdminRoomForm.vue';
 import AdminBookings from './pages/admin/AdminBookings.vue';
 import AdminInvoices from './pages/admin/AdminInvoices.vue';
+import AdminDashboard from './pages/admin/AdminDashboard.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -44,6 +45,11 @@ const router = createRouter({
       path: '/admin',
       component: AdminLayout,
       children: [
+        {
+          path: '/admin/dashboard',
+          name: 'AdminDashboard',
+          component: AdminDashboard
+        },
         { path: 'rooms', component: AdminRooms },
         { path: 'users', component: AdminUsers },
         { path: 'rooms/create', component: AdminRoomForm },
