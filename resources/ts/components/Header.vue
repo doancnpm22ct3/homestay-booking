@@ -52,9 +52,9 @@
               <div v-if="notifications.length === 0" class="p-10 text-center">
                 <p class="text-gray-400 text-sm">Bạn không có thông báo mới.</p>
               </div>
-              <div v-else v-for="notif in notifications" :key="notif.id" @click="router.push('/profile')" class="p-5 flex gap-4 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-50 last:border-0">
+              <div v-else v-for="notif in notifications" :key="notif.id" @click="handleNotificationClick(notif)" class="p-5 flex gap-4 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-50 last:border-0">
                 <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center shrink-0">
-                  <component :is="getStatusIcon(notif.data.status)" :class="['w-5 h-5', getIconColor(notif.data.status)]" />
+                  <component :is="getIcon(notif.data.status, notif.data.type)" :class="['w-5 h-5', getIconColor(notif.data.status, notif.data.type)]" />
                 </div>
                 <div class="flex-1">
                   <p class="text-sm font-bold text-gray-900 mb-0.5">{{ notif.data.title || 'Thông báo mới' }}</p>
@@ -84,7 +84,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import { Bell, LogOut, Menu, Info, CheckCircle, XCircle, Clock } from 'lucide-vue-next';
+import { Bell, LogOut, Menu, Info, CheckCircle, XCircle, Clock, Star } from 'lucide-vue-next';
 
 const router = useRouter();
 
@@ -120,7 +120,8 @@ const markAsRead = async () => {
   }
 };
 
-const getStatusIcon = (status: string) => {
+const getIcon = (status: string, type: string) => {
+  if (type === 'review_request') return Star;
   switch (status) {
     case 'confirmed': return CheckCircle;
     case 'cancelled': return XCircle;
@@ -130,7 +131,8 @@ const getStatusIcon = (status: string) => {
   }
 };
 
-const getIconColor = (status: string) => {
+const getIconColor = (status: string, type: string) => {
+  if (type === 'review_request') return 'text-amber-500';
   switch (status) {
     case 'confirmed': return 'text-green-500';
     case 'cancelled': return 'text-red-500';
@@ -138,6 +140,15 @@ const getIconColor = (status: string) => {
     case 'checked_out': return 'text-gray-500';
     default: return 'text-[#4A7055]';
   }
+};
+
+const handleNotificationClick = (notif: any) => {
+  if (notif.data.action_url) {
+    router.push(notif.data.action_url);
+  } else {
+    router.push('/profile');
+  }
+  showNotifications.value = false;
 };
 
 onMounted(() => {

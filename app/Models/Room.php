@@ -30,16 +30,27 @@ class Room extends Model
         'estimated_fix_date',
     ];
 
+    protected $appends = ['average_rating'];
+
     // Khai báo mối quan hệ 1 Phòng có nhiều Ảnh
     public function images()
     {
         return $this->hasMany(RoomImage::class);
     }
 
-    // Một phòng có nhiều booking
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class)->where('is_hidden', false);
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return round($this->reviews()->avg('rating'), 1) ?: 0;
     }
 
     // Scope: tìm phòng trống trong khoảng ngày

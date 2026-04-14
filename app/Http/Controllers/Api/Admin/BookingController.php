@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use App\Notifications\BookingStatusUpdated;
+use App\Notifications\ReviewRequest;
 
 class BookingController extends Controller
 {
@@ -337,6 +338,8 @@ class BookingController extends Controller
             // Notify Customer
             if ($booking->customer) {
                 $booking->customer->notify(new BookingStatusUpdated($booking, "Bạn đã trả phòng (Check-out) thành công cho đơn đặt phòng #{$booking->booking_code}."));
+                // Gửi thêm thông báo yêu cầu đánh giá
+                $booking->customer->notify(new ReviewRequest($booking));
             }
 
             DB::commit();

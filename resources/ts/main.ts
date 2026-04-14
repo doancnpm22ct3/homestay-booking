@@ -25,6 +25,7 @@ import AdminBookings from './pages/admin/AdminBookings.vue';
 import AdminInvoices from './pages/admin/AdminInvoices.vue';
 import AdminDashboard from './pages/admin/AdminDashboard.vue';
 import AdminVouchers from './pages/admin/AdminVouchers.vue';
+import AdminReviews from './pages/admin/AdminReviews.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -58,6 +59,7 @@ const router = createRouter({
         { path: 'booking-management', component: AdminBookings },
         { path: 'invoices', component: AdminInvoices },
         { path: 'vouchers', component: AdminVouchers },
+        { path: 'reviews', component: AdminReviews },
       ]
     }
   ]

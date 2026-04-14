@@ -43,8 +43,8 @@
             {{ title }}
           </h3>
           <div class="flex items-center gap-1 mt-1 text-sm font-bold text-gray-800 shrink-0">
-            <Star class="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-            <span>4.8</span>
+            <Star class="w-3.5 h-3.5" :class="average_rating > 0 ? 'fill-amber-400 text-amber-400' : 'text-gray-300'" />
+            <span>{{ average_rating > 0 ? average_rating : 'Mới' }}</span>
           </div>
         </div>
         
@@ -107,6 +107,7 @@ const props = defineProps<{
   rent_type?: string;
   max_guests?: number | string;
   max_children?: number | string;
+  average_rating?: number;
 }>();
 
 const isSaved = ref(false);

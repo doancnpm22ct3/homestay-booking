@@ -23,11 +23,11 @@
             Sức chứa: {{ room.max_guests }} NL + {{ room.max_children || 0 }} TE (<10t)
           </div>
         </div>
-        <div class="flex items-center gap-4 text-sm text-gray-600 font-['Inter']">
+          <div class="flex items-center gap-4 text-sm text-gray-600 font-['Inter']" v-if="room">
           <div class="flex items-center gap-1">
-            <Star class="w-4 h-4 fill-amber-400 text-amber-400" />
-            <span class="font-bold text-gray-900">4.8</span>
-            <span class="underline cursor-pointer hover:text-[#4A7055] transition-colors">(120 đánh giá)</span>
+            <Star class="w-4 h-4" :class="room.average_rating > 0 ? 'fill-amber-400 text-amber-400' : 'text-gray-300'" />
+            <span class="font-bold text-gray-900">{{ room.average_rating || 'Chưa có' }}</span>
+            <span class="underline cursor-pointer hover:text-[#4A7055] transition-colors" @click="scrollToReviews">({{ totalReviews }} đánh giá)</span>
           </div>
           <div class="flex items-center gap-1">
             <MapPin class="w-4 h-4" />
@@ -181,27 +181,69 @@
             </div>
           </section>
 
-          <section>
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 font-['Playfair_Display']">Đánh giá</h2>
-            <div class="space-y-6">
-              <div v-for="i in 4" :key="i" class="pb-6 border-b border-gray-100 last:border-0">
-                <div class="flex items-center gap-4 mb-4">
-                  <div class="w-12 h-12 rounded-full bg-[#4A7055]/10 flex items-center justify-center text-[#4A7055] font-bold text-lg">
-                    U
-                  </div>
-                  <div>
-                    <div class="font-bold text-gray-900 font-['Inter']">User {{ i }}</div>
-                    <div class="text-sm text-gray-500 font-['Inter']">Tháng 10 năm 2023</div>
-                  </div>
-                </div>
-                <p class="text-gray-700 italic font-['Inter'] leading-relaxed">
-                  "Mình ở một tuần, trải nghiệm cực kì tốt, 100% sẽ giới thiệu cho bạn mình. Phòng đẹp hơn cả mình kỳ vọng mà giá cả phải chăng."
-                </p>
+          <section id="reviews-section" class="scroll-mt-24">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 font-['Playfair_Display']">Đánh giá từ khách hàng</h2>
+            
+            <!-- Form gửi đánh giá (Chỉ hiện nếu có booking hợp lệ) -->
+            <div v-if="canReviewBooking" class="mb-12 bg-[#4A7055]/5 p-6 rounded-2xl border border-[#4A7055]/10">
+              <h3 class="font-bold text-gray-900 mb-4 font-['Inter'] text-lg">Chia sẻ trải nghiệm của bạn</h3>
+              <div class="flex items-center gap-2 mb-4">
+                <Star 
+                  v-for="i in 5" :key="i"
+                  class="w-8 h-8 cursor-pointer transition-all"
+                  :class="i <= newReview.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-300 hover:text-amber-200'"
+                  @click="newReview.rating = i"
+                />
+              </div>
+              <textarea 
+                v-model="newReview.comment"
+                placeholder="Phòng có sạch sẽ không? Vị trí có thuận tiện không?..."
+                class="w-full p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#4A7055] outline-none min-h-[100px] text-sm"
+              ></textarea>
+              <div class="flex justify-end mt-4">
+                <button 
+                  @click="submitReview"
+                  :disabled="isSubmittingReview || newReview.rating === 0"
+                  class="bg-[#4A7055] text-white px-6 py-2 rounded-full font-bold hover:bg-[#3b5a44] transition-colors disabled:opacity-50"
+                >
+                  {{ isSubmittingReview ? 'Đang gửi...' : 'Gửi đánh giá' }}
+                </button>
               </div>
             </div>
-            <button class="mt-6 border-2 border-gray-900 text-gray-900 px-8 py-3 rounded-full font-bold font-['Inter'] hover:bg-gray-900 hover:text-white transition-colors">
-              Hiển thị tất cả 120 đánh giá
-            </button>
+
+            <div v-if="reviews.length > 0" class="space-y-6">
+              <div v-for="review in reviews" :key="review.id" class="pb-6 border-b border-gray-100 last:border-0 hover:bg-white/50 transition-colors p-4 rounded-xl">
+                <div class="flex justify-between items-start mb-4">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-[#4A7055]/10 flex items-center justify-center text-[#4A7055] font-bold text-lg uppercase">
+                      {{ review.user?.name?.charAt(0) || 'U' }}
+                    </div>
+                    <div>
+                      <div class="font-bold text-gray-900 font-['Inter']">{{ review.user?.name }}</div>
+                      <div class="text-sm text-gray-500 font-['Inter']">{{ formatDate(review.created_at) }}</div>
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <Star v-for="s in 5" :key="s" class="w-4 h-4" :class="s <= review.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-200'" />
+                  </div>
+                </div>
+                <p class="text-gray-700 font-['Inter'] leading-relaxed">
+                  {{ review.comment || 'Không có nhận xét.' }}
+                </p>
+              </div>
+              
+              <button 
+                v-if="hasMoreReviews" 
+                @click="loadMoreReviews"
+                class="w-full mt-6 border-2 border-gray-200 text-gray-600 px-8 py-3 rounded-full font-bold font-['Inter'] hover:border-gray-900 hover:text-gray-900 transition-all"
+              >
+                Tải thêm đánh giá
+              </button>
+            </div>
+            <div v-else class="text-center py-12 bg-white rounded-2xl border border-dashed border-gray-200">
+              <Star class="w-12 h-12 text-gray-200 mx-auto mb-3" />
+              <p class="text-gray-500 font-['Inter']">Chưa có đánh giá nào cho phòng này.</p>
+            </div>
           </section>
 
         </div>
@@ -302,6 +344,17 @@ interface RoomData {
   images?: any[];
   amenities?: any[]; 
   amenity_list?: any[]; 
+  average_rating?: number;
+}
+
+interface ReviewData {
+  id: number;
+  rating: number;
+  comment: string;
+  created_at: string;
+  user: {
+    name: string;
+  };
 }
 
 const route = useRoute();
@@ -322,6 +375,18 @@ const checkOut = ref('');
 const adults = ref(1);
 const children = ref(0);
 const errorMessage = ref('');
+
+// --- REVIEWS STATE ---
+const reviews = ref<ReviewData[]>([]);
+const totalReviews = ref(0);
+const curPage = ref(1);
+const hasMoreReviews = ref(false);
+const canReviewBooking = ref<any>(null); // Lưu thông tin booking có thể review
+const isSubmittingReview = ref(false);
+const newReview = ref({
+  rating: 0,
+  comment: ''
+});
 
 const todayObj = new Date();
 const minDate = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, '0')}-${String(todayObj.getDate()).padStart(2, '0')}`;
@@ -351,6 +416,96 @@ const prevImage = () => {
 onUnmounted(() => {
   document.body.style.overflow = '';
 });
+
+const scrollToReviews = () => {
+  const el = document.getElementById('reviews-section');
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+};
+
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return `Tháng ${date.getMonth() + 1} năm ${date.getFullYear()}`;
+};
+
+const fetchReviews = async (page = 1) => {
+  try {
+    const res = await fetch(`/api/rooms/${route.params.id}/reviews?page=${page}`);
+    const data = await res.json();
+    if (page === 1) reviews.value = data.data;
+    else reviews.value.push(...data.data);
+    
+    totalReviews.value = data.total;
+    hasMoreReviews.value = data.current_page < data.last_page;
+    curPage.value = data.current_page;
+  } catch (e) {
+    console.error('Lỗi tải đánh giá:', e);
+  }
+};
+
+const loadMoreReviews = () => {
+  fetchReviews(curPage.value + 1);
+};
+
+const checkReviewPermission = async () => {
+  try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    const res = await fetch('/api/my-bookings', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const bookings = await res.json();
+    
+    // Tìm đơn đặt phòng này: đã hoàn thành và chưa được review
+    const roomId = Number(route.params.id);
+    const eligible = bookings.find((b: any) => 
+      Number(b.room_id) === roomId && 
+      b.status === 'checked_out'
+      // Note: Backend sẽ validate kỹ hơn việc đã review hay chưa
+    );
+    
+    if (eligible) {
+      // Kiểm tra xem thực sự đã review chưa bằng cách gọi API (hoặc backend trả về flag)
+      // Để tối ưu, em sẽ để user bấm gửi rồi backend báo lỗi nếu đã review,
+      // nhưng ở đây ta check sơ bộ.
+      canReviewBooking.value = eligible;
+    }
+  } catch (e) {
+    console.error('Lỗi check quyền review:', e);
+  }
+};
+
+const submitReview = async () => {
+  if (newReview.value.rating === 0) return;
+  isSubmittingReview.value = true;
+  try {
+    const token = localStorage.getItem('auth_token');
+    const res = await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        booking_id: canReviewBooking.value.id,
+        rating: newReview.value.rating,
+        comment: newReview.value.comment
+      })
+    });
+    
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Lỗi gửi đánh giá');
+    
+    alert('Cảm ơn bạn đã đánh giá!');
+    canReviewBooking.value = null; // Ẩn form sau khi gửi
+    fetchReviews(1); // Tải lại danh sách
+  } catch (e: any) {
+    alert(e.message);
+  } finally {
+    isSubmittingReview.value = false;
+  }
+};
 
 
 onMounted(async () => {
@@ -405,6 +560,16 @@ onMounted(async () => {
     console.error(error);
   } finally {
     loading.value = false;
+  }
+
+  fetchReviews();
+  checkReviewPermission();
+
+  // Tự động cuộn đến phần đánh giá nếu có param ?review=true
+  if (route.query.review === 'true') {
+    setTimeout(() => {
+      scrollToReviews();
+    }, 800);
   }
 });
 

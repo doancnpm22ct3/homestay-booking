@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\VoucherController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\VoucherController as AdminVoucherController;
+use App\Http\Controllers\Api\ReviewController;
 
 Route::post('/payment/create', [PaymentController::class, 'createPayment']);
 Route::get('/payment/vnpay-return', [PaymentController::class, 'vnpayReturn']);
@@ -52,7 +53,8 @@ Route::get('/rooms', function (Request $request) {
             'is_visible' => $room->is_visible,
             'max_guests' => $room->max_guests,
             'max_children' => $room->max_children,
-            'image' => $primaryImage ? $primaryImage->image_url : null
+            'image' => $primaryImage ? $primaryImage->image_url : null,
+            'average_rating' => $room->average_rating
         ];
     });
 
@@ -82,6 +84,10 @@ Route::get('/rooms/{id}', function ($id) {
 
     return response()->json($room);
 });
+
+// --- ĐÁNH GIÁ (REVIEWS) ---
+Route::get('/rooms/{id}/reviews', [ReviewController::class, 'index']);
+Route::middleware('auth:sanctum')->post('/reviews', [ReviewController::class, 'store'])->middleware('throttle:5,1');
 
 // --- QUẢN LÝ PHÒNG ---
 Route::post('/admin/rooms', [RoomController::class, 'store']);
@@ -190,4 +196,9 @@ Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
     Route::put('/vouchers/{id}', [AdminVoucherController::class, 'update']);
     Route::delete('/vouchers/{id}', [AdminVoucherController::class, 'destroy']);
     Route::patch('/vouchers/{id}/toggle-status', [AdminVoucherController::class, 'toggleStatus']);
+
+    // Quản lý đánh giá (Reviews)
+    Route::get('/reviews', [ReviewController::class, 'adminIndex']);
+    Route::patch('/reviews/{id}/toggle-visibility', [ReviewController::class, 'toggleVisibility']);
+    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
 });
