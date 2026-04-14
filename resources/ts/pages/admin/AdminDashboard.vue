@@ -26,10 +26,19 @@
         </div>
 
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-orange-500">
-          <p class="text-gray-500 font-medium mb-1">Tỷ Lệ Phòng Trống(Hiện tại)</p>
-          <h3 class="text-3xl font-bold text-orange-500">{{ overview.vacancy_rate }}</h3>
+           <p class="text-gray-500 font-medium mb-1">Tỷ Lệ Phòng Trống(Hiện tại)</p>
+           <h3 class="text-3xl font-bold text-orange-500">{{ overview.vacancy_rate }}</h3>
+         </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-amber-500">
+          <p class="text-gray-500 font-medium mb-1">Đánh Giá Trung Bình</p>
+          <h3 class="text-3xl font-bold text-amber-500 flex items-center gap-2">
+            {{ overview.avg_rating }} 
+            <Star class="w-6 h-6 fill-amber-500" />
+            <span class="text-sm font-normal text-gray-500">({{ overview.total_reviews }} lượt)</span>
+          </h3>
         </div>
-      </div>
+       </div>
 
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <h2 class="text-xl font-bold text-gray-900 mb-6">Doanh Thu Các Tháng Trong Năm</h2>
@@ -44,6 +53,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { Bar } from 'vue-chartjs';
+import { Star } from 'lucide-vue-next';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 
 // Đăng ký các thành phần của ChartJS
@@ -56,7 +66,9 @@ const selectedYear = ref(new Date().getFullYear().toString());
 const overview = ref({
   total_bookings: 0,
   total_revenue: 0,
-  vacancy_rate: '0%'
+  vacancy_rate: '0%',
+  total_reviews: 0,
+  avg_rating: 0
 });
 
 const chartData = ref({

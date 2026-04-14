@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use App\Notifications\BookingStatusUpdated;
 use App\Notifications\ReviewRequest;
+use App\Models\Review;
 
 class BookingController extends Controller
 {
@@ -83,6 +84,8 @@ class BookingController extends Controller
             'occupancy_rate' => round(($occupied / $totalRooms) * 100),
             'unpaid_count'   => Booking::whereRaw('paid_amount < total_amount')->whereNotIn('status',['cancelled','no_show'])->count(),
             'dirty_rooms'    => Room::where('room_status','dirty')->count(),
+            'total_reviews'  => Review::count(),
+            'avg_rating'     => round(Review::avg('rating') ?: 0, 1),
         ]);
     }
 

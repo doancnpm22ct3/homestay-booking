@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\Room;
+use App\Models\Review;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -62,6 +63,8 @@ class DashboardController extends Controller
                     'total_bookings' => $totalBookings,
                     'total_revenue' => $totalRevenue,
                     'vacancy_rate' => $vacancyRate . '%',
+                    'total_reviews' => Review::whereYear('created_at', $year)->count(),
+                    'avg_rating' => round(Review::whereYear('created_at', $year)->avg('rating') ?: 0, 1),
                 ],
                 'chart' => [
                     'labels' => ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
