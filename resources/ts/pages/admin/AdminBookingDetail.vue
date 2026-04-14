@@ -103,8 +103,10 @@
                     <option value="other">Phụ thu khác...</option>
                   </select>
                   
-                  <!-- Custom Service Name (only show if 'other' is selected) -->
-                  <input v-if="selectedPreset === 'other' || !selectedPreset" v-model="newSvc.service_name" placeholder="Tên dịch vụ" class="input-sm flex-1" />
+                  <!-- Custom Service Name (show when 'other' is selected OR no preset chosen) -->
+                  <input v-if="selectedPreset === 'other' || !selectedPreset" v-model="newSvc.service_name" placeholder="Tên phụ thu/dịch vụ" class="input-sm flex-1" />
+                  <!-- Show selected preset name as readonly when a preset is chosen -->
+                  <span v-else class="input-sm flex-1 bg-gray-50 text-gray-700 truncate">{{ newSvc.service_name }}</span>
                   
                   <input v-model.number="newSvc.unit_price" type="number" placeholder="Đơn giá" class="input-sm w-28" />
                   <input v-model.number="newSvc.quantity" type="number" placeholder="SL" class="input-sm w-16" min="1" />
@@ -270,7 +272,14 @@ async function saveNotes() {
 }
 
 async function addService() {
-  if (!newSvc.value.service_name) return;
+  if (!newSvc.value.service_name) {
+    alert('Vui lòng chọn dịch vụ từ danh sách hoặc nhập tên phụ thu!');
+    return;
+  }
+  if (!newSvc.value.unit_price || newSvc.value.unit_price <= 0) {
+    alert('Vui lòng nhập đơn giá!');
+    return;
+  }
   const res = await fetch(`${API}/bookings/${props.bookingId}/services`, {
     method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token()}`},
     body: JSON.stringify(newSvc.value),

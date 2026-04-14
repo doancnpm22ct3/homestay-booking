@@ -12,7 +12,7 @@ class BookingServiceController extends Controller
     {
         $booking = Booking::findOrFail($id);
         $v = $request->validate(['service_name'=>'required|string','unit_price'=>'required|numeric|min:0','quantity'=>'required|integer|min:1','is_paid'=>'nullable|boolean','note'=>'nullable|string']);
-        $svc = $booking->services()->create([...$v,'total_price'=>(int)($v['unit_price']*$v['quantity'])]);
+        $svc = $booking->services()->create(array_merge($v, ['total_price' => (int)($v['unit_price'] * $v['quantity'])]));
         
         if (!empty($v['is_paid'])) {
             // Không cộng vào total_amount hay paid_amount vì đây là tiền thu riêng ngoài booking chính

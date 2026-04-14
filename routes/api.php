@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Admin\RoomAvailabilityController;
 use App\Http\Controllers\Api\VoucherController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\Admin\DashboardController;
+use App\Http\Controllers\Api\Admin\VoucherController as AdminVoucherController;
 
 Route::post('/payment/create', [PaymentController::class, 'createPayment']);
 Route::get('/payment/vnpay-return', [PaymentController::class, 'vnpayReturn']);
@@ -182,4 +183,11 @@ Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
     
     // Danh sách hiển thị riêng cho Admin (có phân cấp)
     Route::get('/rooms', [RoomController::class, 'adminIndex']);
+
+    // MỚI: QUẢN LÝ VOUCHER CHO ADMIN
+    Route::get('/vouchers', [AdminVoucherController::class, 'index']);
+    Route::post('/vouchers', [AdminVoucherController::class, 'store']);
+    Route::put('/vouchers/{id}', [AdminVoucherController::class, 'update']);
+    Route::delete('/vouchers/{id}', [AdminVoucherController::class, 'destroy']);
+    Route::patch('/vouchers/{id}/toggle-status', [AdminVoucherController::class, 'toggleStatus']);
 });

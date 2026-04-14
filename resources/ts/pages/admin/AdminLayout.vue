@@ -13,7 +13,7 @@
           class="flex items-center px-4 py-3 rounded-xl text-gray-500 hover:bg-[#EDF2EF] hover:text-[#4A7055] transition-all duration-200 group" 
           active-class="bg-[#4A7055] !text-white shadow-md">
           <LayoutDashboard class="w-5 h-5 mr-3 transition-transform group-hover:scale-110" /> 
-          <span class="font-medium">Dashboard</span>
+          <span class="font-medium">Quản lý thống kê</span>
         </router-link>
 
         <router-link to="/admin/rooms" 
@@ -41,7 +41,14 @@
           class="flex items-center px-4 py-3 rounded-xl text-gray-500 hover:bg-[#EDF2EF] hover:text-[#4A7055] transition-all duration-200 group" 
           active-class="bg-[#4A7055] !text-white shadow-md">
           <Users class="w-5 h-5 mr-3 transition-transform group-hover:scale-110" /> 
-          <span class="font-medium">Người dùng</span>
+          <span class="font-medium">Quản lý người dùng</span>
+        </router-link>
+
+        <router-link to="/admin/vouchers" 
+          class="flex items-center px-4 py-3 rounded-xl text-gray-500 hover:bg-[#EDF2EF] hover:text-[#4A7055] transition-all duration-200 group" 
+          active-class="bg-[#4A7055] !text-white shadow-md">
+          <Ticket class="w-5 h-5 mr-3 transition-transform group-hover:scale-110" /> 
+          <span class="font-medium">Quản lý mã giảm giá</span>
         </router-link>
       </nav>
 
@@ -71,5 +78,5 @@
 </template>
 
 <script setup lang="ts">
-import { LayoutDashboard, Home, ClipboardList, Users, LogOut, Receipt } from 'lucide-vue-next';
+import { LayoutDashboard, Home, ClipboardList, Users, LogOut, Receipt, Ticket } from 'lucide-vue-next';
 </script>

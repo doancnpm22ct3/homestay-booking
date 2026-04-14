@@ -33,7 +33,16 @@ class BookingStatusUpdated extends Notification
      */
     public function via($notifiable)
     {
-        return ['database', 'mail'];
+        // Chỉ dùng database để tránh lỗi mail chưa cấu hình SMTP
+        // Bật lại 'mail' khi đã thiết lập SMTP trong .env
+        $channels = ['database'];
+        
+        // Tự động kích hoạt mail nếu MAIL_HOST đã được cấu hình
+        if (config('mail.mailers.smtp.host') && config('mail.mailers.smtp.host') !== 'mailpit') {
+            $channels[] = 'mail';
+        }
+        
+        return $channels;
     }
 
     /**

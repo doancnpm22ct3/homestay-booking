@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Mar 19, 2026 at 10:03 AM
+-- Generation Time: Apr 14, 2026 at 01:46 PM
 -- Server version: 8.4.3
 -- PHP Version: 8.4.12
 
@@ -46,7 +46,8 @@ INSERT INTO `amenities` (`id`, `name`, `icon`) VALUES
 (6, 'Bãi đậu xe', 'car'),
 (7, 'Khác(Khăn tắm, bàn chải...)', 'star'),
 (9, 'Máy Điều hòa', 'star'),
-(10, 'Máy Chiếu', 'star');
+(10, 'Máy Chiếu', 'star'),
+(11, 'Giặt áo quần', 'star');
 
 -- --------------------------------------------------------
 
@@ -94,34 +95,45 @@ CREATE TABLE `bookings` (
   `cancel_reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `refund_amount` decimal(15,0) NOT NULL DEFAULT '0',
   `additional_fee` decimal(12,2) NOT NULL DEFAULT '0.00',
-  `additional_note` text COLLATE utf8mb4_unicode_ci
+  `additional_note` text COLLATE utf8mb4_unicode_ci,
+  `voucher_id` bigint UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `bookings`
 --
 
-INSERT INTO `bookings` (`id`, `booking_code`, `customer_name`, `customer_email`, `customer_phone`, `room_name`, `total_price`, `deposit_amount`, `payment_status`, `paid_at`, `payment_method`, `created_at`, `updated_at`, `customer_id`, `room_id`, `check_in_date`, `check_out_date`, `check_in_time`, `check_out_time`, `adults`, `children`, `status`, `source`, `subtotal`, `discount_amount`, `discount_type`, `discount_reason`, `total_amount`, `paid_amount`, `guest_note`, `internal_note`, `created_by`, `confirmed_by`, `checked_in_by`, `checked_out_by`, `cancelled_at`, `cancel_reason`, `refund_amount`, `additional_fee`, `additional_note`) VALUES
-(1, 'HD-69BA991447A97', 'Lan Anh', 'volananh2k4@gmail.com', '0945999305', 'Mơ Màng Room', 160000.00, 48000.00, 'completed', NULL, 'bank', '2026-03-13 03:53:30', '2026-03-19 03:54:04', NULL, NULL, NULL, NULL, '14:00:00', '12:00:00', 1, 0, 'pending', 'website', 7000000, 0, NULL, NULL, 7000000, 7000000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL),
-(2, 'HD-69BAC70157928', 'Lan Anh', 'volananh2k4@gmail.com', '0945999305', 'Bình Yên Room', 170000.00, 51000.00, 'completed', NULL, 'bank', '2026-03-13 03:59:32', '2026-03-19 03:54:04', NULL, NULL, NULL, NULL, '14:00:00', '12:00:00', 1, 0, 'pending', 'website', 7000000, 0, NULL, NULL, 7000000, 7000000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL),
-(3, 'HD-69BAC8A4AE80E', 'Lan Anh', 'volananh2k4@gmail.com', '0945999305', 'Đông Chí Room', 160000.00, 48000.00, 'completed', NULL, 'bank', '2026-03-13 04:00:56', '2026-03-19 03:54:04', NULL, NULL, NULL, NULL, '14:00:00', '12:00:00', 1, 0, 'pending', 'website', 7000000, 0, NULL, NULL, 7000000, 7000000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL),
-(4, 'HD-69B41A9313088', 'admin', 'admin@gmail.com', '1', 'nhan', 200000.00, 60000.00, 'completed', NULL, 'bank', '2026-03-13 14:09:23', '2026-03-13 14:36:15', NULL, 10, '2026-03-14', '2026-03-15', '14:00:00', '12:00:00', 2, 1, 'confirmed', 'website', 200000, 0, NULL, NULL, 200000, 200000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL),
-(5, 'HD-69B42D9658AE6', 'admin', 'admin@gmail.com', '1', 'nhan', 200000.00, 60000.00, 'completed', NULL, 'bank', '2026-03-13 15:30:30', '2026-03-15 09:26:48', NULL, 10, '2026-03-15', '2026-03-16', '14:00:00', '12:00:00', 2, 1, 'confirmed', 'website', 200000, 0, NULL, NULL, 200000, 200000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL),
-(6, 'HD-69B67BC4C4771', 'pham duy', 'duy@gmail.com', '0935824455', 'Phòng hạnh phúc', 500000.00, 150000.00, 'completed', NULL, 'bank', '2026-03-15 09:28:36', '2026-03-15 09:57:03', NULL, 4, '2026-03-01', '2026-03-02', '14:00:00', '12:00:00', 2, 2, 'confirmed', 'website', 500000, 0, NULL, NULL, 500000, 500000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL),
-(7, 'HD-69B68203CAE7E', 'pham duy', 'duy@gmail.com', '0935824455', 'Phòng hạnh phúc', 6500000.00, 1950000.00, 'completed', NULL, 'bank', '2026-03-15 09:55:15', '2026-03-15 10:26:59', NULL, 4, '2026-03-09', '2026-03-22', '14:00:00', '12:00:00', 2, 2, 'confirmed', 'website', 6500000, 0, NULL, NULL, 6500000, 6500000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL),
-(8, 'HD-69B688AA9C05C', 'pham duy', 'duy@gmail.com', '0935824455', 'nhan', 800000.00, 240000.00, 'completed', NULL, 'bank', '2026-03-15 10:23:38', '2026-03-15 11:04:30', NULL, 10, '2026-03-01', '2026-03-05', '14:00:00', '12:00:00', 2, 2, 'confirmed', 'website', 800000, 0, NULL, NULL, 800000, 700000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL),
-(9, 'HD-69B68D81B5B2D', 'pham duy', 'duy@gmail.com', '0935824455', 'nhan', 400000.00, 120000.00, 'completed', NULL, 'bank', '2026-03-15 10:44:17', '2026-03-15 17:05:14', NULL, 10, '2026-03-01', '2026-03-03', '14:00:00', '12:00:00', 5, 5, 'confirmed', 'website', 400000, 0, NULL, NULL, 400000, 400000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL),
-(10, 'HD-69B68E60ADE6F', 'pham duy', 'duy@gmail.com', '0935824455', '2', 28000000.00, 8400000.00, 'completed', NULL, 'bank', '2026-03-15 10:48:00', '2026-03-15 17:05:07', NULL, 12, '2026-03-01', '2026-03-05', '14:00:00', '12:00:00', 2, 1, 'confirmed', 'website', 28000000, 0, NULL, NULL, 28000000, 28000000, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-15 10:56:05', 'Khách yêu cầu hủy', 8400000, 0.00, NULL),
-(11, 'HD-69B6F6FB60B27', 'pham duy', 'duy@gmail.com', '0935824455', 'Phòng hạnh phúc', 1500000.00, 450000.00, 'deposited', NULL, 'bank', '2026-03-15 18:14:19', '2026-03-15 18:20:20', NULL, 4, '2026-03-01', '2026-03-04', '14:00:00', '12:00:00', 2, 1, 'checked_out', 'website', 1500000, 0, NULL, NULL, 1500000, 1500000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL),
-(12, 'HD-69B6F74B9CA72', 'admin', 'admin@gmail.com', '1', 'nhan', 400000.00, 120000.00, 'completed', NULL, 'bank', '2026-03-15 18:15:39', '2026-03-15 18:25:16', NULL, 12, '2026-03-01', '2026-03-03', '14:00:00', '12:00:00', 2, 1, 'checked_in', 'website', 400000, 0, NULL, NULL, 400000, 400000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL),
-(13, 'HD-69B6F903A6EC0', 'pham duy', 'duy@gmail.com', '0935824455', 'nhan', 600000.00, 180000.00, 'deposited', NULL, 'bank', '2026-03-15 18:22:59', '2026-03-15 18:41:11', NULL, 10, '2026-03-01', '2026-03-04', '14:00:00', '12:00:00', 2, 0, 'cancelled', 'website', 600000, 0, NULL, NULL, 600000, 600000, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-15 18:24:17', 'Khách yêu cầu hủy', 180000, 0.00, NULL),
-(14, 'HD-69B6FB399BD38', 'admin', 'admin@gmail.com', '1', 'Phòng hạnh phúc', 5500000.00, 1650000.00, 'deposited', NULL, 'bank', '2026-03-15 18:32:25', '2026-03-19 10:01:37', NULL, 4, '2026-03-01', '2026-03-12', '14:00:00', '12:00:00', 2, 2, 'cancelled', 'website', 5500000, 0, NULL, NULL, 5500000, 1650000, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-19 10:01:37', 'Overbooking', 0, 0.00, NULL),
-(15, 'HD-69B6FB9A3038A', 'admin', 'admin@gmail.com', '1', '2', 84000000.00, 25200000.00, 'deposited', NULL, 'bank', '2026-03-15 18:34:02', '2026-03-15 18:41:24', NULL, 12, '2026-02-28', '2026-03-12', '14:00:00', '12:00:00', 2, 1, 'checked_in', 'website', 84000000, 0, NULL, NULL, 84000000, 25200000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL),
-(17, 'HD-69BB9FE308076', 'admin', 'admin@gmail.com', '1', 'NC Haven Homestay', 2000000.00, 600000.00, 'completed', NULL, 'bank', '2026-03-19 07:04:03', '2026-03-19 07:05:39', NULL, 35, '2026-03-02', '2026-03-03', '14:00:00', '12:00:00', 3, 1, 'confirmed', 'website', 2000000, 0, NULL, NULL, 2000000, 2000000, NULL, NULL, NULL, NULL, 12, 12, NULL, NULL, 0, 0.00, NULL),
-(18, 'HD-69BBAF8B65041', 'Lan Anh', 'volananh2k4@gmail.com', '0945999305', 'Phòng 103', 350000.00, 105000.00, 'deposited', NULL, 'bank', '2026-03-19 08:10:51', '2026-03-19 08:12:05', NULL, 34, '2026-03-20', '2026-03-21', '14:00:00', '12:00:00', 2, 0, 'checked_out', 'website', 350000, 0, NULL, NULL, 350000, 350000, NULL, NULL, NULL, 12, 12, 12, NULL, NULL, 0, 0.00, NULL),
-(19, 'HD-69BBB39D5FCFE', 'admin', 'admin@gmail.com', '1', 'Mộng Mơ Room', 150000.00, 45000.00, 'deposited', NULL, 'bank', '2026-03-19 08:28:13', '2026-03-19 10:00:47', NULL, 6, '2026-03-03', '2026-03-04', '14:00:00', '12:00:00', 2, 1, 'cancelled', 'website', 150000, 0, NULL, NULL, 150000, 45000, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-19 10:00:47', 'Khách yêu cầu hủy', 45000, 0.00, NULL),
-(20, 'HD-69BBB4FF8563F', 'admin', 'admin@gmail.com', '1', 'NC Haven Homestay', 26000000.00, 7800000.00, 'deposited', NULL, 'bank', '2026-03-19 08:34:07', '2026-03-19 08:56:50', NULL, 35, '2026-03-19', '2026-04-01', '14:00:00', '12:00:00', 6, 4, 'checked_out', 'website', 26400000, 0, NULL, NULL, 26400000, 26400000, NULL, NULL, NULL, NULL, 12, 12, NULL, NULL, 0, 0.00, NULL),
-(21, 'HD-69BBC28237062', 'admin', 'admin@gmail.com', '1', 'Phòng 102', 6000000.00, 1800000.00, 'deposited', NULL, 'bank', '2026-03-19 09:31:46', '2026-03-19 09:48:31', NULL, 33, '2026-03-19', '2026-03-31', '14:00:00', '12:00:00', 4, 1, 'checked_in', 'website', 6000000, 0, NULL, NULL, 6000000, 1800000, NULL, NULL, NULL, NULL, 12, NULL, NULL, NULL, 0, 0.00, NULL);
+INSERT INTO `bookings` (`id`, `booking_code`, `customer_name`, `customer_email`, `customer_phone`, `room_name`, `total_price`, `deposit_amount`, `payment_status`, `paid_at`, `payment_method`, `created_at`, `updated_at`, `customer_id`, `room_id`, `check_in_date`, `check_out_date`, `check_in_time`, `check_out_time`, `adults`, `children`, `status`, `source`, `subtotal`, `discount_amount`, `discount_type`, `discount_reason`, `total_amount`, `paid_amount`, `guest_note`, `internal_note`, `created_by`, `confirmed_by`, `checked_in_by`, `checked_out_by`, `cancelled_at`, `cancel_reason`, `refund_amount`, `additional_fee`, `additional_note`, `voucher_id`) VALUES
+(1, 'HD-69BA991447A97', 'Lan Anh', 'volananh2k4@gmail.com', '0945999305', 'Mơ Màng Room', 160000.00, 48000.00, 'completed', NULL, 'bank', '2026-03-13 03:53:30', '2026-03-19 03:54:04', NULL, NULL, NULL, NULL, '14:00:00', '12:00:00', 1, 0, 'pending', 'website', 7000000, 0, NULL, NULL, 7000000, 7000000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(2, 'HD-69BAC70157928', 'Lan Anh', 'volananh2k4@gmail.com', '0945999305', 'Bình Yên Room', 170000.00, 51000.00, 'completed', NULL, 'bank', '2026-03-13 03:59:32', '2026-03-19 03:54:04', NULL, NULL, NULL, NULL, '14:00:00', '12:00:00', 1, 0, 'pending', 'website', 7000000, 0, NULL, NULL, 7000000, 7000000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(3, 'HD-69BAC8A4AE80E', 'Lan Anh', 'volananh2k4@gmail.com', '0945999305', 'Đông Chí Room', 160000.00, 48000.00, 'completed', NULL, 'bank', '2026-03-13 04:00:56', '2026-03-19 03:54:04', NULL, NULL, NULL, NULL, '14:00:00', '12:00:00', 1, 0, 'pending', 'website', 7000000, 0, NULL, NULL, 7000000, 7000000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(4, 'HD-69B41A9313088', 'admin', 'admin@gmail.com', '1', 'nhan', 200000.00, 60000.00, 'completed', NULL, 'bank', '2026-03-13 14:09:23', '2026-03-13 14:36:15', NULL, 10, '2026-03-14', '2026-03-15', '14:00:00', '12:00:00', 2, 1, 'confirmed', 'website', 200000, 0, NULL, NULL, 200000, 200000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(5, 'HD-69B42D9658AE6', 'admin', 'admin@gmail.com', '1', 'nhan', 200000.00, 60000.00, 'completed', NULL, 'bank', '2026-03-13 15:30:30', '2026-03-15 09:26:48', NULL, 10, '2026-03-15', '2026-03-16', '14:00:00', '12:00:00', 2, 1, 'confirmed', 'website', 200000, 0, NULL, NULL, 200000, 200000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(6, 'HD-69B67BC4C4771', 'pham duy', 'duy@gmail.com', '0935824455', 'Phòng hạnh phúc', 500000.00, 150000.00, 'completed', NULL, 'bank', '2026-03-15 09:28:36', '2026-03-15 09:57:03', NULL, 4, '2026-03-01', '2026-03-02', '14:00:00', '12:00:00', 2, 2, 'confirmed', 'website', 500000, 0, NULL, NULL, 500000, 500000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(7, 'HD-69B68203CAE7E', 'pham duy', 'duy@gmail.com', '0935824455', 'Phòng hạnh phúc', 6500000.00, 1950000.00, 'completed', NULL, 'bank', '2026-03-15 09:55:15', '2026-03-15 10:26:59', NULL, 4, '2026-03-09', '2026-03-22', '14:00:00', '12:00:00', 2, 2, 'confirmed', 'website', 6500000, 0, NULL, NULL, 6500000, 6500000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(8, 'HD-69B688AA9C05C', 'pham duy', 'duy@gmail.com', '0935824455', 'nhan', 800000.00, 240000.00, 'completed', NULL, 'bank', '2026-03-15 10:23:38', '2026-03-15 11:04:30', NULL, 10, '2026-03-01', '2026-03-05', '14:00:00', '12:00:00', 2, 2, 'confirmed', 'website', 800000, 0, NULL, NULL, 800000, 700000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(9, 'HD-69B68D81B5B2D', 'pham duy', 'duy@gmail.com', '0935824455', 'nhan', 400000.00, 120000.00, 'completed', NULL, 'bank', '2026-03-15 10:44:17', '2026-03-15 17:05:14', NULL, 10, '2026-03-01', '2026-03-03', '14:00:00', '12:00:00', 5, 5, 'confirmed', 'website', 400000, 0, NULL, NULL, 400000, 400000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(10, 'HD-69B68E60ADE6F', 'pham duy', 'duy@gmail.com', '0935824455', '2', 28000000.00, 8400000.00, 'completed', NULL, 'bank', '2026-03-15 10:48:00', '2026-03-20 01:20:37', NULL, 12, '2026-03-01', '2026-03-05', '14:00:00', '12:00:00', 2, 1, 'checked_in', 'website', 28000000, 0, NULL, NULL, 28000000, 28000000, NULL, NULL, NULL, NULL, 12, NULL, '2026-03-15 10:56:05', 'Khách yêu cầu hủy', 8400000, 0.00, NULL, NULL),
+(11, 'HD-69B6F6FB60B27', 'pham duy', 'duy@gmail.com', '0935824455', 'Phòng hạnh phúc', 1500000.00, 450000.00, 'deposited', NULL, 'bank', '2026-03-15 18:14:19', '2026-03-15 18:20:20', NULL, 4, '2026-03-01', '2026-03-04', '14:00:00', '12:00:00', 2, 1, 'checked_out', 'website', 1500000, 0, NULL, NULL, 1500000, 1500000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(12, 'HD-69B6F74B9CA72', 'admin', 'admin@gmail.com', '1', 'nhan', 400000.00, 120000.00, 'completed', NULL, 'bank', '2026-03-15 18:15:39', '2026-03-15 18:25:16', NULL, 12, '2026-03-01', '2026-03-03', '14:00:00', '12:00:00', 2, 1, 'checked_in', 'website', 400000, 0, NULL, NULL, 400000, 400000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(13, 'HD-69B6F903A6EC0', 'pham duy', 'duy@gmail.com', '0935824455', 'nhan', 600000.00, 180000.00, 'deposited', NULL, 'bank', '2026-03-15 18:22:59', '2026-03-15 18:41:11', NULL, 10, '2026-03-01', '2026-03-04', '14:00:00', '12:00:00', 2, 0, 'cancelled', 'website', 600000, 0, NULL, NULL, 600000, 600000, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-15 18:24:17', 'Khách yêu cầu hủy', 180000, 0.00, NULL, NULL),
+(14, 'HD-69B6FB399BD38', 'admin', 'admin@gmail.com', '1', 'Phòng hạnh phúc', 5500000.00, 1650000.00, 'deposited', NULL, 'bank', '2026-03-15 18:32:25', '2026-03-19 10:01:37', NULL, 4, '2026-03-01', '2026-03-12', '14:00:00', '12:00:00', 2, 2, 'cancelled', 'website', 5500000, 0, NULL, NULL, 5500000, 1650000, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-19 10:01:37', 'Overbooking', 0, 0.00, NULL, NULL),
+(15, 'HD-69B6FB9A3038A', 'admin', 'admin@gmail.com', '1', '2', 84000000.00, 25200000.00, 'deposited', NULL, 'bank', '2026-03-15 18:34:02', '2026-03-15 18:41:24', NULL, 12, '2026-02-28', '2026-03-12', '14:00:00', '12:00:00', 2, 1, 'checked_in', 'website', 84000000, 0, NULL, NULL, 84000000, 25200000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(17, 'HD-69BB9FE308076', 'admin', 'admin@gmail.com', '1', 'NC Haven Homestay', 2000000.00, 600000.00, 'completed', NULL, 'bank', '2026-03-19 07:04:03', '2026-03-19 07:05:39', NULL, 35, '2026-03-02', '2026-03-03', '14:00:00', '12:00:00', 3, 1, 'confirmed', 'website', 2000000, 0, NULL, NULL, 2000000, 2000000, NULL, NULL, NULL, NULL, 12, 12, NULL, NULL, 0, 0.00, NULL, NULL),
+(18, 'HD-69BBAF8B65041', 'Lan Anh', 'volananh2k4@gmail.com', '0945999305', 'Phòng 103', 350000.00, 105000.00, 'deposited', NULL, 'bank', '2026-03-19 08:10:51', '2026-03-19 08:12:05', NULL, 34, '2026-03-20', '2026-03-21', '14:00:00', '12:00:00', 2, 0, 'checked_out', 'website', 350000, 0, NULL, NULL, 350000, 350000, NULL, NULL, NULL, 12, 12, 12, NULL, NULL, 0, 0.00, NULL, NULL),
+(19, 'HD-69BBB39D5FCFE', 'admin', 'admin@gmail.com', '1', 'Mộng Mơ Room', 150000.00, 45000.00, 'deposited', NULL, 'bank', '2026-03-19 08:28:13', '2026-03-19 10:00:47', NULL, 6, '2026-03-03', '2026-03-04', '14:00:00', '12:00:00', 2, 1, 'cancelled', 'website', 150000, 0, NULL, NULL, 150000, 45000, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-19 10:00:47', 'Khách yêu cầu hủy', 45000, 0.00, NULL, NULL),
+(20, 'HD-69BBB4FF8563F', 'admin', 'admin@gmail.com', '1', 'NC Haven Homestay', 26000000.00, 7800000.00, 'deposited', NULL, 'bank', '2026-03-19 08:34:07', '2026-03-19 08:56:50', NULL, 35, '2026-03-19', '2026-04-01', '14:00:00', '12:00:00', 6, 4, 'checked_out', 'website', 26400000, 0, NULL, NULL, 26400000, 26400000, NULL, NULL, NULL, NULL, 12, 12, NULL, NULL, 0, 0.00, NULL, NULL),
+(21, 'HD-69BBC28237062', 'admin', 'admin@gmail.com', '1', 'Phòng 102', 6000000.00, 1800000.00, 'deposited', NULL, 'bank', '2026-03-19 09:31:46', '2026-04-10 01:03:58', NULL, 28, '2026-03-19', '2026-03-31', '14:00:00', '12:00:00', 4, 1, 'checked_in', 'website', 6060002, 0, NULL, NULL, 6060002, 1800000, NULL, NULL, NULL, NULL, 12, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(22, 'HD-69BC3F9E4BA6F', 'admin', 'admin@gmail.com', '1', 'Phòng 101', 1350000.00, 405000.00, 'deposited', NULL, 'bank', '2026-03-19 18:25:34', '2026-03-19 18:25:34', NULL, 32, '2026-03-20', '2026-03-23', '14:00:00', '12:00:00', 2, 0, 'pending', 'website', 1350000, 0, NULL, NULL, 1350000, 405000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(23, 'HD-69BCBB595FF3B', 'lan anh', 'anh@gmail.com', '0906123333', 'NC Haven Homestay', 4000000.00, 1200000.00, 'deposited', NULL, 'bank', '2026-03-20 03:13:29', '2026-03-20 03:13:29', NULL, 35, '2026-03-20', '2026-03-22', '14:00:00', '12:00:00', 6, 3, 'pending', 'website', 4000000, 0, NULL, NULL, 4000000, 1200000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(24, 'HD-69D75B678A74A', 'Ngô Đức Nhân', 'ngodnhan9981@gmail.com', '0854892319', 'Phòng 103', 950000.00, 285000.00, 'deposited', NULL, 'bank', '2026-04-09 07:55:19', '2026-04-09 07:55:19', NULL, 34, '2026-04-09', '2026-04-12', '14:00:00', '12:00:00', 2, 1, 'pending', 'website', 1050000, 0, NULL, NULL, 950000, 285000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(25, 'HD-69D7D3BADD17B', 'admin', 'admin@gmail.com', '1', 'Phòng 101', 700000.00, 210000.00, 'deposited', NULL, 'bank', '2026-04-09 16:28:42', '2026-04-09 16:28:42', 12, 27, '2026-04-10', '2026-04-12', '14:00:00', '12:00:00', 2, 1, 'pending', 'website', 700000, 0, NULL, NULL, 700000, 210000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(26, 'HD-69D7EDAC94DFB', 'Ngô Đức Nhân', 'ngodnhan9981@gmail.com', '0854892319', 'Mùa Thu Room', 400000.00, 120000.00, 'deposited', NULL, 'bank', '2026-04-09 18:19:24', '2026-04-09 18:19:24', 17, 11, '2026-04-10', '2026-04-12', '14:00:00', '12:00:00', 2, 1, 'pending', 'website', 400000, 0, NULL, NULL, 400000, 120000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(27, 'HD-69D7EDBE04BC1', 'Ngô Đức Nhân', 'ngodnhan9981@gmail.com', '0854892319', 'Mùa Thu Room', 300000.00, 90000.00, 'deposited', NULL, 'bank', '2026-04-09 18:19:42', '2026-04-09 18:19:42', 17, 11, '2026-04-10', '2026-04-12', '14:00:00', '12:00:00', 2, 1, 'pending', 'website', 400000, 0, NULL, NULL, 300000, 90000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(28, 'HD-69D84C07EDC09', 'admin', 'admin@gmail.com', '1', 'Yên Tĩnh Room', 340000.00, 102000.00, 'deposited', NULL, 'bank', '2026-04-10 01:01:59', '2026-04-10 01:15:51', 12, 9, '2026-04-10', '2026-04-12', '14:00:00', '12:00:00', 2, 1, 'checked_in', 'website', 340000, 0, NULL, NULL, 340000, 102000, NULL, NULL, NULL, NULL, 12, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(29, 'HD-69D84E3A556C4', 'admin', 'admin@gmail.com', '1', 'SONG CAT', 2800000.00, 840000.00, 'deposited', NULL, 'bank', '2026-04-10 01:11:22', '2026-04-10 01:28:16', 12, 25, '2026-04-10', '2026-04-11', '14:00:00', '12:00:00', 2, 0, 'checked_out', 'website', 2860000, 0, NULL, NULL, 2860000, 2860000, NULL, NULL, NULL, NULL, 12, 12, NULL, NULL, 0, 0.00, NULL, NULL),
+(30, 'HD-69D853EF01EB1', 'Ngô Đức Nhân', 'ngodnhan9981@gmail.com', '0854892319', 'Phòng 103', 450000.00, 135000.00, 'deposited', NULL, 'bank', '2026-04-10 01:35:43', '2026-04-10 01:35:43', 17, 29, '2026-04-11', '2026-04-12', '14:00:00', '12:00:00', 2, 0, 'pending', 'website', 450000, 0, NULL, NULL, 450000, 135000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(31, 'HD-69D85841363BD', 'Ngô Đức Nhân', 'ngodnhan9981@gmail.com', '0854892319', 'Mộng Mị Room', 200000.00, 60000.00, 'deposited', NULL, 'bank', '2026-04-10 01:54:09', '2026-04-10 01:54:09', 17, 8, '2026-04-14', '2026-04-15', '14:00:00', '12:00:00', 2, 0, 'pending', 'website', 200000, 0, NULL, NULL, 200000, 60000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -177,7 +189,16 @@ INSERT INTO `booking_activities` (`id`, `booking_id`, `actor_id`, `actor_name`, 
 (29, 20, 12, 'admin', 'checkout', NULL, NULL, 'Khách đã check-out. Phòng chuyển sang bảo trì/dọn dẹp.', '2026-03-19 08:56:53'),
 (30, 21, 12, 'admin', 'checkin', NULL, NULL, 'Khách đã check-in thành công', '2026-03-19 09:48:31'),
 (31, 19, 12, 'admin', 'cancelled', NULL, NULL, 'Booking hủy: Khách yêu cầu hủy', '2026-03-19 10:00:47'),
-(33, 14, 12, 'admin', 'cancelled', NULL, NULL, 'Booking hủy: Overbooking', '2026-03-19 10:01:37');
+(33, 14, 12, 'admin', 'cancelled', NULL, NULL, 'Booking hủy: Overbooking', '2026-03-19 10:01:37'),
+(34, 21, 12, 'admin', 'room_transferred', '{\"room_id\":33}', '{\"room_id\":28}', 'Đổi phòng: #33 → #28. Lý do: hư máy lạnh', '2026-03-19 18:26:58'),
+(35, 10, 12, 'admin', 'checkin', NULL, NULL, 'Khách đã check-in thành công', '2026-03-20 01:20:37'),
+(36, 21, 12, 'admin', 'service_added', NULL, NULL, 'Thêm dịch vụ: Giặt ủi × 1', '2026-04-10 01:03:42'),
+(37, 21, 12, 'admin', 'service_added', NULL, NULL, 'Thêm dịch vụ: Sting × 1', '2026-04-10 01:03:58'),
+(39, 28, 12, 'admin', 'checkin', NULL, NULL, 'Khách đã check-in thành công', '2026-04-10 01:15:51'),
+(40, 29, 12, 'admin', 'checkin', NULL, NULL, 'Khách đã check-in thành công', '2026-04-10 01:24:30'),
+(41, 29, 12, 'admin', 'service_added', NULL, NULL, 'Thêm dịch vụ: Giặt ủi × 1', '2026-04-10 01:26:13'),
+(42, 29, 12, 'admin', 'service_added', NULL, NULL, 'Thêm dịch vụ thu tiền mặt ngay (không tính vào bill): sting × 1', '2026-04-10 01:26:57'),
+(43, 29, 12, 'admin', 'checkout', NULL, NULL, 'Khách đã check-out. Phòng chuyển sang bảo trì/dọn dẹp.', '2026-04-10 01:28:17');
 
 -- --------------------------------------------------------
 
@@ -212,7 +233,8 @@ INSERT INTO `booking_payments` (`id`, `booking_id`, `amount`, `payment_method`, 
 (17, 17, 1400000, 'cash', 'balance', NULL, 'Thanh toán khi check-out', 12, '2026-03-19 07:05:17', '2026-03-19 07:05:17'),
 (18, 18, 245000, 'cash', 'balance', NULL, 'Thanh toán khi check-out', 12, '2026-03-19 08:12:05', '2026-03-19 08:12:05'),
 (19, 20, 18600000, 'card', 'balance', NULL, 'Thanh toán khi check-out', 12, '2026-03-19 08:56:50', '2026-03-19 08:56:50'),
-(20, 19, 45000, 'transfer', 'refund', NULL, 'Hoàn tiền: Khách yêu cầu hủy', 12, '2026-03-19 10:00:47', '2026-03-19 10:00:47');
+(20, 19, 45000, 'transfer', 'refund', NULL, 'Hoàn tiền: Khách yêu cầu hủy', 12, '2026-03-19 10:00:47', '2026-03-19 10:00:47'),
+(21, 29, 2020000, 'cash', 'balance', NULL, 'Thanh toán khi check-out', 12, '2026-04-10 01:28:16', '2026-04-10 01:28:16');
 
 -- --------------------------------------------------------
 
@@ -227,10 +249,21 @@ CREATE TABLE `booking_services` (
   `unit_price` decimal(15,0) NOT NULL DEFAULT '0',
   `quantity` smallint UNSIGNED NOT NULL DEFAULT '1',
   `total_price` decimal(15,0) NOT NULL DEFAULT '0',
+  `is_paid` tinyint(1) NOT NULL DEFAULT '0',
   `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `booking_services`
+--
+
+INSERT INTO `booking_services` (`id`, `booking_id`, `service_name`, `unit_price`, `quantity`, `total_price`, `is_paid`, `note`, `created_at`, `updated_at`) VALUES
+(1, 21, 'Giặt ủi', 60000, 1, 60000, 0, NULL, '2026-04-10 01:03:42', '2026-04-10 01:03:42'),
+(2, 21, 'Sting', 2, 1, 2, 0, NULL, '2026-04-10 01:03:58', '2026-04-10 01:03:58'),
+(3, 29, 'Giặt ủi', 60000, 1, 60000, 0, NULL, '2026-04-10 01:26:13', '2026-04-10 01:26:13'),
+(4, 29, 'sting', 10000, 1, 10000, 1, NULL, '2026-04-10 01:26:57', '2026-04-10 01:26:57');
 
 -- --------------------------------------------------------
 
@@ -306,7 +339,41 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (17, '2026_03_15_165837_create_jobs_table', 8),
 (18, '2026_03_16_150203_add_max_children_to_rooms_table', 9),
 (19, '2026_03_16_151602_restructure_rooms_table', 10),
-(20, '2026_03_16_225516_add_home_to_rent_type_enum', 11);
+(20, '2026_03_16_225516_add_home_to_rent_type_enum', 11),
+(21, '2026_04_01_214136_create_vouchers_table', 12),
+(22, '2026_04_01_214504_add_voucher_id_to_bookings_table', 13),
+(23, '2026_04_09_133950_add_reward_fields_to_users_table', 14),
+(24, '2026_04_09_134000_add_details_to_vouchers_table', 15),
+(25, '2026_04_09_134001_create_user_vouchers_table', 16),
+(26, '2026_03_10_000000_create_base_tables', 17),
+(27, '2026_03_27_095720_create_notifications_table', 17),
+(28, '2026_03_27_222621_add_is_paid_to_booking_services_table', 17);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `notifiable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `notifiable_id` bigint UNSIGNED NOT NULL,
+  `data` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `read_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`id`, `type`, `notifiable_type`, `notifiable_id`, `data`, `read_at`, `created_at`, `updated_at`) VALUES
+('70d0fbaa-0762-499b-9c59-f00a9a82229b', 'App\\Notifications\\BookingStatusUpdated', 'App\\Models\\User', 12, '{\"booking_id\":29,\"booking_code\":\"HD-69D84E3A556C4\",\"message\":\"B\\u1ea1n \\u0111\\u00e3 nh\\u1eadn ph\\u00f2ng (Check-in) th\\u00e0nh c\\u00f4ng cho \\u0111\\u01a1n \\u0111\\u1eb7t ph\\u00f2ng #HD-69D84E3A556C4.\",\"status\":\"checked_in\",\"title\":\"C\\u1eadp nh\\u1eadt tr\\u1ea1ng th\\u00e1i \\u0111\\u01a1n h\\u00e0ng\"}', NULL, '2026-04-10 01:24:30', '2026-04-10 01:24:30'),
+('9ed5ddf7-6d51-4dbe-a9fb-3e96215f53d1', 'App\\Notifications\\BookingStatusUpdated', 'App\\Models\\User', 12, '{\"booking_id\":29,\"booking_code\":\"HD-69D84E3A556C4\",\"message\":\"B\\u1ea1n \\u0111\\u00e3 tr\\u1ea3 ph\\u00f2ng (Check-out) th\\u00e0nh c\\u00f4ng cho \\u0111\\u01a1n \\u0111\\u1eb7t ph\\u00f2ng #HD-69D84E3A556C4.\",\"status\":\"checked_out\",\"title\":\"C\\u1eadp nh\\u1eadt tr\\u1ea1ng th\\u00e1i \\u0111\\u01a1n h\\u00e0ng\"}', NULL, '2026-04-10 01:28:17', '2026-04-10 01:28:17'),
+('d4e87a5a-c5e5-45b8-9c7e-5b8c351e6d55', 'App\\Notifications\\BookingStatusUpdated', 'App\\Models\\User', 12, '{\"booking_id\":28,\"booking_code\":\"HD-69D84C07EDC09\",\"message\":\"B\\u1ea1n \\u0111\\u00e3 nh\\u1eadn ph\\u00f2ng (Check-in) th\\u00e0nh c\\u00f4ng cho \\u0111\\u01a1n \\u0111\\u1eb7t ph\\u00f2ng #HD-69D84C07EDC09.\",\"status\":\"checked_in\",\"title\":\"C\\u1eadp nh\\u1eadt tr\\u1ea1ng th\\u00e1i \\u0111\\u01a1n h\\u00e0ng\"}', NULL, '2026-04-10 01:15:51', '2026-04-10 01:15:51');
 
 -- --------------------------------------------------------
 
@@ -402,7 +469,28 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (64, 'App\\Models\\User', 9, 'auth_token', '02fc82664114ef21c6e03759523489ce0a64585bb207374282404e03e318b4d3', '[\"*\"]', NULL, NULL, '2026-03-18 12:30:38', '2026-03-18 12:30:38'),
 (66, 'App\\Models\\User', 12, 'auth_token', 'dae391bccc9a5168a9817a8782a5eca67b19dd85c0802e18cbdc7cf941cee99b', '[\"*\"]', NULL, NULL, '2026-03-18 18:14:42', '2026-03-18 18:14:42'),
 (68, 'App\\Models\\User', 15, 'auth_token', 'c385dd6f74d5138c63765a65609dd72baccaaa1b38b09dff7860f702bb37cac6', '[\"*\"]', NULL, NULL, '2026-03-19 08:10:24', '2026-03-19 08:10:24'),
-(69, 'App\\Models\\User', 12, 'auth_token', '8676b490205d480a186acec8f635b60b589687d4f65a86bfbc507a69e3481528', '[\"*\"]', '2026-03-19 10:01:37', NULL, '2026-03-19 08:11:13', '2026-03-19 10:01:37');
+(70, 'App\\Models\\User', 12, 'auth_token', '01d6b27a1091378cc7d474952820dbf6b02caaf5cf0f97e3a43431560df2ae9d', '[\"*\"]', NULL, NULL, '2026-03-19 18:16:04', '2026-03-19 18:16:04'),
+(72, 'App\\Models\\User', 14, 'auth_token', '68e26548125b0d19c4b39a7a86fc6ac5f7b71baa689be51fe279ea072b57e723', '[\"*\"]', NULL, NULL, '2026-03-20 03:11:10', '2026-03-20 03:11:10'),
+(74, 'App\\Models\\User', 12, 'auth_token', '052b87a0e9b374864636c1c575ed7c370f6a662db7733fec90556b366a8d854f', '[\"*\"]', NULL, NULL, '2026-03-20 03:16:24', '2026-03-20 03:16:24'),
+(75, 'App\\Models\\User', 12, 'auth_token', 'a3eb22641c6fc277caf0274c2b6fb8ae466c4c509dd71324806a3e30cee9598d', '[\"*\"]', NULL, NULL, '2026-04-01 15:41:59', '2026-04-01 15:41:59'),
+(76, 'App\\Models\\User', 17, 'auth_token', 'da90638d8d813fa2d18f8ccfb29c5dd0f9048f757b44b2b687e46a56c4e2bf95', '[\"*\"]', '2026-04-09 11:26:07', NULL, '2026-04-09 07:50:51', '2026-04-09 11:26:07'),
+(77, 'App\\Models\\User', 17, 'auth_token', 'c559f376b1b29acbd2d1bfcb592d973e1565b3ff960cfd66dc9ddf7611fe5405', '[\"*\"]', NULL, NULL, '2026-04-09 11:26:10', '2026-04-09 11:26:10'),
+(78, 'App\\Models\\User', 17, 'auth_token', '639d0ae60ec05e2e14a196cb8afb0b7e7384c871cddd016c3f7f4d79e229d1b3', '[\"*\"]', NULL, NULL, '2026-04-09 14:53:04', '2026-04-09 14:53:04'),
+(79, 'App\\Models\\User', 17, 'auth_token', '88f596857c323c5da3d555f74281a044f35129cdd304c3424eca519a842c8c12', '[\"*\"]', NULL, NULL, '2026-04-09 14:53:15', '2026-04-09 14:53:15'),
+(80, 'App\\Models\\User', 17, 'auth_token', '064b463f9cbd647f95d7e7cd6e8b78c5f89714cd9bc6e34cde102c8bfd04d194', '[\"*\"]', NULL, NULL, '2026-04-09 15:11:40', '2026-04-09 15:11:40'),
+(81, 'App\\Models\\User', 18, 'auth_token', '7d69106bc5d0a319889fa301f5ea682797ab3df4722edbe9b8b9876c7b3ea7e1', '[\"*\"]', NULL, NULL, '2026-04-09 15:48:04', '2026-04-09 15:48:04'),
+(82, 'App\\Models\\User', 18, 'auth_token', '6e9b465e227ef8014fdafbeaf826b6a66664091ae10ea780d04929caf98e8019', '[\"*\"]', NULL, NULL, '2026-04-09 15:50:10', '2026-04-09 15:50:10'),
+(83, 'App\\Models\\User', 18, 'auth_token', '140b0c693fb7f4a44c7af0e7c2df27f8bab1938a3da9be028676436c0993a2ae', '[\"*\"]', NULL, NULL, '2026-04-09 15:52:34', '2026-04-09 15:52:34'),
+(84, 'App\\Models\\User', 18, 'auth_token', '2ca0702b5c0c096b0903db98d2587b979f491e8b5cef6a9b8bca817b149253e4', '[\"*\"]', NULL, NULL, '2026-04-09 15:52:36', '2026-04-09 15:52:36'),
+(85, 'App\\Models\\User', 12, 'auth_token', '4c0389bb18361f2e31c5edc42cb9edece0242b0dceb5235f4fb0cfe2c0395b52', '[\"*\"]', NULL, NULL, '2026-04-09 15:54:21', '2026-04-09 15:54:21'),
+(86, 'App\\Models\\User', 12, 'auth_token', 'f713ce6b5d10f3b1b0c9930da26b36a3473ff091e25e497886f20fea271aff8a', '[\"*\"]', NULL, NULL, '2026-04-09 15:54:30', '2026-04-09 15:54:30'),
+(87, 'App\\Models\\User', 12, 'auth_token', '6f63746ef7f2058c30a57b5df8e41c8ec5f4147f019b54c9bf1caa69e84da6e9', '[\"*\"]', NULL, NULL, '2026-04-09 15:56:48', '2026-04-09 15:56:48'),
+(88, 'App\\Models\\User', 12, 'auth_token', '4c8782c1ab73b494f7721606009da2d5a65f3c195497dcb74a23fa335b664fba', '[\"*\"]', NULL, NULL, '2026-04-09 15:59:20', '2026-04-09 15:59:20'),
+(89, 'App\\Models\\User', 12, 'auth_token', 'aa0d071bc9153b71109f35cc4e2603053fcbb04e2c587fb17a54ee2b4674466e', '[\"*\"]', '2026-04-09 16:58:05', NULL, '2026-04-09 16:08:09', '2026-04-09 16:58:05'),
+(91, 'App\\Models\\User', 12, 'auth_token', '20e236184f08eb7f8cc52138b53ef9d423b25133e1b2de71f8c6f12d954bb10f', '[\"*\"]', '2026-04-09 22:51:08', NULL, '2026-04-09 22:50:05', '2026-04-09 22:51:08'),
+(92, 'App\\Models\\User', 17, 'auth_token', 'b411da40ec85addca291e027a5feb1fd5272d017e39e98a06b9795ed91a2a3a2', '[\"*\"]', '2026-04-10 00:51:25', NULL, '2026-04-09 22:51:42', '2026-04-10 00:51:25'),
+(95, 'App\\Models\\User', 12, 'auth_token', 'dcd532f5ebb2b1186eca750e25aeba3d615577c2f4906478d8740924f045da44', '[\"*\"]', '2026-04-10 01:16:40', NULL, '2026-04-10 01:13:03', '2026-04-10 01:16:40'),
+(97, 'App\\Models\\User', 17, 'auth_token', '02de5f5444d04c03c74aca5dbe1fdddcfc674936f93802abbee8b82097f4963d', '[\"*\"]', '2026-04-10 01:59:45', NULL, '2026-04-10 01:30:08', '2026-04-10 01:59:45');
 
 -- --------------------------------------------------------
 
@@ -460,24 +548,23 @@ INSERT INTO `rooms` (`id`, `parent_id`, `room_number`, `floor`, `title`, `locati
 (5, 5, NULL, NULL, 'Nhật Thực', 'Quận Liên Chiểu, Đà Nẵng', 'room', 'private_room', 120000.00, 2, 1, NULL, 'available', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
 (6, 4, NULL, NULL, 'Mộng Mơ Room', 'Quận Cẩm Lệ, Đà Nẵng', 'room', 'private_room', 150000.00, 2, 1, NULL, 'available', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
 (7, NULL, NULL, NULL, 'Mơ Màng Room', 'Quận Thanh Khê, Đà Nẵng', 'room', 'home', 150000.00, 2, 1, NULL, 'available', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
-(8, NULL, NULL, NULL, 'Mộng Mị Room', 'Quận Hải Châu, Đà Nẵng', 'room', 'home', 200000.00, 2, 1, NULL, 'available', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
-(9, NULL, NULL, NULL, 'Yên Tĩnh Room', 'Quận Sơn Trà, Đà Nẵng', 'room', 'home', 170000.00, 2, 1, NULL, 'available', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
-(11, NULL, NULL, NULL, 'Mùa Thu Room', 'Quận Hải Châu, Đà Nẵng', 'room', 'home', 200000.00, 2, 1, NULL, 'available', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
-(12, NULL, NULL, NULL, 'Đông Chí Room', 'Quận Liên Chiểu, Đà Nẵng', 'room', 'home', 160000.00, 2, 1, NULL, 'booked', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
+(8, NULL, NULL, NULL, 'Mộng Mị Room', 'Quận Hải Châu, Đà Nẵng', 'room', 'home', 200000.00, 2, 1, NULL, 'booked', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
+(9, NULL, NULL, NULL, 'Yên Tĩnh Room', 'Quận Sơn Trà, Đà Nẵng', 'room', 'home', 170000.00, 2, 1, NULL, 'in_use', 'occupied', 1, '2026-03-19 04:03:14', 12, NULL, NULL, NULL),
+(11, NULL, NULL, NULL, 'Mùa Thu Room', 'Quận Hải Châu, Đà Nẵng', 'room', 'home', 200000.00, 2, 1, NULL, 'booked', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
+(12, NULL, NULL, NULL, 'Đông Chí Room', 'Quận Liên Chiểu, Đà Nẵng', 'room', 'home', 160000.00, 2, 1, NULL, 'in_use', 'occupied', 1, '2026-03-19 04:03:14', 12, NULL, NULL, NULL),
 (13, NULL, NULL, NULL, 'Bình Yên Room', 'Quận Ngũ Hành Sơn, Đà Nẵng', 'room', 'home', 170000.00, 2, 1, NULL, 'booked', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
 (23, NULL, NULL, NULL, 'The Coastal Sanctuary', '93 Võ Nguyên Giáp , Mân Thái , Sơn Trà, Đà Nẵng', 'house', 'whole_house', 3500000.00, 15, 5, 'Chỗ ở\r\n🌿 Kết nối lại, thư giãn và trẻ hóa – Một hơi thở không khí trong lành\r\n\r\n★ Tại sao nên chọn khu nghỉ dưỡng riêng của chúng tôi thay vì một khu nghỉ dưỡng đông đúc?\r\nHãy tưởng tượng bạn thức dậy với âm thanh nhẹ nhàng của đại dương, bước ra ngoài để tập yoga riêng bên hồ bơi và biết rằng con bạn đang chơi an toàn chỉ cách đó vài bước chân. Tại một khu nghỉ dưỡng lớn, bạn chia sẻ những khoảnh khắc này với hàng trăm người lạ. Ở đây, nép mình tuyệt đẹp giữa bãi biển Cửa Đại và sông Thu Bồn, toàn bộ khu bảo tồn hiện đại này là của bạn 100%.\r\nChúng tôi hiểu rằng việc tìm kiếm một không gian vừa phục vụ cho sự nghỉ ngơi yên tĩnh của ông bà vừa phù hợp với năng lượng vui tươi của trẻ em là điều hiếm có. Đó là lý do tại sao chúng tôi tuyển chọn biệt thự này như một trải nghiệm được quản lý toàn diện, dễ dàng.', 'available', 'available', 1, '2026-03-18 16:27:58', NULL, NULL, NULL, NULL),
 (24, NULL, NULL, NULL, 'Furama', 'Furama Resort Danang,105 Võ Nguyên Giáp, Mỹ An, Ngũ Hành Sơn, Đà Nẵng', 'house', 'whole_house', 4000000.00, 10, 2, 'Homestay thuộc khu nghỉ dưỡng Furama Resort 5 sao, ở trung tâm thành phố Đà Nẵng và có bãi biển riêng, tầm nhìn ra biển, yên tĩnh và công viên.\r\n* Khanh Villa nằm trong chuỗi Furama Villas Đà Nẵng - một khu phức hợp nghỉ dưỡng với các Homestay riêng 5 sao, đẳng cấp, mang đến những khoảnh khắc tuyệt vời.', 'available', 'available', 1, '2026-03-18 16:41:34', NULL, NULL, NULL, NULL),
-(25, NULL, NULL, NULL, 'SONG CAT', '26 Nước Mặn 1 ,Khuê Mỹ, Ngũ Hành Sơn, Đà Nẵng', 'house', 'whole_house', 2800000.00, 10, 6, 'SONG CAT Homestay nằm ở khu vực Ngũ Hành Sơn của Đà Nẵng, cách Bãi biển Mỹ An 1,9 km, cách Bãi biển Mỹ Khê 1,9 km và cách Công viên Châu Á Đà Nẵng 3,4 km. Homestay này cách Ngũ Hành Sơn 5,1 km và cầu Sông Hàn 6 km.\r\n\r\nCầu Love Lock Đà Nẵng cách biệt thự 4,2 km, trong khi Bảo tàng Chăm cách 4,8 km. Sân bay gần nhất là Sân bay Quốc tế Đà Nẵng, cách Homestay SONG CAT 8 km.', 'available', 'available', 1, '2026-03-18 16:52:42', NULL, NULL, NULL, NULL),
+(25, NULL, NULL, NULL, 'SONG CAT', '26 Nước Mặn 1 ,Khuê Mỹ, Ngũ Hành Sơn, Đà Nẵng', 'house', 'whole_house', 2800000.00, 10, 6, 'SONG CAT Homestay nằm ở khu vực Ngũ Hành Sơn của Đà Nẵng, cách Bãi biển Mỹ An 1,9 km, cách Bãi biển Mỹ Khê 1,9 km và cách Công viên Châu Á Đà Nẵng 3,4 km. Homestay này cách Ngũ Hành Sơn 5,1 km và cầu Sông Hàn 6 km.\r\n\r\nCầu Love Lock Đà Nẵng cách biệt thự 4,2 km, trong khi Bảo tàng Chăm cách 4,8 km. Sân bay gần nhất là Sân bay Quốc tế Đà Nẵng, cách Homestay SONG CAT 8 km.', 'available', 'dirty', 1, '2026-03-18 16:52:42', 12, NULL, NULL, NULL),
 (26, NULL, NULL, NULL, 'Hiếu Homestay', 'Phước Trường 7, An Hải, Sơn Trà, Đà Nẵng', 'house', 'room_based', 0.00, 20, 0, NULL, 'available', 'available', 1, '2026-03-18 16:58:18', NULL, NULL, NULL, NULL),
-(27, 26, NULL, NULL, 'Phòng 101', 'Phước Trường 7, An Hải, Sơn Trà, Đà Nẵng', 'room', 'private_room', 350000.00, 2, 1, 'Vị trí lý tưởng – Gần biển, gần thiên nhiên\r\nHomestay toạ lạc trong một khu phố yên tĩnh – nơi bạn có thể tận hưởng không khí trong lành, cảnh quan xanh mát và chỉ mất vài phút đi bộ để đến bãi biển thơ mộng. Hãy bắt đầu buổi sáng bằng cách dạo biển, tham gia phiên chợ hải sản địa phương, hoặc đơn giản là thả mình trên cát và nghe tiếng sóng vỗ.', 'available', 'available', 1, '2026-03-18 17:02:26', NULL, NULL, NULL, NULL),
-(28, 26, NULL, NULL, 'Phòng 102', 'Phước Trường 7, An Hải, Sơn Trà, Đà Nẵng', 'room', 'private_room', 350000.00, 2, 1, 'Vị trí lý tưởng – Gần biển, gần thiên nhiên\r\nHomestay toạ lạc trong một khu phố yên tĩnh – nơi bạn có thể tận hưởng không khí trong lành, cảnh quan xanh mát và chỉ mất vài phút đi bộ để đến bãi biển thơ mộng. Hãy bắt đầu buổi sáng bằng cách dạo biển, tham gia phiên chợ hải sản địa phương, hoặc đơn giản là thả mình trên cát và nghe tiếng sóng vỗ.', 'available', 'available', 1, '2026-03-18 17:05:14', NULL, NULL, NULL, NULL),
-(29, 26, NULL, NULL, 'Phòng 103', 'Phước Trường 7, An Hải, Sơn Trà, Đà Nẵng', 'room', 'private_room', 450000.00, 4, 2, 'Vị trí lý tưởng – Gần biển, gần thiên nhiên\r\nHomestay toạ lạc trong một khu phố yên tĩnh – nơi bạn có thể tận hưởng không khí trong lành, cảnh quan xanh mát và chỉ mất vài phút đi bộ để đến bãi biển thơ mộng. Hãy bắt đầu buổi sáng bằng cách dạo biển, tham gia phiên chợ hải sản địa phương, hoặc đơn giản là thả mình trên cát và nghe tiếng sóng vỗ.', 'available', 'available', 1, '2026-03-18 17:07:20', NULL, NULL, NULL, NULL),
+(27, 26, NULL, NULL, 'Phòng 101', 'Phước Trường 7, An Hải, Sơn Trà, Đà Nẵng', 'room', 'private_room', 350000.00, 2, 1, 'Vị trí lý tưởng – Gần biển, gần thiên nhiên\r\nHomestay toạ lạc trong một khu phố yên tĩnh – nơi bạn có thể tận hưởng không khí trong lành, cảnh quan xanh mát và chỉ mất vài phút đi bộ để đến bãi biển thơ mộng. Hãy bắt đầu buổi sáng bằng cách dạo biển, tham gia phiên chợ hải sản địa phương, hoặc đơn giản là thả mình trên cát và nghe tiếng sóng vỗ.', 'booked', 'available', 1, '2026-03-18 17:02:26', NULL, NULL, NULL, NULL),
+(28, 26, NULL, NULL, 'Phòng 102', 'Phước Trường 7, An Hải, Sơn Trà, Đà Nẵng', 'room', 'private_room', 350000.00, 2, 1, 'Vị trí lý tưởng – Gần biển, gần thiên nhiên\r\nHomestay toạ lạc trong một khu phố yên tĩnh – nơi bạn có thể tận hưởng không khí trong lành, cảnh quan xanh mát và chỉ mất vài phút đi bộ để đến bãi biển thơ mộng. Hãy bắt đầu buổi sáng bằng cách dạo biển, tham gia phiên chợ hải sản địa phương, hoặc đơn giản là thả mình trên cát và nghe tiếng sóng vỗ.', 'in_use', 'occupied', 1, '2026-03-18 17:05:14', NULL, NULL, NULL, NULL),
+(29, 26, NULL, NULL, 'Phòng 103', 'Phước Trường 7, An Hải, Sơn Trà, Đà Nẵng', 'room', 'private_room', 450000.00, 4, 2, 'Vị trí lý tưởng – Gần biển, gần thiên nhiên\r\nHomestay toạ lạc trong một khu phố yên tĩnh – nơi bạn có thể tận hưởng không khí trong lành, cảnh quan xanh mát và chỉ mất vài phút đi bộ để đến bãi biển thơ mộng. Hãy bắt đầu buổi sáng bằng cách dạo biển, tham gia phiên chợ hải sản địa phương, hoặc đơn giản là thả mình trên cát và nghe tiếng sóng vỗ.', 'booked', 'available', 1, '2026-03-18 17:07:20', NULL, NULL, NULL, NULL),
 (30, NULL, NULL, NULL, 'Oristay', 'Oristay House Đà Nẵng, Hoàng Văn Thụ, Phước Ninh, Hải Châu, Đà Nẵng', 'room', 'home', 3000000.00, 4, 4, 'Homestay 🌿 này có 02 tầng riêng biệt. thiết kế đơn giản, ấm cúng. Khu vực xung quanh yên tĩnh, ngay trung tâm thành phố mang đến bầu không khí yên bình và dễ chịu. Tôi tin rằng khi bạn mới đến, bạn sẽ cảm thấy như đây thực sự là một nơi thoải mái và nhẹ nhàng để thư giãn.\r\n\r\n👨‍👩‍👦‍👦 Đó là một lựa chọn lý tưởng cho một nhóm bạn thân hoặc một gia đình nhỏ đang tìm kiếm một không gian riêng tư, thoải mái và ấm cúng để nghỉ ngơi, tụ tập hoặc chỉ đơn giản là tận hưởng thời gian chất lượng bên nhau. Với bố cục các phòng ngủ riêng biệt và khu vực chung rộng rãi, mọi người đều có thể tận hưởng cả sự riêng tư và kết nối.', 'available', 'available', 1, '2026-03-18 17:23:10', NULL, NULL, NULL, NULL),
 (31, NULL, NULL, NULL, 'A Little Hoi An Homestay', 'Furama Resort Danang,50 Võ Nguyên Giáp, Mỹ An, Ngũ Hành Sơn, Đà Nẵng', 'house', 'room_based', 0.00, 20, 0, NULL, 'available', 'available', 1, '2026-03-18 17:36:54', NULL, NULL, NULL, NULL),
-(32, 31, NULL, NULL, 'Phòng 101', 'Furama Resort Danang,50 Võ Nguyên Giáp, Mỹ An, Ngũ Hành Sơn, Đà Nẵng', 'room', 'private_room', 450000.00, 2, 1, 'Nằm trên bờ Sông Hoài, Little Hoi An Boutique Hotel & Spa cách Bãi biển Cửa Đại 4 km. Với Wi-Fi miễn phí, khách sạn này còn có hồ bơi ngoài trời cũng như tiệm làm tóc và làm đẹp cung cấp đầy đủ các liệu pháp spa.\r\n\r\nKhách có thể sử dụng đàn piano ở sảnh đợi. Ngoài ra, khách cũng có thể thư giãn cạnh quầy bar bên hồ bơi, tập thể dục tại trung tâm thể dục hay học cách nấu các món ăn Việt Nam chính thống. Nhân viên tại lễ tân 24 giờ có thể hỗ trợ khách các dịch vụ giặt là/ủi và dịch vụ phòng.\r\n\r\nCác phòng gắn máy điều hòa có sàn gỗ và được trang bị TV màn hình phẳng, bàn làm việc, minibar cũng như tiện nghi pha trà/cà phê. Phòng tắm riêng đi kèm góc tắm vòi sen mở và đồ vệ sinh cá nhân miễn phí.', 'available', 'available', 1, '2026-03-18 17:40:09', NULL, NULL, NULL, NULL),
-(33, 31, NULL, NULL, 'Phòng 102', 'Furama Resort Danang,50 Võ Nguyên Giáp, Mỹ An, Ngũ Hành Sơn, Đà Nẵng', 'room', 'private_room', 500000.00, 4, 2, 'Nằm trên bờ Sông Hoài, Little Hoi An Boutique Hotel & Spa cách Bãi biển Cửa Đại 4 km. Với Wi-Fi miễn phí, khách sạn này còn có hồ bơi ngoài trời cũng như tiệm làm tóc và làm đẹp cung cấp đầy đủ các liệu pháp spa.\r\n\r\nKhách có thể sử dụng đàn piano ở sảnh đợi. Ngoài ra, khách cũng có thể thư giãn cạnh quầy bar bên hồ bơi, tập thể dục tại trung tâm thể dục hay học cách nấu các món ăn Việt Nam chính thống. Nhân viên tại lễ tân 24 giờ có thể hỗ trợ khách các dịch vụ giặt là/ủi và dịch vụ phòng.\r\n\r\nCác phòng gắn máy điều hòa có sàn gỗ và được trang bị TV màn hình phẳng, bàn làm việc, minibar cũng như tiện nghi pha trà/cà phê. Phòng tắm riêng đi kèm góc tắm vòi sen mở và đồ vệ sinh cá nhân miễn phí.', 'in_use', 'occupied', 1, '2026-03-18 17:41:11', 12, NULL, NULL, NULL),
-(34, 31, NULL, NULL, 'Phòng 103', 'Furama Resort Danang,50 Võ Nguyên Giáp, Mỹ An, Ngũ Hành Sơn, Đà Nẵng', 'room', 'private_room', 350000.00, 2, 1, 'Nằm trên bờ Sông Hoài, Little Hoi An Boutique Hotel & Spa cách Bãi biển Cửa Đại 4 km. Với Wi-Fi miễn phí, khách sạn này còn có hồ bơi ngoài trời cũng như tiệm làm tóc và làm đẹp cung cấp đầy đủ các liệu pháp spa.\r\n\r\nKhách có thể sử dụng đàn piano ở sảnh đợi. Ngoài ra, khách cũng có thể thư giãn cạnh quầy bar bên hồ bơi, tập thể dục tại trung tâm thể dục hay học cách nấu các món ăn Việt Nam chính thống. Nhân viên tại lễ tân 24 giờ có thể hỗ trợ khách các dịch vụ giặt là/ủi và dịch vụ phòng.\r\n\r\nCác phòng gắn máy điều hòa có sàn gỗ và được trang bị TV màn hình phẳng, bàn làm việc, minibar cũng như tiện nghi pha trà/cà phê. Phòng tắm riêng đi kèm góc tắm vòi sen mở và đồ vệ sinh cá nhân miễn phí.', 'available', 'dirty', 1, '2026-03-18 17:42:42', 12, NULL, NULL, NULL),
-(35, NULL, NULL, NULL, 'NC Haven Homestay', '21/6/5 Trần Đình Đàn, An Hải, Sơn Trà, Đà Nẵng', 'room', 'home', 2000000.00, 6, 4, '✨Đây không chỉ là một Homestay cho thuê, đây là \"ngôi nhà thứ hai\" của bạn được kiến tạo từ sự tận tâm, nơi mỗi góc nhỏ đều kể một câu chuyện về sự thư giãn và phong cách sống hiện đại. NC Haven Homestay là sự kết hợp hoàn hảo giữa thiết kế sang trọng và cảm giác ấm cúng như gia đình.✨\r\nChỗ ở\r\n🏡 NC Haven Homestay: Homestay 4 Tầng, Nâng Tầm Kỳ Nghỉ Đà Nẵng Của Bạn 💎\r\n\r\n🪴 Với phong cách Wabi-Sabi là triết lý thẩm mỹ tôn vinh vẻ đẹp của sự không hoàn hảo, tính vô thường và sự khiêm nhường. Phong cách này tập trung vào tính chân thật, đơn giản và dấu vết của thời gian.\r\n\r\nĐặc trưng là sử dụng màu sắc đất, trung tính, các vật liệu thô mộc tự nhiên (gỗ chưa xử lý, đất sét, vải lanh), cùng đổ vật có khiếm khuyết. Mục đích là tạo nên không gian yên bình, tối giản, và sâu lắng, chấp nhận sự không hoàn chỉnh.\r\n\r\n🍃 NC Haven Homestay – chốn nghỉ dưỡng lý tưởng, nơi kiến trúc hiện đại, sang trọng hòa quyện cùng sự tiện nghi tuyệt đối, được thổi hồn bởi đội ngũ kiến trúc sư uy tín hàng đầu Đà Nẵng.', 'available', 'dirty', 1, '2026-03-18 17:53:11', 12, NULL, NULL, NULL);
+(32, 31, NULL, NULL, 'Phòng 101', 'Furama Resort Danang,50 Võ Nguyên Giáp, Mỹ An, Ngũ Hành Sơn, Đà Nẵng', 'room', 'private_room', 450000.00, 2, 1, 'Nằm trên bờ Sông Hoài, Little Hoi An Boutique Hotel & Spa cách Bãi biển Cửa Đại 4 km. Với Wi-Fi miễn phí, khách sạn này còn có hồ bơi ngoài trời cũng như tiệm làm tóc và làm đẹp cung cấp đầy đủ các liệu pháp spa.\r\n\r\nKhách có thể sử dụng đàn piano ở sảnh đợi. Ngoài ra, khách cũng có thể thư giãn cạnh quầy bar bên hồ bơi, tập thể dục tại trung tâm thể dục hay học cách nấu các món ăn Việt Nam chính thống. Nhân viên tại lễ tân 24 giờ có thể hỗ trợ khách các dịch vụ giặt là/ủi và dịch vụ phòng.\r\n\r\nCác phòng gắn máy điều hòa có sàn gỗ và được trang bị TV màn hình phẳng, bàn làm việc, minibar cũng như tiện nghi pha trà/cà phê. Phòng tắm riêng đi kèm góc tắm vòi sen mở và đồ vệ sinh cá nhân miễn phí.', 'booked', 'available', 1, '2026-03-18 17:40:09', NULL, NULL, NULL, NULL),
+(33, 31, NULL, NULL, 'Phòng 102', 'Furama Resort Danang,50 Võ Nguyên Giáp, Mỹ An, Ngũ Hành Sơn, Đà Nẵng', 'room', 'private_room', 500000.00, 4, 2, 'Nằm trên bờ Sông Hoài, Little Hoi An Boutique Hotel & Spa cách Bãi biển Cửa Đại 4 km. Với Wi-Fi miễn phí, khách sạn này còn có hồ bơi ngoài trời cũng như tiệm làm tóc và làm đẹp cung cấp đầy đủ các liệu pháp spa.\r\n\r\nKhách có thể sử dụng đàn piano ở sảnh đợi. Ngoài ra, khách cũng có thể thư giãn cạnh quầy bar bên hồ bơi, tập thể dục tại trung tâm thể dục hay học cách nấu các món ăn Việt Nam chính thống. Nhân viên tại lễ tân 24 giờ có thể hỗ trợ khách các dịch vụ giặt là/ủi và dịch vụ phòng.\r\n\r\nCác phòng gắn máy điều hòa có sàn gỗ và được trang bị TV màn hình phẳng, bàn làm việc, minibar cũng như tiện nghi pha trà/cà phê. Phòng tắm riêng đi kèm góc tắm vòi sen mở và đồ vệ sinh cá nhân miễn phí.', 'maintenance', 'dirty', 1, '2026-03-18 17:41:11', 12, NULL, NULL, NULL),
+(34, 31, NULL, NULL, 'Phòng 103', 'Furama Resort Danang,50 Võ Nguyên Giáp, Mỹ An, Ngũ Hành Sơn, Đà Nẵng', 'room', 'private_room', 350000.00, 2, 1, 'Nằm trên bờ Sông Hoài, Little Hoi An Boutique Hotel & Spa cách Bãi biển Cửa Đại 4 km. Với Wi-Fi miễn phí, khách sạn này còn có hồ bơi ngoài trời cũng như tiệm làm tóc và làm đẹp cung cấp đầy đủ các liệu pháp spa.\r\n\r\nKhách có thể sử dụng đàn piano ở sảnh đợi. Ngoài ra, khách cũng có thể thư giãn cạnh quầy bar bên hồ bơi, tập thể dục tại trung tâm thể dục hay học cách nấu các món ăn Việt Nam chính thống. Nhân viên tại lễ tân 24 giờ có thể hỗ trợ khách các dịch vụ giặt là/ủi và dịch vụ phòng.\r\n\r\nCác phòng gắn máy điều hòa có sàn gỗ và được trang bị TV màn hình phẳng, bàn làm việc, minibar cũng như tiện nghi pha trà/cà phê. Phòng tắm riêng đi kèm góc tắm vòi sen mở và đồ vệ sinh cá nhân miễn phí.', 'booked', 'dirty', 1, '2026-03-18 17:42:42', 12, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -721,6 +808,9 @@ CREATE TABLE `users` (
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `role` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'customer',
   `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `points` int NOT NULL DEFAULT '0',
+  `referral_code` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `referred_by_id` bigint UNSIGNED DEFAULT NULL,
   `phone` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -733,13 +823,77 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `role`, `status`, `phone`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(9, 'votronghieu1', 'tronghieuvo9@gmail.com', 'customer', 'active', '0906123931', NULL, '$2y$10$dJi7w3tzWfOIhT/U/kFjaeH35x.E1mBNt9696UisqLztctVQkfKx.', NULL, '2026-03-09 04:21:29', '2026-03-09 10:35:00'),
-(12, 'admin', 'admin@gmail.com', 'admin', 'active', '1', NULL, '$2y$10$9VuzbFvDsHTLldawJA5SoucTImooB9VsjISTMpUmeyt/wYrQ/U0Z6', NULL, '2026-03-09 04:46:24', '2026-03-09 04:46:24'),
-(13, 'votrong', 'tronghieuvo@gmail.com', 'customer', 'active', '0906123933', NULL, '$2y$10$lFOqdvuPcxxMfhziWSIqNOW40LcnaRb4GoOt6ggrCneK1wzUP6EOa', NULL, '2026-03-09 04:47:47', '2026-03-09 10:34:16'),
-(14, 'anh ngu', 'anh@gmail.com', 'customer', 'active', '0906123333', NULL, '$2y$10$.VidHnEsUZhC4LiuP7qFcO3rWYBjYjjooNxF85AUYJ02m2kw9Rs0C', NULL, '2026-03-11 06:13:35', '2026-03-11 06:14:01'),
-(15, 'Lan Anh', 'volananh2k4@gmail.com', 'customer', 'active', '0945999305', NULL, '$2y$10$OP9qeiy8GykRTZj8PUs4YevbDc6otBLYZauesw3sLl.VqTkNRMDOq', NULL, '2026-03-11 07:55:59', '2026-03-11 08:23:00'),
-(16, 'pham duy', 'duy@gmail.com', 'customer', 'active', '0935824455', NULL, '$2y$10$F4auRGeC/e4IWKaMNkVCWut5b2C/.JqJPfhoL1J0fiZAuEiiD6dBO', NULL, '2026-03-15 09:27:20', '2026-03-15 09:27:20');
+INSERT INTO `users` (`id`, `name`, `email`, `role`, `status`, `points`, `referral_code`, `referred_by_id`, `phone`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
+(9, 'votronghieu1', 'tronghieuvo9@gmail.com', 'customer', 'active', 10, NULL, NULL, '0906123931', NULL, '$2y$10$dJi7w3tzWfOIhT/U/kFjaeH35x.E1mBNt9696UisqLztctVQkfKx.', NULL, '2026-03-09 04:21:29', '2026-04-09 07:50:26'),
+(12, 'admin', 'admin@gmail.com', 'admin', 'active', 38, NULL, NULL, '1', NULL, '$2y$10$9VuzbFvDsHTLldawJA5SoucTImooB9VsjISTMpUmeyt/wYrQ/U0Z6', NULL, '2026-03-09 04:46:24', '2026-04-10 01:11:22'),
+(13, 'votrong', 'tronghieuvo@gmail.com', 'customer', 'active', 0, NULL, NULL, '0906123933', NULL, '$2y$10$lFOqdvuPcxxMfhziWSIqNOW40LcnaRb4GoOt6ggrCneK1wzUP6EOa', NULL, '2026-03-09 04:47:47', '2026-03-09 10:34:16'),
+(14, 'lan anh', 'anh@gmail.com', 'customer', 'active', 0, NULL, NULL, '0906123333', NULL, '$2y$10$.VidHnEsUZhC4LiuP7qFcO3rWYBjYjjooNxF85AUYJ02m2kw9Rs0C', NULL, '2026-03-11 06:13:35', '2026-03-20 03:11:28'),
+(15, 'Lan Anh', 'volananh2k4@gmail.com', 'customer', 'active', 0, NULL, NULL, '0945999305', NULL, '$2y$10$OP9qeiy8GykRTZj8PUs4YevbDc6otBLYZauesw3sLl.VqTkNRMDOq', NULL, '2026-03-11 07:55:59', '2026-03-11 08:23:00'),
+(16, 'pham duy', 'duy@gmail.com', 'customer', 'active', 0, NULL, NULL, '0935824455', NULL, '$2y$10$F4auRGeC/e4IWKaMNkVCWut5b2C/.JqJPfhoL1J0fiZAuEiiD6dBO', NULL, '2026-03-15 09:27:20', '2026-03-15 09:27:20'),
+(17, 'Ngô Đức Nhân', 'ngodnhan9981@gmail.com', 'customer', 'active', 13, 'EXIPDNFS', 9, '0854892319', NULL, '$2y$10$fcTeDiramILOwo3MaMMWlOKEhybFkuvjUiUZ1pl98M7IeKBNWO39O', NULL, '2026-04-09 07:50:26', '2026-04-10 01:54:09'),
+(18, 'Ngo Nhan', 'ngodnnhan9981@gmail.com', 'customer', 'active', 0, 'YDRVYH6V', NULL, '0987654321', NULL, '$2y$10$bH5Apg1.JeJUQqCGAp0KEuTD8NEQxxVccGBS7QDOyaZLKSW2QIXo6', NULL, '2026-04-09 15:46:23', '2026-04-09 15:46:23');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_vouchers`
+--
+
+CREATE TABLE `user_vouchers` (
+  `id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `voucher_id` bigint UNSIGNED NOT NULL,
+  `is_used` tinyint(1) NOT NULL DEFAULT '0',
+  `used_at` datetime DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `user_vouchers`
+--
+
+INSERT INTO `user_vouchers` (`id`, `user_id`, `voucher_id`, `is_used`, `used_at`, `created_at`, `updated_at`) VALUES
+(1, 17, 2, 1, '2026-04-10 01:19:42', '2026-04-09 07:50:26', '2026-04-09 18:19:42'),
+(2, 17, 3, 0, NULL, '2026-04-09 07:50:26', '2026-04-09 07:50:26'),
+(3, 17, 4, 0, NULL, '2026-04-09 07:51:07', '2026-04-09 07:51:07'),
+(4, 17, 5, 0, NULL, '2026-04-09 07:51:21', '2026-04-09 07:51:21'),
+(5, 17, 6, 0, NULL, '2026-04-09 07:51:32', '2026-04-09 07:51:32'),
+(6, 18, 2, 0, NULL, '2026-04-09 15:46:23', '2026-04-09 15:46:23');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `vouchers`
+--
+
+CREATE TABLE `vouchers` (
+  `id` bigint UNSIGNED NOT NULL,
+  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `points_required` int DEFAULT NULL,
+  `discount_type` enum('percent','fixed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'percent',
+  `discount_value` decimal(15,0) NOT NULL,
+  `expires_at` datetime DEFAULT NULL,
+  `max_uses` int UNSIGNED DEFAULT NULL,
+  `used_count` int UNSIGNED NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `vouchers`
+--
+
+INSERT INTO `vouchers` (`id`, `code`, `title`, `description`, `points_required`, `discount_type`, `discount_value`, `expires_at`, `max_uses`, `used_count`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 'SUM26', NULL, NULL, NULL, 'percent', 10, '2026-04-03 00:00:00', NULL, 0, 1, '2026-04-02 04:13:37', '2026-04-02 04:13:37'),
+(2, 'WELCOME100', 'Voucher Tân Thủ', 'Chào mừng bạn đến với hệ thống! Giảm ngay 100K cho đơn hàng đầu tiên.', NULL, 'fixed', 100000, NULL, NULL, 0, 1, '2026-04-09 07:44:39', '2026-04-09 07:44:39'),
+(3, 'REF50', 'Voucher Bạn Bè', 'Ưu đãi dành cho khách hàng được giới thiệu. Giảm 50K.', NULL, 'fixed', 50000, NULL, NULL, 0, 1, '2026-04-09 07:44:39', '2026-04-09 07:44:39'),
+(4, 'HE2024', 'Chào Hè 2024', 'Ưu đãi mùa hè rực rỡ. Giảm 15% tổng hóa đơn.', NULL, 'percent', 15, NULL, NULL, 0, 1, '2026-04-09 07:44:39', '2026-04-09 07:44:39'),
+(5, 'REDEEM50', 'Voucher Đổi Thưởng 50K', 'Sử dụng 10 điểm để đổi voucher này.', 10, 'fixed', 50000, NULL, NULL, 0, 1, '2026-04-09 07:44:39', '2026-04-09 07:44:39'),
+(6, 'REDEEM100', 'Voucher Đổi Thưởng 100K', 'Sử dụng 18 điểm để đổi voucher này.', 18, 'fixed', 100000, '2026-04-10 00:00:00', 7, 0, 1, '2026-04-09 07:44:39', '2026-04-09 16:25:46');
 
 --
 -- Indexes for dumped tables
@@ -757,7 +911,8 @@ ALTER TABLE `amenities`
 ALTER TABLE `bookings`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `bookings_booking_code_unique` (`booking_code`),
-  ADD KEY `bookings_customer_id_foreign` (`customer_id`);
+  ADD KEY `bookings_customer_id_foreign` (`customer_id`),
+  ADD KEY `bookings_voucher_id_foreign` (`voucher_id`);
 
 --
 -- Indexes for table `booking_activities`
@@ -801,6 +956,13 @@ ALTER TABLE `jobs`
 --
 ALTER TABLE `migrations`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `notifications_notifiable_type_notifiable_id_index` (`notifiable_type`,`notifiable_id`);
 
 --
 -- Indexes for table `password_resets`
@@ -849,7 +1011,24 @@ ALTER TABLE `room_images`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `users_email_unique` (`email`);
+  ADD UNIQUE KEY `users_email_unique` (`email`),
+  ADD UNIQUE KEY `users_referral_code_unique` (`referral_code`),
+  ADD KEY `users_referred_by_id_foreign` (`referred_by_id`);
+
+--
+-- Indexes for table `user_vouchers`
+--
+ALTER TABLE `user_vouchers`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_vouchers_user_id_voucher_id_unique` (`user_id`,`voucher_id`),
+  ADD KEY `user_vouchers_voucher_id_foreign` (`voucher_id`);
+
+--
+-- Indexes for table `vouchers`
+--
+ALTER TABLE `vouchers`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `vouchers_code_unique` (`code`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -859,13 +1038,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `amenities`
 --
 ALTER TABLE `amenities`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `booking_activities`
@@ -877,13 +1056,13 @@ ALTER TABLE `booking_activities`
 -- AUTO_INCREMENT for table `booking_payments`
 --
 ALTER TABLE `booking_payments`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `booking_services`
 --
 ALTER TABLE `booking_services`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -901,13 +1080,13 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
 
 --
 -- AUTO_INCREMENT for table `reviews`
@@ -919,7 +1098,7 @@ ALTER TABLE `reviews`
 -- AUTO_INCREMENT for table `rooms`
 --
 ALTER TABLE `rooms`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `room_images`
@@ -931,7 +1110,19 @@ ALTER TABLE `room_images`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- AUTO_INCREMENT for table `user_vouchers`
+--
+ALTER TABLE `user_vouchers`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `vouchers`
+--
+ALTER TABLE `vouchers`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
@@ -941,7 +1132,8 @@ ALTER TABLE `users`
 -- Constraints for table `bookings`
 --
 ALTER TABLE `bookings`
-  ADD CONSTRAINT `bookings_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `bookings_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `bookings_voucher_id_foreign` FOREIGN KEY (`voucher_id`) REFERENCES `vouchers` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `booking_activities`
@@ -962,6 +1154,19 @@ ALTER TABLE `booking_payments`
 --
 ALTER TABLE `booking_services`
   ADD CONSTRAINT `booking_services_booking_id_foreign` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `users`
+--
+ALTER TABLE `users`
+  ADD CONSTRAINT `users_referred_by_id_foreign` FOREIGN KEY (`referred_by_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `user_vouchers`
+--
+ALTER TABLE `user_vouchers`
+  ADD CONSTRAINT `user_vouchers_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `user_vouchers_voucher_id_foreign` FOREIGN KEY (`voucher_id`) REFERENCES `vouchers` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
