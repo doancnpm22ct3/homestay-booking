@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 6.0.0-dev+20260305.a34bb65806
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Apr 14, 2026 at 01:46 PM
--- Server version: 8.4.3
--- PHP Version: 8.4.12
+-- Máy chủ: 127.0.0.1
+-- Thời gian đã tạo: Th4 14, 2026 lúc 06:16 PM
+-- Phiên bản máy phục vụ: 10.4.32-MariaDB
+-- Phiên bản PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,23 +18,23 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `homestay_booking`
+-- Cơ sở dữ liệu: `homestay_booking`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `amenities`
+-- Cấu trúc bảng cho bảng `amenities`
 --
 
 CREATE TABLE `amenities` (
-  `id` int NOT NULL,
-  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `icon` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `icon` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `amenities`
+-- Đang đổ dữ liệu cho bảng `amenities`
 --
 
 INSERT INTO `amenities` (`id`, `name`, `icon`) VALUES
@@ -52,55 +52,55 @@ INSERT INTO `amenities` (`id`, `name`, `icon`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `bookings`
+-- Cấu trúc bảng cho bảng `bookings`
 --
 
 CREATE TABLE `bookings` (
-  `id` bigint UNSIGNED NOT NULL,
-  `booking_code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `customer_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `customer_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `customer_phone` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `room_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `booking_code` varchar(255) NOT NULL,
+  `customer_name` varchar(255) NOT NULL,
+  `customer_email` varchar(255) NOT NULL,
+  `customer_phone` varchar(255) NOT NULL,
+  `room_name` varchar(255) NOT NULL,
   `total_price` decimal(15,2) NOT NULL,
   `deposit_amount` decimal(15,2) NOT NULL,
-  `payment_status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'deposited',
+  `payment_status` varchar(255) NOT NULL DEFAULT 'deposited',
   `paid_at` timestamp NULL DEFAULT NULL,
-  `payment_method` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'bank',
+  `payment_method` varchar(255) NOT NULL DEFAULT 'bank',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `customer_id` bigint UNSIGNED DEFAULT NULL,
-  `room_id` bigint UNSIGNED DEFAULT NULL,
+  `customer_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `room_id` bigint(20) UNSIGNED DEFAULT NULL,
   `check_in_date` date DEFAULT NULL,
   `check_out_date` date DEFAULT NULL,
   `check_in_time` time NOT NULL DEFAULT '14:00:00',
   `check_out_time` time NOT NULL DEFAULT '12:00:00',
-  `adults` tinyint UNSIGNED NOT NULL DEFAULT '1',
-  `children` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `status` enum('pending','confirmed','checked_in','checked_out','cancelled','no_show') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
-  `source` enum('website','booking_com','agoda','walkin','phone','other') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'website',
-  `subtotal` decimal(15,0) NOT NULL DEFAULT '0',
-  `discount_amount` decimal(15,0) NOT NULL DEFAULT '0',
-  `discount_type` enum('percent','fixed') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `discount_reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `total_amount` decimal(15,0) NOT NULL DEFAULT '0',
-  `paid_amount` decimal(15,0) NOT NULL DEFAULT '0',
-  `guest_note` text COLLATE utf8mb4_unicode_ci,
-  `internal_note` text COLLATE utf8mb4_unicode_ci,
-  `created_by` bigint UNSIGNED DEFAULT NULL,
-  `confirmed_by` bigint UNSIGNED DEFAULT NULL,
-  `checked_in_by` bigint UNSIGNED DEFAULT NULL,
-  `checked_out_by` bigint UNSIGNED DEFAULT NULL,
+  `adults` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
+  `children` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `status` enum('pending','confirmed','checked_in','checked_out','cancelled','no_show') NOT NULL DEFAULT 'pending',
+  `source` enum('website','booking_com','agoda','walkin','phone','other') NOT NULL DEFAULT 'website',
+  `subtotal` decimal(15,0) NOT NULL DEFAULT 0,
+  `discount_amount` decimal(15,0) NOT NULL DEFAULT 0,
+  `discount_type` enum('percent','fixed') DEFAULT NULL,
+  `discount_reason` varchar(255) DEFAULT NULL,
+  `total_amount` decimal(15,0) NOT NULL DEFAULT 0,
+  `paid_amount` decimal(15,0) NOT NULL DEFAULT 0,
+  `guest_note` text DEFAULT NULL,
+  `internal_note` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `confirmed_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `checked_in_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `checked_out_by` bigint(20) UNSIGNED DEFAULT NULL,
   `cancelled_at` timestamp NULL DEFAULT NULL,
-  `cancel_reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `refund_amount` decimal(15,0) NOT NULL DEFAULT '0',
-  `additional_fee` decimal(12,2) NOT NULL DEFAULT '0.00',
-  `additional_note` text COLLATE utf8mb4_unicode_ci,
-  `voucher_id` bigint UNSIGNED DEFAULT NULL
+  `cancel_reason` varchar(255) DEFAULT NULL,
+  `refund_amount` decimal(15,0) NOT NULL DEFAULT 0,
+  `additional_fee` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `additional_note` text DEFAULT NULL,
+  `voucher_id` bigint(20) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `bookings`
+-- Đang đổ dữ liệu cho bảng `bookings`
 --
 
 INSERT INTO `bookings` (`id`, `booking_code`, `customer_name`, `customer_email`, `customer_phone`, `room_name`, `total_price`, `deposit_amount`, `payment_status`, `paid_at`, `payment_method`, `created_at`, `updated_at`, `customer_id`, `room_id`, `check_in_date`, `check_out_date`, `check_in_time`, `check_out_time`, `adults`, `children`, `status`, `source`, `subtotal`, `discount_amount`, `discount_type`, `discount_reason`, `total_amount`, `paid_amount`, `guest_note`, `internal_note`, `created_by`, `confirmed_by`, `checked_in_by`, `checked_out_by`, `cancelled_at`, `cancel_reason`, `refund_amount`, `additional_fee`, `additional_note`, `voucher_id`) VALUES
@@ -133,28 +133,31 @@ INSERT INTO `bookings` (`id`, `booking_code`, `customer_name`, `customer_email`,
 (28, 'HD-69D84C07EDC09', 'admin', 'admin@gmail.com', '1', 'Yên Tĩnh Room', 340000.00, 102000.00, 'deposited', NULL, 'bank', '2026-04-10 01:01:59', '2026-04-10 01:15:51', 12, 9, '2026-04-10', '2026-04-12', '14:00:00', '12:00:00', 2, 1, 'checked_in', 'website', 340000, 0, NULL, NULL, 340000, 102000, NULL, NULL, NULL, NULL, 12, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
 (29, 'HD-69D84E3A556C4', 'admin', 'admin@gmail.com', '1', 'SONG CAT', 2800000.00, 840000.00, 'deposited', NULL, 'bank', '2026-04-10 01:11:22', '2026-04-10 01:28:16', 12, 25, '2026-04-10', '2026-04-11', '14:00:00', '12:00:00', 2, 0, 'checked_out', 'website', 2860000, 0, NULL, NULL, 2860000, 2860000, NULL, NULL, NULL, NULL, 12, 12, NULL, NULL, 0, 0.00, NULL, NULL),
 (30, 'HD-69D853EF01EB1', 'Ngô Đức Nhân', 'ngodnhan9981@gmail.com', '0854892319', 'Phòng 103', 450000.00, 135000.00, 'deposited', NULL, 'bank', '2026-04-10 01:35:43', '2026-04-10 01:35:43', 17, 29, '2026-04-11', '2026-04-12', '14:00:00', '12:00:00', 2, 0, 'pending', 'website', 450000, 0, NULL, NULL, 450000, 135000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
-(31, 'HD-69D85841363BD', 'Ngô Đức Nhân', 'ngodnhan9981@gmail.com', '0854892319', 'Mộng Mị Room', 200000.00, 60000.00, 'deposited', NULL, 'bank', '2026-04-10 01:54:09', '2026-04-10 01:54:09', 17, 8, '2026-04-14', '2026-04-15', '14:00:00', '12:00:00', 2, 0, 'pending', 'website', 200000, 0, NULL, NULL, 200000, 60000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL);
+(31, 'HD-69D85841363BD', 'Ngô Đức Nhân', 'ngodnhan9981@gmail.com', '0854892319', 'Mộng Mị Room', 200000.00, 60000.00, 'deposited', NULL, 'bank', '2026-04-10 01:54:09', '2026-04-10 01:54:09', 17, 8, '2026-04-14', '2026-04-15', '14:00:00', '12:00:00', 2, 0, 'pending', 'website', 200000, 0, NULL, NULL, 200000, 60000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL),
+(32, 'HD-69DE611822186', 'votronghieu1', 'tronghieuvo9@gmail.com', '0906123931', 'SONG CAT', 8400000.00, 2520000.00, 'deposited', NULL, 'bank', '2026-04-14 15:45:28', '2026-04-14 15:47:37', 9, 25, '2026-04-16', '2026-04-19', '14:00:00', '12:00:00', 2, 2, 'checked_out', 'website', 8400000, 0, NULL, NULL, 8400000, 8400000, NULL, NULL, NULL, NULL, 12, 12, NULL, NULL, 0, 0.00, NULL, NULL),
+(33, 'HD-69DE62B394BBA', 'votronghieu1', 'tronghieuvo9@gmail.com', '0906123931', 'Nhật Thực', 240000.00, 72000.00, 'deposited', NULL, 'bank', '2026-04-14 15:52:19', '2026-04-14 15:52:50', 9, 5, '2026-04-23', '2026-04-25', '14:00:00', '12:00:00', 2, 1, 'checked_out', 'website', 240000, 0, NULL, NULL, 240000, 240000, NULL, NULL, NULL, NULL, 12, 12, NULL, NULL, 0, 0.00, NULL, NULL),
+(34, 'HD-69DE637AA8399', 'votronghieu1', 'tronghieuvo9@gmail.com', '0906123931', 'Mộng Mơ Room', 150000.00, 45000.00, 'deposited', NULL, 'bank', '2026-04-14 15:55:38', '2026-04-14 15:56:11', 9, 6, '2026-04-14', '2026-04-15', '14:00:00', '12:00:00', 2, 1, 'checked_out', 'website', 150000, 0, NULL, NULL, 150000, 150000, NULL, NULL, NULL, NULL, 12, 12, NULL, NULL, 0, 0.00, NULL, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `booking_activities`
+-- Cấu trúc bảng cho bảng `booking_activities`
 --
 
 CREATE TABLE `booking_activities` (
-  `id` bigint UNSIGNED NOT NULL,
-  `booking_id` bigint UNSIGNED NOT NULL,
-  `actor_id` bigint UNSIGNED DEFAULT NULL,
-  `actor_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `action_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `old_value` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  `new_value` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ;
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `booking_id` bigint(20) UNSIGNED NOT NULL,
+  `actor_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `actor_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `action_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `old_value` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `new_value` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `booking_activities`
+-- Đang đổ dữ liệu cho bảng `booking_activities`
 --
 
 INSERT INTO `booking_activities` (`id`, `booking_id`, `actor_id`, `actor_name`, `action_type`, `old_value`, `new_value`, `description`, `created_at`) VALUES
@@ -198,29 +201,35 @@ INSERT INTO `booking_activities` (`id`, `booking_id`, `actor_id`, `actor_name`, 
 (40, 29, 12, 'admin', 'checkin', NULL, NULL, 'Khách đã check-in thành công', '2026-04-10 01:24:30'),
 (41, 29, 12, 'admin', 'service_added', NULL, NULL, 'Thêm dịch vụ: Giặt ủi × 1', '2026-04-10 01:26:13'),
 (42, 29, 12, 'admin', 'service_added', NULL, NULL, 'Thêm dịch vụ thu tiền mặt ngay (không tính vào bill): sting × 1', '2026-04-10 01:26:57'),
-(43, 29, 12, 'admin', 'checkout', NULL, NULL, 'Khách đã check-out. Phòng chuyển sang bảo trì/dọn dẹp.', '2026-04-10 01:28:17');
+(43, 29, 12, 'admin', 'checkout', NULL, NULL, 'Khách đã check-out. Phòng chuyển sang bảo trì/dọn dẹp.', '2026-04-10 01:28:17'),
+(44, 32, 12, 'admin', 'checkin', NULL, NULL, 'Khách đã check-in thành công', '2026-04-14 15:47:22'),
+(45, 32, 12, 'admin', 'checkout', NULL, NULL, 'Khách đã check-out. Phòng chuyển sang bảo trì/dọn dẹp.', '2026-04-14 15:47:37'),
+(46, 33, 12, 'admin', 'checkin', NULL, NULL, 'Khách đã check-in thành công', '2026-04-14 15:52:44'),
+(47, 33, 12, 'admin', 'checkout', NULL, NULL, 'Khách đã check-out. Phòng chuyển sang bảo trì/dọn dẹp.', '2026-04-14 15:52:50'),
+(48, 34, 12, 'admin', 'checkin', NULL, NULL, 'Khách đã check-in thành công', '2026-04-14 15:56:04'),
+(49, 34, 12, 'admin', 'checkout', NULL, NULL, 'Khách đã check-out. Phòng chuyển sang bảo trì/dọn dẹp.', '2026-04-14 15:56:11');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `booking_payments`
+-- Cấu trúc bảng cho bảng `booking_payments`
 --
 
 CREATE TABLE `booking_payments` (
-  `id` bigint UNSIGNED NOT NULL,
-  `booking_id` bigint UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `booking_id` bigint(20) UNSIGNED NOT NULL,
   `amount` decimal(15,0) NOT NULL,
-  `payment_method` enum('cash','transfer','card') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'cash',
-  `payment_type` enum('deposit','balance','refund') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'balance',
-  `reference_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `recorded_by` bigint UNSIGNED DEFAULT NULL,
+  `payment_method` enum('cash','transfer','card') NOT NULL DEFAULT 'cash',
+  `payment_type` enum('deposit','balance','refund') NOT NULL DEFAULT 'balance',
+  `reference_code` varchar(255) DEFAULT NULL,
+  `note` varchar(255) DEFAULT NULL,
+  `recorded_by` bigint(20) UNSIGNED DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `booking_payments`
+-- Đang đổ dữ liệu cho bảng `booking_payments`
 --
 
 INSERT INTO `booking_payments` (`id`, `booking_id`, `amount`, `payment_method`, `payment_type`, `reference_code`, `note`, `recorded_by`, `created_at`, `updated_at`) VALUES
@@ -234,29 +243,32 @@ INSERT INTO `booking_payments` (`id`, `booking_id`, `amount`, `payment_method`, 
 (18, 18, 245000, 'cash', 'balance', NULL, 'Thanh toán khi check-out', 12, '2026-03-19 08:12:05', '2026-03-19 08:12:05'),
 (19, 20, 18600000, 'card', 'balance', NULL, 'Thanh toán khi check-out', 12, '2026-03-19 08:56:50', '2026-03-19 08:56:50'),
 (20, 19, 45000, 'transfer', 'refund', NULL, 'Hoàn tiền: Khách yêu cầu hủy', 12, '2026-03-19 10:00:47', '2026-03-19 10:00:47'),
-(21, 29, 2020000, 'cash', 'balance', NULL, 'Thanh toán khi check-out', 12, '2026-04-10 01:28:16', '2026-04-10 01:28:16');
+(21, 29, 2020000, 'cash', 'balance', NULL, 'Thanh toán khi check-out', 12, '2026-04-10 01:28:16', '2026-04-10 01:28:16'),
+(22, 32, 5880000, 'cash', 'balance', NULL, 'Thanh toán khi check-out', 12, '2026-04-14 15:47:37', '2026-04-14 15:47:37'),
+(23, 33, 168000, 'cash', 'balance', NULL, 'Thanh toán khi check-out', 12, '2026-04-14 15:52:50', '2026-04-14 15:52:50'),
+(24, 34, 105000, 'cash', 'balance', NULL, 'Thanh toán khi check-out', 12, '2026-04-14 15:56:11', '2026-04-14 15:56:11');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `booking_services`
+-- Cấu trúc bảng cho bảng `booking_services`
 --
 
 CREATE TABLE `booking_services` (
-  `id` bigint UNSIGNED NOT NULL,
-  `booking_id` bigint UNSIGNED NOT NULL,
-  `service_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `unit_price` decimal(15,0) NOT NULL DEFAULT '0',
-  `quantity` smallint UNSIGNED NOT NULL DEFAULT '1',
-  `total_price` decimal(15,0) NOT NULL DEFAULT '0',
-  `is_paid` tinyint(1) NOT NULL DEFAULT '0',
-  `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `booking_id` bigint(20) UNSIGNED NOT NULL,
+  `service_name` varchar(255) NOT NULL,
+  `unit_price` decimal(15,0) NOT NULL DEFAULT 0,
+  `quantity` smallint(5) UNSIGNED NOT NULL DEFAULT 1,
+  `total_price` decimal(15,0) NOT NULL DEFAULT 0,
+  `is_paid` tinyint(1) NOT NULL DEFAULT 0,
+  `note` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `booking_services`
+-- Đang đổ dữ liệu cho bảng `booking_services`
 --
 
 INSERT INTO `booking_services` (`id`, `booking_id`, `service_name`, `unit_price`, `quantity`, `total_price`, `is_paid`, `note`, `created_at`, `updated_at`) VALUES
@@ -268,57 +280,60 @@ INSERT INTO `booking_services` (`id`, `booking_id`, `service_name`, `unit_price`
 -- --------------------------------------------------------
 
 --
--- Table structure for table `failed_jobs`
+-- Cấu trúc bảng cho bảng `failed_jobs`
 --
 
 CREATE TABLE `failed_jobs` (
-  `id` bigint UNSIGNED NOT NULL,
-  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `uuid` varchar(255) NOT NULL,
+  `connection` text NOT NULL,
+  `queue` text NOT NULL,
+  `payload` longtext NOT NULL,
+  `exception` longtext NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `jobs`
+-- Cấu trúc bảng cho bảng `jobs`
 --
 
 CREATE TABLE `jobs` (
-  `id` bigint UNSIGNED NOT NULL,
-  `queue` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `attempts` tinyint UNSIGNED NOT NULL,
-  `reserved_at` int UNSIGNED DEFAULT NULL,
-  `available_at` int UNSIGNED NOT NULL,
-  `created_at` int UNSIGNED NOT NULL
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `queue` varchar(255) NOT NULL,
+  `payload` longtext NOT NULL,
+  `attempts` tinyint(3) UNSIGNED NOT NULL,
+  `reserved_at` int(10) UNSIGNED DEFAULT NULL,
+  `available_at` int(10) UNSIGNED NOT NULL,
+  `created_at` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `jobs`
+-- Đang đổ dữ liệu cho bảng `jobs`
 --
 
 INSERT INTO `jobs` (`id`, `queue`, `payload`, `attempts`, `reserved_at`, `available_at`, `created_at`) VALUES
 (1, 'default', '{\"uuid\":\"e1d72814-3c06-4b66-9b01-e51bb30dd7d9\",\"displayName\":\"App\\\\Jobs\\\\CleanRoomJob\",\"job\":\"Illuminate\\\\Queue\\\\CallQueuedHandler@call\",\"maxTries\":null,\"maxExceptions\":null,\"failOnTimeout\":false,\"backoff\":null,\"timeout\":null,\"retryUntil\":null,\"data\":{\"commandName\":\"App\\\\Jobs\\\\CleanRoomJob\",\"command\":\"O:21:\\\"App\\\\Jobs\\\\CleanRoomJob\\\":2:{s:9:\\\"\\u0000*\\u0000roomId\\\";i:10;s:5:\\\"delay\\\";O:25:\\\"Illuminate\\\\Support\\\\Carbon\\\":3:{s:4:\\\"date\\\";s:26:\\\"2026-03-15 19:00:02.731976\\\";s:13:\\\"timezone_type\\\";i:3;s:8:\\\"timezone\\\";s:16:\\\"Asia\\/Ho_Chi_Minh\\\";}}\"}}', 0, NULL, 1773576002, 1773572402),
-(2, 'default', '{\"uuid\":\"b53e8971-9f0e-4379-98d5-d7c7b346cd16\",\"displayName\":\"App\\\\Jobs\\\\CleanRoomJob\",\"job\":\"Illuminate\\\\Queue\\\\CallQueuedHandler@call\",\"maxTries\":null,\"maxExceptions\":null,\"failOnTimeout\":false,\"backoff\":null,\"timeout\":null,\"retryUntil\":null,\"data\":{\"commandName\":\"App\\\\Jobs\\\\CleanRoomJob\",\"command\":\"O:21:\\\"App\\\\Jobs\\\\CleanRoomJob\\\":2:{s:9:\\\"\\u0000*\\u0000roomId\\\";i:4;s:5:\\\"delay\\\";O:25:\\\"Illuminate\\\\Support\\\\Carbon\\\":3:{s:4:\\\"date\\\";s:26:\\\"2026-03-16 02:20:20.552933\\\";s:13:\\\"timezone_type\\\";i:3;s:8:\\\"timezone\\\";s:16:\\\"Asia\\/Ho_Chi_Minh\\\";}}\"}}', 0, NULL, 1773602420, 1773598824);
+(2, 'default', '{\"uuid\":\"b53e8971-9f0e-4379-98d5-d7c7b346cd16\",\"displayName\":\"App\\\\Jobs\\\\CleanRoomJob\",\"job\":\"Illuminate\\\\Queue\\\\CallQueuedHandler@call\",\"maxTries\":null,\"maxExceptions\":null,\"failOnTimeout\":false,\"backoff\":null,\"timeout\":null,\"retryUntil\":null,\"data\":{\"commandName\":\"App\\\\Jobs\\\\CleanRoomJob\",\"command\":\"O:21:\\\"App\\\\Jobs\\\\CleanRoomJob\\\":2:{s:9:\\\"\\u0000*\\u0000roomId\\\";i:4;s:5:\\\"delay\\\";O:25:\\\"Illuminate\\\\Support\\\\Carbon\\\":3:{s:4:\\\"date\\\";s:26:\\\"2026-03-16 02:20:20.552933\\\";s:13:\\\"timezone_type\\\";i:3;s:8:\\\"timezone\\\";s:16:\\\"Asia\\/Ho_Chi_Minh\\\";}}\"}}', 0, NULL, 1773602420, 1773598824),
+(3, 'default', '{\"uuid\":\"cb266232-eeab-4d27-b081-26ce4f89dddc\",\"displayName\":\"App\\\\Jobs\\\\CleanRoomJob\",\"job\":\"Illuminate\\\\Queue\\\\CallQueuedHandler@call\",\"maxTries\":null,\"maxExceptions\":null,\"failOnTimeout\":false,\"backoff\":null,\"timeout\":null,\"retryUntil\":null,\"data\":{\"commandName\":\"App\\\\Jobs\\\\CleanRoomJob\",\"command\":\"O:21:\\\"App\\\\Jobs\\\\CleanRoomJob\\\":2:{s:9:\\\"\\u0000*\\u0000roomId\\\";i:25;s:5:\\\"delay\\\";O:25:\\\"Illuminate\\\\Support\\\\Carbon\\\":3:{s:4:\\\"date\\\";s:26:\\\"2026-04-14 23:47:37.164348\\\";s:13:\\\"timezone_type\\\";i:3;s:8:\\\"timezone\\\";s:16:\\\"Asia\\/Ho_Chi_Minh\\\";}}\"}}', 0, NULL, 1776185257, 1776181657),
+(4, 'default', '{\"uuid\":\"942a0b47-4c71-4a2b-8af1-21de20e8288a\",\"displayName\":\"App\\\\Jobs\\\\CleanRoomJob\",\"job\":\"Illuminate\\\\Queue\\\\CallQueuedHandler@call\",\"maxTries\":null,\"maxExceptions\":null,\"failOnTimeout\":false,\"backoff\":null,\"timeout\":null,\"retryUntil\":null,\"data\":{\"commandName\":\"App\\\\Jobs\\\\CleanRoomJob\",\"command\":\"O:21:\\\"App\\\\Jobs\\\\CleanRoomJob\\\":2:{s:9:\\\"\\u0000*\\u0000roomId\\\";i:5;s:5:\\\"delay\\\";O:25:\\\"Illuminate\\\\Support\\\\Carbon\\\":3:{s:4:\\\"date\\\";s:26:\\\"2026-04-14 23:52:50.974067\\\";s:13:\\\"timezone_type\\\";i:3;s:8:\\\"timezone\\\";s:16:\\\"Asia\\/Ho_Chi_Minh\\\";}}\"}}', 0, NULL, 1776185570, 1776181970),
+(5, 'default', '{\"uuid\":\"1bcb7bf6-5879-42a2-b451-6a468cf6dc2e\",\"displayName\":\"App\\\\Jobs\\\\CleanRoomJob\",\"job\":\"Illuminate\\\\Queue\\\\CallQueuedHandler@call\",\"maxTries\":null,\"maxExceptions\":null,\"failOnTimeout\":false,\"backoff\":null,\"timeout\":null,\"retryUntil\":null,\"data\":{\"commandName\":\"App\\\\Jobs\\\\CleanRoomJob\",\"command\":\"O:21:\\\"App\\\\Jobs\\\\CleanRoomJob\\\":2:{s:9:\\\"\\u0000*\\u0000roomId\\\";i:6;s:5:\\\"delay\\\";O:25:\\\"Illuminate\\\\Support\\\\Carbon\\\":3:{s:4:\\\"date\\\";s:26:\\\"2026-04-14 23:56:11.298885\\\";s:13:\\\"timezone_type\\\";i:3;s:8:\\\"timezone\\\";s:16:\\\"Asia\\/Ho_Chi_Minh\\\";}}\"}}', 0, NULL, 1776185771, 1776182171);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `migrations`
+-- Cấu trúc bảng cho bảng `migrations`
 --
 
 CREATE TABLE `migrations` (
-  `id` int UNSIGNED NOT NULL,
-  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `batch` int NOT NULL
+  `id` int(10) UNSIGNED NOT NULL,
+  `migration` varchar(255) NOT NULL,
+  `batch` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `migrations`
+-- Đang đổ dữ liệu cho bảng `migrations`
 --
 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
@@ -347,59 +362,68 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (25, '2026_04_09_134001_create_user_vouchers_table', 16),
 (26, '2026_03_10_000000_create_base_tables', 17),
 (27, '2026_03_27_095720_create_notifications_table', 17),
-(28, '2026_03_27_222621_add_is_paid_to_booking_services_table', 17);
+(28, '2026_03_27_222621_add_is_paid_to_booking_services_table', 17),
+(29, '2026_04_14_220705_create_reviews_table', 99);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `notifications`
+-- Cấu trúc bảng cho bảng `notifications`
 --
 
 CREATE TABLE `notifications` (
-  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `notifiable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `notifiable_id` bigint UNSIGNED NOT NULL,
-  `data` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` char(36) NOT NULL,
+  `type` varchar(255) NOT NULL,
+  `notifiable_type` varchar(255) NOT NULL,
+  `notifiable_id` bigint(20) UNSIGNED NOT NULL,
+  `data` text NOT NULL,
   `read_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `notifications`
+-- Đang đổ dữ liệu cho bảng `notifications`
 --
 
 INSERT INTO `notifications` (`id`, `type`, `notifiable_type`, `notifiable_id`, `data`, `read_at`, `created_at`, `updated_at`) VALUES
+('1a420280-9f81-4978-95ca-0f6a41ca01ea', 'App\\Notifications\\BookingStatusUpdated', 'App\\Models\\User', 9, '{\"booking_id\":34,\"booking_code\":\"HD-69DE637AA8399\",\"message\":\"B\\u1ea1n \\u0111\\u00e3 nh\\u1eadn ph\\u00f2ng (Check-in) th\\u00e0nh c\\u00f4ng cho \\u0111\\u01a1n \\u0111\\u1eb7t ph\\u00f2ng #HD-69DE637AA8399.\",\"status\":\"checked_in\",\"title\":\"C\\u1eadp nh\\u1eadt tr\\u1ea1ng th\\u00e1i \\u0111\\u01a1n h\\u00e0ng\"}', NULL, '2026-04-14 15:56:04', '2026-04-14 15:56:04'),
+('5e7c942b-b602-4173-a7db-40609ea8fe8a', 'App\\Notifications\\BookingStatusUpdated', 'App\\Models\\User', 9, '{\"booking_id\":33,\"booking_code\":\"HD-69DE62B394BBA\",\"message\":\"B\\u1ea1n \\u0111\\u00e3 tr\\u1ea3 ph\\u00f2ng (Check-out) th\\u00e0nh c\\u00f4ng cho \\u0111\\u01a1n \\u0111\\u1eb7t ph\\u00f2ng #HD-69DE62B394BBA.\",\"status\":\"checked_out\",\"title\":\"C\\u1eadp nh\\u1eadt tr\\u1ea1ng th\\u00e1i \\u0111\\u01a1n h\\u00e0ng\"}', NULL, '2026-04-14 15:52:51', '2026-04-14 15:52:51'),
+('6a197479-89d2-4c2d-baa6-f675b3a3e204', 'App\\Notifications\\BookingStatusUpdated', 'App\\Models\\User', 9, '{\"booking_id\":32,\"booking_code\":\"HD-69DE611822186\",\"message\":\"B\\u1ea1n \\u0111\\u00e3 nh\\u1eadn ph\\u00f2ng (Check-in) th\\u00e0nh c\\u00f4ng cho \\u0111\\u01a1n \\u0111\\u1eb7t ph\\u00f2ng #HD-69DE611822186.\",\"status\":\"checked_in\",\"title\":\"C\\u1eadp nh\\u1eadt tr\\u1ea1ng th\\u00e1i \\u0111\\u01a1n h\\u00e0ng\"}', '2026-04-14 15:48:03', '2026-04-14 15:47:23', '2026-04-14 15:48:03'),
 ('70d0fbaa-0762-499b-9c59-f00a9a82229b', 'App\\Notifications\\BookingStatusUpdated', 'App\\Models\\User', 12, '{\"booking_id\":29,\"booking_code\":\"HD-69D84E3A556C4\",\"message\":\"B\\u1ea1n \\u0111\\u00e3 nh\\u1eadn ph\\u00f2ng (Check-in) th\\u00e0nh c\\u00f4ng cho \\u0111\\u01a1n \\u0111\\u1eb7t ph\\u00f2ng #HD-69D84E3A556C4.\",\"status\":\"checked_in\",\"title\":\"C\\u1eadp nh\\u1eadt tr\\u1ea1ng th\\u00e1i \\u0111\\u01a1n h\\u00e0ng\"}', NULL, '2026-04-10 01:24:30', '2026-04-10 01:24:30'),
+('760c204c-62ec-45cb-bb8c-1c9db70eb6e6', 'App\\Notifications\\BookingStatusUpdated', 'App\\Models\\User', 9, '{\"booking_id\":34,\"booking_code\":\"HD-69DE637AA8399\",\"message\":\"B\\u1ea1n \\u0111\\u00e3 tr\\u1ea3 ph\\u00f2ng (Check-out) th\\u00e0nh c\\u00f4ng cho \\u0111\\u01a1n \\u0111\\u1eb7t ph\\u00f2ng #HD-69DE637AA8399.\",\"status\":\"checked_out\",\"title\":\"C\\u1eadp nh\\u1eadt tr\\u1ea1ng th\\u00e1i \\u0111\\u01a1n h\\u00e0ng\"}', NULL, '2026-04-14 15:56:11', '2026-04-14 15:56:11'),
+('970ea54c-74a5-41e7-a464-ecd4d010924a', 'App\\Notifications\\BookingStatusUpdated', 'App\\Models\\User', 9, '{\"booking_id\":32,\"booking_code\":\"HD-69DE611822186\",\"message\":\"B\\u1ea1n \\u0111\\u00e3 tr\\u1ea3 ph\\u00f2ng (Check-out) th\\u00e0nh c\\u00f4ng cho \\u0111\\u01a1n \\u0111\\u1eb7t ph\\u00f2ng #HD-69DE611822186.\",\"status\":\"checked_out\",\"title\":\"C\\u1eadp nh\\u1eadt tr\\u1ea1ng th\\u00e1i \\u0111\\u01a1n h\\u00e0ng\"}', '2026-04-14 15:48:03', '2026-04-14 15:47:37', '2026-04-14 15:48:03'),
 ('9ed5ddf7-6d51-4dbe-a9fb-3e96215f53d1', 'App\\Notifications\\BookingStatusUpdated', 'App\\Models\\User', 12, '{\"booking_id\":29,\"booking_code\":\"HD-69D84E3A556C4\",\"message\":\"B\\u1ea1n \\u0111\\u00e3 tr\\u1ea3 ph\\u00f2ng (Check-out) th\\u00e0nh c\\u00f4ng cho \\u0111\\u01a1n \\u0111\\u1eb7t ph\\u00f2ng #HD-69D84E3A556C4.\",\"status\":\"checked_out\",\"title\":\"C\\u1eadp nh\\u1eadt tr\\u1ea1ng th\\u00e1i \\u0111\\u01a1n h\\u00e0ng\"}', NULL, '2026-04-10 01:28:17', '2026-04-10 01:28:17'),
-('d4e87a5a-c5e5-45b8-9c7e-5b8c351e6d55', 'App\\Notifications\\BookingStatusUpdated', 'App\\Models\\User', 12, '{\"booking_id\":28,\"booking_code\":\"HD-69D84C07EDC09\",\"message\":\"B\\u1ea1n \\u0111\\u00e3 nh\\u1eadn ph\\u00f2ng (Check-in) th\\u00e0nh c\\u00f4ng cho \\u0111\\u01a1n \\u0111\\u1eb7t ph\\u00f2ng #HD-69D84C07EDC09.\",\"status\":\"checked_in\",\"title\":\"C\\u1eadp nh\\u1eadt tr\\u1ea1ng th\\u00e1i \\u0111\\u01a1n h\\u00e0ng\"}', NULL, '2026-04-10 01:15:51', '2026-04-10 01:15:51');
+('a9738356-3445-4921-a286-bd457d3d9005', 'App\\Notifications\\BookingStatusUpdated', 'App\\Models\\User', 9, '{\"booking_id\":33,\"booking_code\":\"HD-69DE62B394BBA\",\"message\":\"B\\u1ea1n \\u0111\\u00e3 nh\\u1eadn ph\\u00f2ng (Check-in) th\\u00e0nh c\\u00f4ng cho \\u0111\\u01a1n \\u0111\\u1eb7t ph\\u00f2ng #HD-69DE62B394BBA.\",\"status\":\"checked_in\",\"title\":\"C\\u1eadp nh\\u1eadt tr\\u1ea1ng th\\u00e1i \\u0111\\u01a1n h\\u00e0ng\"}', NULL, '2026-04-14 15:52:44', '2026-04-14 15:52:44'),
+('baa729aa-7e64-44ff-909a-ce2e36185793', 'App\\Notifications\\ReviewRequest', 'App\\Models\\User', 9, '{\"booking_id\":33,\"room_id\":5,\"title\":\"\\u0110\\u1ec3 l\\u1ea1i \\u0111\\u00e1nh gi\\u00e1 \\u2b50\",\"message\":\"K\\u1ef3 ngh\\u1ec9 c\\u1ee7a b\\u1ea1n t\\u1ea1i Nh\\u1eadt Th\\u1ef1c \\u0111\\u00e3 k\\u1ebft th\\u00fac. H\\u00e3y chia s\\u1ebb c\\u1ea3m nh\\u1eadn c\\u1ee7a b\\u1ea1n nh\\u00e9!\",\"type\":\"review_request\",\"action_url\":\"\\/room\\/5?review=true\"}', NULL, '2026-04-14 15:52:51', '2026-04-14 15:52:51'),
+('d4e87a5a-c5e5-45b8-9c7e-5b8c351e6d55', 'App\\Notifications\\BookingStatusUpdated', 'App\\Models\\User', 12, '{\"booking_id\":28,\"booking_code\":\"HD-69D84C07EDC09\",\"message\":\"B\\u1ea1n \\u0111\\u00e3 nh\\u1eadn ph\\u00f2ng (Check-in) th\\u00e0nh c\\u00f4ng cho \\u0111\\u01a1n \\u0111\\u1eb7t ph\\u00f2ng #HD-69D84C07EDC09.\",\"status\":\"checked_in\",\"title\":\"C\\u1eadp nh\\u1eadt tr\\u1ea1ng th\\u00e1i \\u0111\\u01a1n h\\u00e0ng\"}', NULL, '2026-04-10 01:15:51', '2026-04-10 01:15:51'),
+('d64aa0e6-a0f5-4eac-87b1-4ad4725a8dff', 'App\\Notifications\\ReviewRequest', 'App\\Models\\User', 9, '{\"booking_id\":34,\"room_id\":6,\"title\":\"\\u0110\\u1ec3 l\\u1ea1i \\u0111\\u00e1nh gi\\u00e1 \\u2b50\",\"message\":\"K\\u1ef3 ngh\\u1ec9 c\\u1ee7a b\\u1ea1n t\\u1ea1i M\\u1ed9ng M\\u01a1 Room \\u0111\\u00e3 k\\u1ebft th\\u00fac. H\\u00e3y chia s\\u1ebb c\\u1ea3m nh\\u1eadn c\\u1ee7a b\\u1ea1n nh\\u00e9!\",\"type\":\"review_request\",\"action_url\":\"\\/room\\/6?review=true\"}', NULL, '2026-04-14 15:56:11', '2026-04-14 15:56:11');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `password_resets`
+-- Cấu trúc bảng cho bảng `password_resets`
 --
 
 CREATE TABLE `password_resets` (
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `personal_access_tokens`
+-- Cấu trúc bảng cho bảng `personal_access_tokens`
 --
 
 CREATE TABLE `personal_access_tokens` (
-  `id` bigint UNSIGNED NOT NULL,
-  `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tokenable_id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `abilities` text COLLATE utf8mb4_unicode_ci,
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `tokenable_type` varchar(255) NOT NULL,
+  `tokenable_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `abilities` text DEFAULT NULL,
   `last_used_at` timestamp NULL DEFAULT NULL,
   `expires_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -407,7 +431,7 @@ CREATE TABLE `personal_access_tokens` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `personal_access_tokens`
+-- Đang đổ dữ liệu cho bảng `personal_access_tokens`
 --
 
 INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `name`, `token`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`) VALUES
@@ -490,54 +514,66 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (91, 'App\\Models\\User', 12, 'auth_token', '20e236184f08eb7f8cc52138b53ef9d423b25133e1b2de71f8c6f12d954bb10f', '[\"*\"]', '2026-04-09 22:51:08', NULL, '2026-04-09 22:50:05', '2026-04-09 22:51:08'),
 (92, 'App\\Models\\User', 17, 'auth_token', 'b411da40ec85addca291e027a5feb1fd5272d017e39e98a06b9795ed91a2a3a2', '[\"*\"]', '2026-04-10 00:51:25', NULL, '2026-04-09 22:51:42', '2026-04-10 00:51:25'),
 (95, 'App\\Models\\User', 12, 'auth_token', 'dcd532f5ebb2b1186eca750e25aeba3d615577c2f4906478d8740924f045da44', '[\"*\"]', '2026-04-10 01:16:40', NULL, '2026-04-10 01:13:03', '2026-04-10 01:16:40'),
-(97, 'App\\Models\\User', 17, 'auth_token', '02de5f5444d04c03c74aca5dbe1fdddcfc674936f93802abbee8b82097f4963d', '[\"*\"]', '2026-04-10 01:59:45', NULL, '2026-04-10 01:30:08', '2026-04-10 01:59:45');
+(97, 'App\\Models\\User', 17, 'auth_token', '02de5f5444d04c03c74aca5dbe1fdddcfc674936f93802abbee8b82097f4963d', '[\"*\"]', '2026-04-10 01:59:45', NULL, '2026-04-10 01:30:08', '2026-04-10 01:59:45'),
+(98, 'App\\Models\\User', 9, 'auth_token', '9d0bb51f90e40ad6e69ef1b663e7d5cf14ee9f86c0553ba6215267a2690a562e', '[\"*\"]', '2026-04-14 15:58:37', NULL, '2026-04-14 15:42:34', '2026-04-14 15:58:37'),
+(99, 'App\\Models\\User', 12, 'auth_token', '15e67aa40cb475dd33dc86d2392840e13c4bdd6d16b78d2299d38b87ab869f9f', '[\"*\"]', '2026-04-14 15:58:54', NULL, '2026-04-14 15:46:56', '2026-04-14 15:58:54');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `reviews`
+-- Cấu trúc bảng cho bảng `reviews`
 --
 
 CREATE TABLE `reviews` (
-  `id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `room_id` int NOT NULL,
-  `rating` int DEFAULT NULL,
-  `comment` text COLLATE utf8mb4_general_ci,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `room_id` bigint(20) UNSIGNED NOT NULL,
+  `booking_id` bigint(20) UNSIGNED NOT NULL,
+  `rating` tinyint(3) UNSIGNED NOT NULL COMMENT '1-5 stars',
+  `comment` text DEFAULT NULL,
+  `is_hidden` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `reviews`
+--
+
+INSERT INTO `reviews` (`id`, `user_id`, `room_id`, `booking_id`, `rating`, `comment`, `is_hidden`, `created_at`, `updated_at`) VALUES
+(1, 9, 6, 34, 5, 'Trải nghiệm tuyệt vời , ông chủ Võ Trọng Hiếu tốt bụng', 0, '2026-04-14 15:58:37', '2026-04-14 15:58:54');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `rooms`
+-- Cấu trúc bảng cho bảng `rooms`
 --
 
 CREATE TABLE `rooms` (
-  `id` int NOT NULL,
-  `parent_id` bigint UNSIGNED DEFAULT NULL,
-  `room_number` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `floor` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `title` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `location` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `rent_type` enum('whole_house','room_based','private_room','home') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'whole_house',
+  `id` int(11) NOT NULL,
+  `parent_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `room_number` varchar(255) DEFAULT NULL,
+  `floor` varchar(255) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `location` varchar(255) NOT NULL,
+  `type` varchar(50) NOT NULL,
+  `rent_type` enum('whole_house','room_based','private_room','home') NOT NULL DEFAULT 'whole_house',
   `price` decimal(10,2) NOT NULL,
-  `max_guests` int DEFAULT '2',
-  `max_children` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `description` text COLLATE utf8mb4_general_ci,
-  `status` varchar(20) COLLATE utf8mb4_general_ci DEFAULT 'available',
-  `room_status` enum('available','occupied','dirty','out_of_order') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'available',
-  `is_visible` tinyint(1) DEFAULT '1',
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `room_status_updated_by` bigint UNSIGNED DEFAULT NULL,
-  `out_of_order_reason` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `max_guests` int(11) DEFAULT 2,
+  `max_children` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `description` text DEFAULT NULL,
+  `status` varchar(20) DEFAULT 'available',
+  `room_status` enum('available','occupied','dirty','out_of_order') NOT NULL DEFAULT 'available',
+  `is_visible` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `room_status_updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `out_of_order_reason` varchar(255) DEFAULT NULL,
   `estimated_fix_date` date DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `rooms`
+-- Đang đổ dữ liệu cho bảng `rooms`
 --
 
 INSERT INTO `rooms` (`id`, `parent_id`, `room_number`, `floor`, `title`, `location`, `type`, `rent_type`, `price`, `max_guests`, `max_children`, `description`, `status`, `room_status`, `is_visible`, `created_at`, `room_status_updated_by`, `out_of_order_reason`, `estimated_fix_date`, `updated_at`) VALUES
@@ -545,8 +581,8 @@ INSERT INTO `rooms` (`id`, `parent_id`, `room_number`, `floor`, `title`, `locati
 (2, NULL, NULL, NULL, 'Hoàng Hôn Home', 'Quận Sơn Trà, Đà Nẵng', 'house', 'whole_house', 2000000.00, 20, 0, NULL, 'available', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
 (3, NULL, NULL, NULL, 'Nhẹ Nhàng Home', 'Quận Thanh Khê, Đà Nẵng', 'house', 'whole_house', 1700000.00, 20, 0, NULL, 'available', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
 (4, NULL, NULL, NULL, 'Yên Tĩnh Home', 'Quận Cẩm Lệ, Đà Nẵng', 'house', 'room_based', 2500000.00, 20, 0, NULL, 'available', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
-(5, 5, NULL, NULL, 'Nhật Thực', 'Quận Liên Chiểu, Đà Nẵng', 'room', 'private_room', 120000.00, 2, 1, NULL, 'available', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
-(6, 4, NULL, NULL, 'Mộng Mơ Room', 'Quận Cẩm Lệ, Đà Nẵng', 'room', 'private_room', 150000.00, 2, 1, NULL, 'available', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
+(5, 5, NULL, NULL, 'Nhật Thực', 'Quận Liên Chiểu, Đà Nẵng', 'room', 'private_room', 120000.00, 2, 1, NULL, 'maintenance', 'dirty', 1, '2026-03-19 04:03:14', 12, NULL, NULL, NULL),
+(6, 4, NULL, NULL, 'Mộng Mơ Room', 'Quận Cẩm Lệ, Đà Nẵng', 'room', 'private_room', 150000.00, 2, 1, NULL, 'maintenance', 'dirty', 1, '2026-03-19 04:03:14', 12, NULL, NULL, NULL),
 (7, NULL, NULL, NULL, 'Mơ Màng Room', 'Quận Thanh Khê, Đà Nẵng', 'room', 'home', 150000.00, 2, 1, NULL, 'available', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
 (8, NULL, NULL, NULL, 'Mộng Mị Room', 'Quận Hải Châu, Đà Nẵng', 'room', 'home', 200000.00, 2, 1, NULL, 'booked', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
 (9, NULL, NULL, NULL, 'Yên Tĩnh Room', 'Quận Sơn Trà, Đà Nẵng', 'room', 'home', 170000.00, 2, 1, NULL, 'in_use', 'occupied', 1, '2026-03-19 04:03:14', 12, NULL, NULL, NULL),
@@ -555,7 +591,7 @@ INSERT INTO `rooms` (`id`, `parent_id`, `room_number`, `floor`, `title`, `locati
 (13, NULL, NULL, NULL, 'Bình Yên Room', 'Quận Ngũ Hành Sơn, Đà Nẵng', 'room', 'home', 170000.00, 2, 1, NULL, 'booked', 'available', 1, '2026-03-19 04:03:14', NULL, NULL, NULL, NULL),
 (23, NULL, NULL, NULL, 'The Coastal Sanctuary', '93 Võ Nguyên Giáp , Mân Thái , Sơn Trà, Đà Nẵng', 'house', 'whole_house', 3500000.00, 15, 5, 'Chỗ ở\r\n🌿 Kết nối lại, thư giãn và trẻ hóa – Một hơi thở không khí trong lành\r\n\r\n★ Tại sao nên chọn khu nghỉ dưỡng riêng của chúng tôi thay vì một khu nghỉ dưỡng đông đúc?\r\nHãy tưởng tượng bạn thức dậy với âm thanh nhẹ nhàng của đại dương, bước ra ngoài để tập yoga riêng bên hồ bơi và biết rằng con bạn đang chơi an toàn chỉ cách đó vài bước chân. Tại một khu nghỉ dưỡng lớn, bạn chia sẻ những khoảnh khắc này với hàng trăm người lạ. Ở đây, nép mình tuyệt đẹp giữa bãi biển Cửa Đại và sông Thu Bồn, toàn bộ khu bảo tồn hiện đại này là của bạn 100%.\r\nChúng tôi hiểu rằng việc tìm kiếm một không gian vừa phục vụ cho sự nghỉ ngơi yên tĩnh của ông bà vừa phù hợp với năng lượng vui tươi của trẻ em là điều hiếm có. Đó là lý do tại sao chúng tôi tuyển chọn biệt thự này như một trải nghiệm được quản lý toàn diện, dễ dàng.', 'available', 'available', 1, '2026-03-18 16:27:58', NULL, NULL, NULL, NULL),
 (24, NULL, NULL, NULL, 'Furama', 'Furama Resort Danang,105 Võ Nguyên Giáp, Mỹ An, Ngũ Hành Sơn, Đà Nẵng', 'house', 'whole_house', 4000000.00, 10, 2, 'Homestay thuộc khu nghỉ dưỡng Furama Resort 5 sao, ở trung tâm thành phố Đà Nẵng và có bãi biển riêng, tầm nhìn ra biển, yên tĩnh và công viên.\r\n* Khanh Villa nằm trong chuỗi Furama Villas Đà Nẵng - một khu phức hợp nghỉ dưỡng với các Homestay riêng 5 sao, đẳng cấp, mang đến những khoảnh khắc tuyệt vời.', 'available', 'available', 1, '2026-03-18 16:41:34', NULL, NULL, NULL, NULL),
-(25, NULL, NULL, NULL, 'SONG CAT', '26 Nước Mặn 1 ,Khuê Mỹ, Ngũ Hành Sơn, Đà Nẵng', 'house', 'whole_house', 2800000.00, 10, 6, 'SONG CAT Homestay nằm ở khu vực Ngũ Hành Sơn của Đà Nẵng, cách Bãi biển Mỹ An 1,9 km, cách Bãi biển Mỹ Khê 1,9 km và cách Công viên Châu Á Đà Nẵng 3,4 km. Homestay này cách Ngũ Hành Sơn 5,1 km và cầu Sông Hàn 6 km.\r\n\r\nCầu Love Lock Đà Nẵng cách biệt thự 4,2 km, trong khi Bảo tàng Chăm cách 4,8 km. Sân bay gần nhất là Sân bay Quốc tế Đà Nẵng, cách Homestay SONG CAT 8 km.', 'available', 'dirty', 1, '2026-03-18 16:52:42', 12, NULL, NULL, NULL),
+(25, NULL, NULL, NULL, 'SONG CAT', '26 Nước Mặn 1 ,Khuê Mỹ, Ngũ Hành Sơn, Đà Nẵng', 'house', 'whole_house', 2800000.00, 10, 6, 'SONG CAT Homestay nằm ở khu vực Ngũ Hành Sơn của Đà Nẵng, cách Bãi biển Mỹ An 1,9 km, cách Bãi biển Mỹ Khê 1,9 km và cách Công viên Châu Á Đà Nẵng 3,4 km. Homestay này cách Ngũ Hành Sơn 5,1 km và cầu Sông Hàn 6 km.\r\n\r\nCầu Love Lock Đà Nẵng cách biệt thự 4,2 km, trong khi Bảo tàng Chăm cách 4,8 km. Sân bay gần nhất là Sân bay Quốc tế Đà Nẵng, cách Homestay SONG CAT 8 km.', 'maintenance', 'dirty', 1, '2026-03-18 16:52:42', 12, NULL, NULL, NULL),
 (26, NULL, NULL, NULL, 'Hiếu Homestay', 'Phước Trường 7, An Hải, Sơn Trà, Đà Nẵng', 'house', 'room_based', 0.00, 20, 0, NULL, 'available', 'available', 1, '2026-03-18 16:58:18', NULL, NULL, NULL, NULL),
 (27, 26, NULL, NULL, 'Phòng 101', 'Phước Trường 7, An Hải, Sơn Trà, Đà Nẵng', 'room', 'private_room', 350000.00, 2, 1, 'Vị trí lý tưởng – Gần biển, gần thiên nhiên\r\nHomestay toạ lạc trong một khu phố yên tĩnh – nơi bạn có thể tận hưởng không khí trong lành, cảnh quan xanh mát và chỉ mất vài phút đi bộ để đến bãi biển thơ mộng. Hãy bắt đầu buổi sáng bằng cách dạo biển, tham gia phiên chợ hải sản địa phương, hoặc đơn giản là thả mình trên cát và nghe tiếng sóng vỗ.', 'booked', 'available', 1, '2026-03-18 17:02:26', NULL, NULL, NULL, NULL),
 (28, 26, NULL, NULL, 'Phòng 102', 'Phước Trường 7, An Hải, Sơn Trà, Đà Nẵng', 'room', 'private_room', 350000.00, 2, 1, 'Vị trí lý tưởng – Gần biển, gần thiên nhiên\r\nHomestay toạ lạc trong một khu phố yên tĩnh – nơi bạn có thể tận hưởng không khí trong lành, cảnh quan xanh mát và chỉ mất vài phút đi bộ để đến bãi biển thơ mộng. Hãy bắt đầu buổi sáng bằng cách dạo biển, tham gia phiên chợ hải sản địa phương, hoặc đơn giản là thả mình trên cát và nghe tiếng sóng vỗ.', 'in_use', 'occupied', 1, '2026-03-18 17:05:14', NULL, NULL, NULL, NULL),
@@ -569,124 +605,124 @@ INSERT INTO `rooms` (`id`, `parent_id`, `room_number`, `floor`, `title`, `locati
 -- --------------------------------------------------------
 
 --
--- Table structure for table `room_amenities`
+-- Cấu trúc bảng cho bảng `room_amenities`
 --
 
 CREATE TABLE `room_amenities` (
-  `room_id` int NOT NULL,
-  `amenity_id` int NOT NULL
+  `room_id` int(11) NOT NULL,
+  `amenity_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `room_amenities`
+-- Đang đổ dữ liệu cho bảng `room_amenities`
 --
 
 INSERT INTO `room_amenities` (`room_id`, `amenity_id`) VALUES
 (1, 1),
-(2, 1),
-(3, 1),
-(4, 1),
-(5, 1),
-(6, 1),
-(7, 1),
-(8, 1),
-(9, 1),
-(10, 1),
-(11, 1),
-(12, 1),
-(13, 1),
-(23, 1),
-(4, 2),
-(13, 2),
-(18, 2),
-(23, 2),
 (1, 3),
-(2, 3),
-(3, 3),
-(4, 3),
-(5, 3),
-(6, 3),
-(7, 3),
-(8, 3),
-(9, 3),
-(11, 3),
-(12, 3),
-(13, 3),
-(23, 3),
 (1, 4),
-(2, 4),
-(3, 4),
-(4, 4),
-(5, 4),
-(8, 4),
-(9, 4),
-(10, 4),
-(12, 4),
-(13, 4),
-(23, 4),
 (1, 5),
-(2, 5),
-(3, 5),
-(4, 5),
-(5, 5),
-(12, 5),
-(13, 5),
-(18, 5),
-(23, 5),
 (1, 6),
-(2, 6),
-(3, 6),
-(4, 6),
-(12, 6),
-(23, 6),
 (1, 7),
-(2, 7),
-(3, 7),
-(4, 7),
-(6, 7),
-(11, 7),
-(13, 7),
 (1, 9),
-(2, 9),
-(3, 9),
-(4, 9),
-(5, 9),
-(6, 9),
-(7, 9),
-(8, 9),
-(9, 9),
-(11, 9),
-(12, 9),
-(13, 9),
 (1, 10),
+(2, 1),
+(2, 3),
+(2, 4),
+(2, 5),
+(2, 6),
+(2, 7),
+(2, 9),
 (2, 10),
+(3, 1),
+(3, 3),
+(3, 4),
+(3, 5),
+(3, 6),
+(3, 7),
+(3, 9),
 (3, 10),
+(4, 1),
+(4, 2),
+(4, 3),
+(4, 4),
+(4, 5),
+(4, 6),
+(4, 7),
+(4, 9),
 (4, 10),
+(5, 1),
+(5, 3),
+(5, 4),
+(5, 5),
+(5, 9),
 (5, 10),
+(6, 1),
+(6, 3),
+(6, 7),
+(6, 9),
 (6, 10),
+(7, 1),
+(7, 3),
+(7, 9),
 (7, 10),
+(8, 1),
+(8, 3),
+(8, 4),
+(8, 9),
 (8, 10),
+(9, 1),
+(9, 3),
+(9, 4),
+(9, 9),
+(10, 1),
+(10, 4),
+(11, 1),
+(11, 3),
+(11, 7),
+(11, 9),
 (11, 10),
+(12, 1),
+(12, 3),
+(12, 4),
+(12, 5),
+(12, 6),
+(12, 9),
 (12, 10),
-(13, 10);
+(13, 1),
+(13, 2),
+(13, 3),
+(13, 4),
+(13, 5),
+(13, 7),
+(13, 9),
+(13, 10),
+(18, 2),
+(18, 5),
+(23, 1),
+(23, 2),
+(23, 3),
+(23, 4),
+(23, 5),
+(23, 6);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `room_images`
+-- Cấu trúc bảng cho bảng `room_images`
 --
 
 CREATE TABLE `room_images` (
-  `id` int NOT NULL,
-  `room_id` int NOT NULL,
-  `image_url` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `is_primary` tinyint(1) DEFAULT '0',
+  `id` int(11) NOT NULL,
+  `room_id` int(11) NOT NULL,
+  `image_url` varchar(255) NOT NULL,
+  `is_primary` tinyint(1) DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `room_images`
+-- Đang đổ dữ liệu cho bảng `room_images`
 --
 
 INSERT INTO `room_images` (`id`, `room_id`, `image_url`, `is_primary`, `created_at`, `updated_at`) VALUES
@@ -799,32 +835,32 @@ INSERT INTO `room_images` (`id`, `room_id`, `image_url`, `is_primary`, `created_
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Cấu trúc bảng cho bảng `users`
 --
 
 CREATE TABLE `users` (
-  `id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `role` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'customer',
-  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
-  `points` int NOT NULL DEFAULT '0',
-  `referral_code` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `referred_by_id` bigint UNSIGNED DEFAULT NULL,
-  `phone` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `role` varchar(255) NOT NULL DEFAULT 'customer',
+  `status` varchar(255) NOT NULL DEFAULT 'active',
+  `points` int(11) NOT NULL DEFAULT 0,
+  `referral_code` varchar(20) DEFAULT NULL,
+  `referred_by_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `phone` varchar(255) DEFAULT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `remember_token` varchar(100) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `users`
+-- Đang đổ dữ liệu cho bảng `users`
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `role`, `status`, `points`, `referral_code`, `referred_by_id`, `phone`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(9, 'votronghieu1', 'tronghieuvo9@gmail.com', 'customer', 'active', 10, NULL, NULL, '0906123931', NULL, '$2y$10$dJi7w3tzWfOIhT/U/kFjaeH35x.E1mBNt9696UisqLztctVQkfKx.', NULL, '2026-03-09 04:21:29', '2026-04-09 07:50:26'),
+(9, 'votronghieu1', 'tronghieuvo9@gmail.com', 'customer', 'active', 97, NULL, NULL, '0906123931', NULL, '$2y$10$dJi7w3tzWfOIhT/U/kFjaeH35x.E1mBNt9696UisqLztctVQkfKx.', NULL, '2026-03-09 04:21:29', '2026-04-14 15:55:38'),
 (12, 'admin', 'admin@gmail.com', 'admin', 'active', 38, NULL, NULL, '1', NULL, '$2y$10$9VuzbFvDsHTLldawJA5SoucTImooB9VsjISTMpUmeyt/wYrQ/U0Z6', NULL, '2026-03-09 04:46:24', '2026-04-10 01:11:22'),
 (13, 'votrong', 'tronghieuvo@gmail.com', 'customer', 'active', 0, NULL, NULL, '0906123933', NULL, '$2y$10$lFOqdvuPcxxMfhziWSIqNOW40LcnaRb4GoOt6ggrCneK1wzUP6EOa', NULL, '2026-03-09 04:47:47', '2026-03-09 10:34:16'),
 (14, 'lan anh', 'anh@gmail.com', 'customer', 'active', 0, NULL, NULL, '0906123333', NULL, '$2y$10$.VidHnEsUZhC4LiuP7qFcO3rWYBjYjjooNxF85AUYJ02m2kw9Rs0C', NULL, '2026-03-11 06:13:35', '2026-03-20 03:11:28'),
@@ -836,21 +872,21 @@ INSERT INTO `users` (`id`, `name`, `email`, `role`, `status`, `points`, `referra
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user_vouchers`
+-- Cấu trúc bảng cho bảng `user_vouchers`
 --
 
 CREATE TABLE `user_vouchers` (
-  `id` bigint UNSIGNED NOT NULL,
-  `user_id` bigint UNSIGNED NOT NULL,
-  `voucher_id` bigint UNSIGNED NOT NULL,
-  `is_used` tinyint(1) NOT NULL DEFAULT '0',
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `voucher_id` bigint(20) UNSIGNED NOT NULL,
+  `is_used` tinyint(1) NOT NULL DEFAULT 0,
   `used_at` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `user_vouchers`
+-- Đang đổ dữ liệu cho bảng `user_vouchers`
 --
 
 INSERT INTO `user_vouchers` (`id`, `user_id`, `voucher_id`, `is_used`, `used_at`, `created_at`, `updated_at`) VALUES
@@ -864,27 +900,27 @@ INSERT INTO `user_vouchers` (`id`, `user_id`, `voucher_id`, `is_used`, `used_at`
 -- --------------------------------------------------------
 
 --
--- Table structure for table `vouchers`
+-- Cấu trúc bảng cho bảng `vouchers`
 --
 
 CREATE TABLE `vouchers` (
-  `id` bigint UNSIGNED NOT NULL,
-  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `points_required` int DEFAULT NULL,
-  `discount_type` enum('percent','fixed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'percent',
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `code` varchar(255) NOT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `points_required` int(11) DEFAULT NULL,
+  `discount_type` enum('percent','fixed') NOT NULL DEFAULT 'percent',
   `discount_value` decimal(15,0) NOT NULL,
   `expires_at` datetime DEFAULT NULL,
-  `max_uses` int UNSIGNED DEFAULT NULL,
-  `used_count` int UNSIGNED NOT NULL DEFAULT '0',
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `max_uses` int(10) UNSIGNED DEFAULT NULL,
+  `used_count` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `vouchers`
+-- Đang đổ dữ liệu cho bảng `vouchers`
 --
 
 INSERT INTO `vouchers` (`id`, `code`, `title`, `description`, `points_required`, `discount_type`, `discount_value`, `expires_at`, `max_uses`, `used_count`, `is_active`, `created_at`, `updated_at`) VALUES
@@ -896,17 +932,17 @@ INSERT INTO `vouchers` (`id`, `code`, `title`, `description`, `points_required`,
 (6, 'REDEEM100', 'Voucher Đổi Thưởng 100K', 'Sử dụng 18 điểm để đổi voucher này.', 18, 'fixed', 100000, '2026-04-10 00:00:00', 7, 0, 1, '2026-04-09 07:44:39', '2026-04-09 16:25:46');
 
 --
--- Indexes for dumped tables
+-- Chỉ mục cho các bảng đã đổ
 --
 
 --
--- Indexes for table `amenities`
+-- Chỉ mục cho bảng `amenities`
 --
 ALTER TABLE `amenities`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `bookings`
+-- Chỉ mục cho bảng `bookings`
 --
 ALTER TABLE `bookings`
   ADD PRIMARY KEY (`id`),
@@ -915,7 +951,7 @@ ALTER TABLE `bookings`
   ADD KEY `bookings_voucher_id_foreign` (`voucher_id`);
 
 --
--- Indexes for table `booking_activities`
+-- Chỉ mục cho bảng `booking_activities`
 --
 ALTER TABLE `booking_activities`
   ADD PRIMARY KEY (`id`),
@@ -923,7 +959,7 @@ ALTER TABLE `booking_activities`
   ADD KEY `booking_activities_actor_id_foreign` (`actor_id`);
 
 --
--- Indexes for table `booking_payments`
+-- Chỉ mục cho bảng `booking_payments`
 --
 ALTER TABLE `booking_payments`
   ADD PRIMARY KEY (`id`),
@@ -931,47 +967,47 @@ ALTER TABLE `booking_payments`
   ADD KEY `booking_payments_recorded_by_foreign` (`recorded_by`);
 
 --
--- Indexes for table `booking_services`
+-- Chỉ mục cho bảng `booking_services`
 --
 ALTER TABLE `booking_services`
   ADD PRIMARY KEY (`id`),
   ADD KEY `booking_services_booking_id_foreign` (`booking_id`);
 
 --
--- Indexes for table `failed_jobs`
+-- Chỉ mục cho bảng `failed_jobs`
 --
 ALTER TABLE `failed_jobs`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
 
 --
--- Indexes for table `jobs`
+-- Chỉ mục cho bảng `jobs`
 --
 ALTER TABLE `jobs`
   ADD PRIMARY KEY (`id`),
   ADD KEY `jobs_queue_index` (`queue`);
 
 --
--- Indexes for table `migrations`
+-- Chỉ mục cho bảng `migrations`
 --
 ALTER TABLE `migrations`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `notifications`
+-- Chỉ mục cho bảng `notifications`
 --
 ALTER TABLE `notifications`
   ADD PRIMARY KEY (`id`),
   ADD KEY `notifications_notifiable_type_notifiable_id_index` (`notifiable_type`,`notifiable_id`);
 
 --
--- Indexes for table `password_resets`
+-- Chỉ mục cho bảng `password_resets`
 --
 ALTER TABLE `password_resets`
   ADD PRIMARY KEY (`email`);
 
 --
--- Indexes for table `personal_access_tokens`
+-- Chỉ mục cho bảng `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
   ADD PRIMARY KEY (`id`),
@@ -979,35 +1015,35 @@ ALTER TABLE `personal_access_tokens`
   ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`);
 
 --
--- Indexes for table `reviews`
+-- Chỉ mục cho bảng `reviews`
 --
 ALTER TABLE `reviews`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `room_id` (`room_id`);
+  ADD KEY `reviews_room_id_is_hidden_index` (`room_id`,`is_hidden`),
+  ADD KEY `reviews_user_id_index` (`user_id`);
 
 --
--- Indexes for table `rooms`
+-- Chỉ mục cho bảng `rooms`
 --
 ALTER TABLE `rooms`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `room_amenities`
+-- Chỉ mục cho bảng `room_amenities`
 --
 ALTER TABLE `room_amenities`
   ADD PRIMARY KEY (`room_id`,`amenity_id`),
   ADD KEY `amenity_id` (`amenity_id`);
 
 --
--- Indexes for table `room_images`
+-- Chỉ mục cho bảng `room_images`
 --
 ALTER TABLE `room_images`
   ADD PRIMARY KEY (`id`),
   ADD KEY `room_id` (`room_id`);
 
 --
--- Indexes for table `users`
+-- Chỉ mục cho bảng `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
@@ -1016,7 +1052,7 @@ ALTER TABLE `users`
   ADD KEY `users_referred_by_id_foreign` (`referred_by_id`);
 
 --
--- Indexes for table `user_vouchers`
+-- Chỉ mục cho bảng `user_vouchers`
 --
 ALTER TABLE `user_vouchers`
   ADD PRIMARY KEY (`id`),
@@ -1024,145 +1060,151 @@ ALTER TABLE `user_vouchers`
   ADD KEY `user_vouchers_voucher_id_foreign` (`voucher_id`);
 
 --
--- Indexes for table `vouchers`
+-- Chỉ mục cho bảng `vouchers`
 --
 ALTER TABLE `vouchers`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `vouchers_code_unique` (`code`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT cho các bảng đã đổ
 --
 
 --
--- AUTO_INCREMENT for table `amenities`
+-- AUTO_INCREMENT cho bảng `amenities`
 --
 ALTER TABLE `amenities`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
--- AUTO_INCREMENT for table `bookings`
+-- AUTO_INCREMENT cho bảng `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
--- AUTO_INCREMENT for table `booking_activities`
+-- AUTO_INCREMENT cho bảng `booking_activities`
 --
 ALTER TABLE `booking_activities`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
--- AUTO_INCREMENT for table `booking_payments`
+-- AUTO_INCREMENT cho bảng `booking_payments`
 --
 ALTER TABLE `booking_payments`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
--- AUTO_INCREMENT for table `booking_services`
+-- AUTO_INCREMENT cho bảng `booking_services`
 --
 ALTER TABLE `booking_services`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `failed_jobs`
+-- AUTO_INCREMENT cho bảng `failed_jobs`
 --
 ALTER TABLE `failed_jobs`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `jobs`
+-- AUTO_INCREMENT cho bảng `jobs`
 --
 ALTER TABLE `jobs`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT for table `migrations`
+-- AUTO_INCREMENT cho bảng `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
--- AUTO_INCREMENT for table `personal_access_tokens`
+-- AUTO_INCREMENT cho bảng `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
 
 --
--- AUTO_INCREMENT for table `reviews`
+-- AUTO_INCREMENT cho bảng `reviews`
 --
 ALTER TABLE `reviews`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `rooms`
+-- AUTO_INCREMENT cho bảng `rooms`
 --
 ALTER TABLE `rooms`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
--- AUTO_INCREMENT for table `room_images`
+-- AUTO_INCREMENT cho bảng `room_images`
 --
 ALTER TABLE `room_images`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT cho bảng `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
--- AUTO_INCREMENT for table `user_vouchers`
+-- AUTO_INCREMENT cho bảng `user_vouchers`
 --
 ALTER TABLE `user_vouchers`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- AUTO_INCREMENT for table `vouchers`
+-- AUTO_INCREMENT cho bảng `vouchers`
 --
 ALTER TABLE `vouchers`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- Constraints for dumped tables
+-- Các ràng buộc cho các bảng đã đổ
 --
 
 --
--- Constraints for table `bookings`
+-- Các ràng buộc cho bảng `bookings`
 --
 ALTER TABLE `bookings`
   ADD CONSTRAINT `bookings_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `bookings_voucher_id_foreign` FOREIGN KEY (`voucher_id`) REFERENCES `vouchers` (`id`) ON DELETE SET NULL;
 
 --
--- Constraints for table `booking_activities`
+-- Các ràng buộc cho bảng `booking_activities`
 --
 ALTER TABLE `booking_activities`
   ADD CONSTRAINT `booking_activities_actor_id_foreign` FOREIGN KEY (`actor_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `booking_activities_booking_id_foreign` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `booking_payments`
+-- Các ràng buộc cho bảng `booking_payments`
 --
 ALTER TABLE `booking_payments`
   ADD CONSTRAINT `booking_payments_booking_id_foreign` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `booking_payments_recorded_by_foreign` FOREIGN KEY (`recorded_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
--- Constraints for table `booking_services`
+-- Các ràng buộc cho bảng `booking_services`
 --
 ALTER TABLE `booking_services`
   ADD CONSTRAINT `booking_services_booking_id_foreign` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `users`
+-- Các ràng buộc cho bảng `reviews`
+--
+ALTER TABLE `reviews`
+  ADD CONSTRAINT `reviews_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `users`
 --
 ALTER TABLE `users`
   ADD CONSTRAINT `users_referred_by_id_foreign` FOREIGN KEY (`referred_by_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
--- Constraints for table `user_vouchers`
+-- Các ràng buộc cho bảng `user_vouchers`
 --
 ALTER TABLE `user_vouchers`
   ADD CONSTRAINT `user_vouchers_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
