@@ -78,9 +78,5 @@
 </template>
 
 <script setup lang="ts">
-<<<<<<< Updated upstream
-import { LayoutDashboard, Home, ClipboardList, Users, LogOut, Receipt } from 'lucide-vue-next';
-=======
 import { LayoutDashboard, Home, ClipboardList, Users, LogOut, Receipt, Ticket, MessageSquare } from 'lucide-vue-next';
->>>>>>> Stashed changes
 </script>

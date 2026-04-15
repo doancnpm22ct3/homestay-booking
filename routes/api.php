@@ -11,8 +11,6 @@ use App\Http\Controllers\Api\Admin\BookingPaymentController;
 use App\Http\Controllers\Api\Admin\BookingServiceController;
 use App\Http\Controllers\Api\Admin\RoomAvailabilityController;
 use App\Http\Controllers\Api\VoucherController;
-<<<<<<< Updated upstream
-=======
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\VoucherController as AdminVoucherController;
@@ -22,7 +20,6 @@ use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
 
 Route::post('/payment/create', [PaymentController::class, 'createPayment']);
 Route::get('/payment/vnpay-return', [PaymentController::class, 'vnpayReturn']);
->>>>>>> Stashed changes
 
 // --- GHI ĐÈ API LẤY DANH SÁCH PHÒNG (TRẢ VỀ KÈM ẢNH) ---
 Route::get('/rooms', function (Request $request) {
@@ -182,9 +179,6 @@ Route::prefix('admin')->group(function () {
     
     // Mới: Danh sách hiển thị riêng cho Admin (có phân cấp)
     Route::get('/rooms', [RoomController::class, 'adminIndex']);
-<<<<<<< Updated upstream
-=======
-
     // QUẢN LÝ VOUCHER CHO ADMIN
     Route::get('/vouchers', [AdminVoucherController::class, 'index']);
     Route::post('/vouchers', [AdminVoucherController::class, 'store']);

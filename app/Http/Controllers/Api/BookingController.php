@@ -6,12 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\Room;
-<<<<<<< Updated upstream
-=======
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BookingConfirmed;
 use App\Models\PointHistory;
->>>>>>> Stashed changes
 
 class BookingController extends Controller
 {
