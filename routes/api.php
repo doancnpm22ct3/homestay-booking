@@ -11,6 +11,18 @@ use App\Http\Controllers\Api\Admin\BookingPaymentController;
 use App\Http\Controllers\Api\Admin\BookingServiceController;
 use App\Http\Controllers\Api\Admin\RoomAvailabilityController;
 use App\Http\Controllers\Api\VoucherController;
+<<<<<<< Updated upstream
+=======
+use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\Admin\DashboardController;
+use App\Http\Controllers\Api\Admin\VoucherController as AdminVoucherController;
+use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\RewardController;
+use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
+
+Route::post('/payment/create', [PaymentController::class, 'createPayment']);
+Route::get('/payment/vnpay-return', [PaymentController::class, 'vnpayReturn']);
+>>>>>>> Stashed changes
 
 // --- GHI ĐÈ API LẤY DANH SÁCH PHÒNG (TRẢ VỀ KÈM ẢNH) ---
 Route::get('/rooms', function (Request $request) {
@@ -111,13 +123,24 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// --- QUẢN LÝ VOUCHER & ĐIỂM THƯỞNG ---
+// --- ĐÁNH GIÁ PHÒNG (công khai) ---
+Route::get('/rooms/{roomId}/reviews', [ReviewController::class, 'index']);
+
+// --- ĐÁNH GIÁ & PHẦN THƯỞNG (yêu cầu đăng nhập) ---
 Route::middleware('auth:sanctum')->group(function () {
+    // Reviews
+    Route::post('/reviews', [ReviewController::class, 'store']);
+    Route::get('/rooms/{roomId}/can-review', [ReviewController::class, 'canReview']);
+
+    // Vouchers & Điểm thưởng
     Route::get('/vouchers/my-vouchers', [VoucherController::class, 'myVouchers']);
     Route::get('/vouchers/redeemable', [VoucherController::class, 'redeemable']);
     Route::post('/vouchers/redeem/{id}', [VoucherController::class, 'redeem']);
     Route::post('/vouchers/claim', [VoucherController::class, 'claim']);
     Route::post('/vouchers/spin', [VoucherController::class, 'spin']);
+
+    // Lịch sử điểm thưởng
+    Route::get('/rewards/history', [RewardController::class, 'history']);
 });
 
 // ══════════════════════════════════════════
@@ -159,6 +182,21 @@ Route::prefix('admin')->group(function () {
     
     // Mới: Danh sách hiển thị riêng cho Admin (có phân cấp)
     Route::get('/rooms', [RoomController::class, 'adminIndex']);
+<<<<<<< Updated upstream
+=======
+
+    // QUẢN LÝ VOUCHER CHO ADMIN
+    Route::get('/vouchers', [AdminVoucherController::class, 'index']);
+    Route::post('/vouchers', [AdminVoucherController::class, 'store']);
+    Route::put('/vouchers/{id}', [AdminVoucherController::class, 'update']);
+    Route::delete('/vouchers/{id}', [AdminVoucherController::class, 'destroy']);
+    Route::patch('/vouchers/{id}/toggle-status', [AdminVoucherController::class, 'toggleStatus']);
+
+    // QUẢN LÝ REVIEW CHO ADMIN
+    Route::get('/reviews', [AdminReviewController::class, 'index']);
+    Route::patch('/reviews/{id}/toggle-visible', [AdminReviewController::class, 'toggleVisible']);
+    Route::delete('/reviews/{id}', [AdminReviewController::class, 'destroy']);
+>>>>>>> Stashed changes
 });
 
 // GET /admin/users (Lấy danh sách)

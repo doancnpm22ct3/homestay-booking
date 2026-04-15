@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Voucher;
 use App\Models\User;
+use App\Models\PointHistory;
 
 class VoucherController extends Controller
 {
@@ -69,13 +70,21 @@ class VoucherController extends Controller
         }
 
         // Kiểm tra xem đã sở hữu chưa
-        if ($user->vouchers()->where('voucher_id', $voucher->id)->wherePivot('is_used', false)->exists()) {
-            return response()->json(['message' => 'Bạn đã đổi mã này rồi và chưa sử dụng.'], 400);
+        if ($user->vouchers()->where('voucher_id', $voucher->id)->exists()) {
+            return response()->json(['message' => 'Bạn đã quy đổi mã này rồi (mỗi mã chỉ được quy đổi 1 lần).'], 400);
         }
 
         // Trừ điểm và thêm voucher
         $user->decrement('points', $voucher->points_required);
         $user->vouchers()->attach($voucher->id);
+
+        // Ghi lịch sử điểm
+        PointHistory::create([
+            'user_id'     => $user->id,
+            'points'      => -$voucher->points_required,
+            'action'      => 'redeem',
+            'description' => 'Đổi ' . $voucher->points_required . ' điểm lấy voucher ' . $voucher->code,
+        ]);
 
         return response()->json(['message' => 'Đổi điểm thành công! Mã đã được lưu vào ví.']);
     }
@@ -108,9 +117,11 @@ class VoucherController extends Controller
     public function spin(Request $request)
     {
         $user = $request->user();
-        
-        // Mỗi ngày được quay 1 lần (Có thể lưu lại timestamp, tạm thời bỏ qua check ngày)
-        // Lấy ngẫu nhiên 1 voucher có points_required là null, hoặc tạo một mã ngẫu nhiên
+
+        // Giới hạn quay 1 lần / ngày
+        if ($user->last_spin_at && $user->last_spin_at->isToday()) {
+            return response()->json(['message' => 'Bạn đã quay hôm nay rồi. Hãy quay lại vào ngày mai nhé! 🌙'], 400);
+        }
 
         $vouchers = Voucher::where('is_active', true)
             ->inRandomOrder()
@@ -123,8 +134,20 @@ class VoucherController extends Controller
 
         $wonVoucher = $vouchers->first();
 
-        // Kiểm tra xem đã có chưa
-        if (!$user->vouchers()->where('voucher_id', $wonVoucher->id)->wherePivot('is_used', false)->exists()) {
+        // Cập nhật thời gian quay gần nhất
+        $user->last_spin_at = now();
+        $user->save();
+
+        // Ghi lịch sử điểm (quay không trừ điểm)
+        PointHistory::create([
+            'user_id'     => $user->id,
+            'points'      => 0,
+            'action'      => 'spin',
+            'description' => 'Vòng quay may mắn — trúng voucher: ' . $wonVoucher->code,
+        ]);
+
+        // Kiểm tra xem đã có chưa (dù dùng hay chưa)
+        if (!$user->vouchers()->where('voucher_id', $wonVoucher->id)->exists()) {
             $user->vouchers()->attach($wonVoucher->id);
             return response()->json([
                 'message' => 'Chúc mừng! Bạn quay trúng mã: ' . $wonVoucher->code,
@@ -133,7 +156,7 @@ class VoucherController extends Controller
         }
 
         return response()->json([
-            'message' => 'Bạn trúng ' . $wonVoucher->code . ' nhưng đã có mã này rồi. Lần sau may mắn nhé!'
+            'message' => 'Bạn trúng ' . $wonVoucher->code . ' nhưng bạn đã sở hữu mã này rồi. Lần sau may mắn nhé!'
         ]);
     }
 }

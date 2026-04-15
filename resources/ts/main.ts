@@ -23,6 +23,12 @@ import AdminRooms from './pages/admin/AdminRooms.vue';
 import AdminRoomForm from './pages/admin/AdminRoomForm.vue';
 import AdminBookings from './pages/admin/AdminBookings.vue';
 import AdminInvoices from './pages/admin/AdminInvoices.vue';
+<<<<<<< Updated upstream
+=======
+import AdminDashboard from './pages/admin/AdminDashboard.vue';
+import AdminVouchers from './pages/admin/AdminVouchers.vue';
+import AdminReviews from './pages/admin/AdminReviews.vue';
+>>>>>>> Stashed changes
 
 const router = createRouter({
   history: createWebHistory(),
@@ -50,6 +56,11 @@ const router = createRouter({
         { path: 'rooms/edit/:id', component: AdminRoomForm },
         { path: 'booking-management', component: AdminBookings },
         { path: 'invoices', component: AdminInvoices },
+<<<<<<< Updated upstream
+=======
+        { path: 'vouchers', component: AdminVouchers },
+        { path: 'reviews', component: AdminReviews },
+>>>>>>> Stashed changes
       ]
     }
   ]

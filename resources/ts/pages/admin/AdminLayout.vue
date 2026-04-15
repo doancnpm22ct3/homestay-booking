@@ -43,6 +43,13 @@
           <Users class="w-5 h-5 mr-3 transition-transform group-hover:scale-110" /> 
           <span class="font-medium">Người dùng</span>
         </router-link>
+
+        <router-link to="/admin/reviews" 
+          class="flex items-center px-4 py-3 rounded-xl text-gray-500 hover:bg-[#EDF2EF] hover:text-[#4A7055] transition-all duration-200 group" 
+          active-class="bg-[#4A7055] !text-white shadow-md">
+          <MessageSquare class="w-5 h-5 mr-3 transition-transform group-hover:scale-110" /> 
+          <span class="font-medium">Quản lý đánh giá</span>
+        </router-link>
       </nav>
 
       <div class="p-4 border-t border-gray-100 mb-2 bg-[#FCFAF6]">
@@ -71,5 +78,9 @@
 </template>
 
 <script setup lang="ts">
+<<<<<<< Updated upstream
 import { LayoutDashboard, Home, ClipboardList, Users, LogOut, Receipt } from 'lucide-vue-next';
+=======
+import { LayoutDashboard, Home, ClipboardList, Users, LogOut, Receipt, Ticket, MessageSquare } from 'lucide-vue-next';
+>>>>>>> Stashed changes
 </script>

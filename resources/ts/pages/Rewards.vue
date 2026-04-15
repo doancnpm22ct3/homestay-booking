@@ -143,6 +143,50 @@
               <p class="text-gray-400 italic">Hiện không có voucher nào khả dụng để đổi.</p>
             </div>
           </div>
+          
+          <!-- Lịch sử điểm thưởng -->
+          <div class="space-y-6 pt-6 border-t border-gray-100">
+            <h2 class="text-2xl font-bold text-gray-900 font-['Playfair_Display'] flex items-center gap-2">
+              <Clock class="w-6 h-6 text-[#4A7055]" />
+              Lịch sử điểm thưởng
+            </h2>
+            
+            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+              <div v-if="pointHistories.length === 0" class="p-8 text-center text-gray-500 italic">
+                Chưa có lịch sử giao dịch điểm.
+              </div>
+              <div v-else>
+                <div v-for="history in pointHistories" :key="history.id" class="p-5 border-b border-gray-50 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                  <div>
+                    <div class="font-bold text-gray-900 mb-1 flex items-center gap-2">
+                      {{ history.action_label }}
+                      <span 
+                        class="text-xs px-2 py-0.5 rounded-md"
+                        :class="history.action === 'earn' ? 'bg-blue-100 text-blue-700' : (history.action === 'spin' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700')"
+                      >
+                        {{ history.action }}
+                      </span>
+                    </div>
+                    <div class="text-sm text-gray-500">{{ history.description }}</div>
+                    <div class="text-xs text-gray-400 mt-1">{{ history.created_at }}</div>
+                  </div>
+                  <div class="text-lg font-bold" :class="history.points > 0 ? 'text-emerald-600' : (history.points < 0 ? 'text-red-500' : 'text-gray-500')">
+                    {{ history.points > 0 ? '+' : '' }}{{ history.points }}
+                  </div>
+                </div>
+                
+                <div v-if="hasMoreHistory" class="p-4 text-center">
+                  <button 
+                    @click="fetchHistory(historyPage + 1)" 
+                    :disabled="loadingHistory"
+                    class="text-sm font-bold text-[#4A7055] hover:underline disabled:opacity-50"
+                  >
+                    {{ loadingHistory ? 'Đang tải...' : 'Xem thêm' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
         </div>
       </div>
@@ -174,7 +218,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Coins, Copy, Check, Gift, Trophy } from 'lucide-vue-next';
+import { Coins, Copy, Check, Gift, Trophy, Clock } from 'lucide-vue-next';
 
 interface Voucher {
   id: number;
@@ -186,10 +230,23 @@ interface Voucher {
   discount_value: number;
 }
 
+interface PointHistory {
+  id: number;
+  points: number;
+  action: string;
+  description: string;
+  created_at: string;
+  action_label: string;
+}
+
 const userPoints = ref(0);
 const referralCode = ref('');
 const copied = ref(false);
 const redeemableVouchers = ref<Voucher[]>([]);
+const pointHistories = ref<PointHistory[]>([]);
+const historyPage = ref(1);
+const hasMoreHistory = ref(true);
+const loadingHistory = ref(false);
 const isSpinning = ref(false);
 const rotation = ref(0);
 const spinResult = ref<any>(null);
@@ -226,7 +283,39 @@ const fetchData = async () => {
   }
 };
 
-onMounted(fetchData);
+const fetchHistory = async (page = 1) => {
+  if (loadingHistory.value) return;
+  
+  loadingHistory.value = true;
+  try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    const response = await fetch(`/api/rewards/history?page=${page}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (page === 1) {
+        pointHistories.value = data.histories.data;
+      } else {
+        pointHistories.value.push(...data.histories.data);
+      }
+      historyPage.value = data.histories.current_page;
+      hasMoreHistory.value = data.histories.current_page < data.histories.last_page;
+    }
+  } catch (error) {
+    console.error('Lỗi khi tải lịch sử:', error);
+  } finally {
+    loadingHistory.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchData();
+  fetchHistory();
+});
 
 const copyReferral = () => {
   navigator.clipboard.writeText(referralCode.value);
@@ -285,6 +374,7 @@ const spinWheel = async () => {
           code: data.voucher ? data.voucher.code : 'UNKNOWN',
           message: data.message
         };
+        fetchHistory(1); // Cập nhật lại lịch sử
       }, 4000);
     } else {
       alert(data.message);

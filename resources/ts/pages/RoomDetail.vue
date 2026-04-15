@@ -26,8 +26,8 @@
         <div class="flex items-center gap-4 text-sm text-gray-600 font-['Inter']">
           <div class="flex items-center gap-1">
             <Star class="w-4 h-4 fill-amber-400 text-amber-400" />
-            <span class="font-bold text-gray-900">4.8</span>
-            <span class="underline cursor-pointer hover:text-[#4A7055] transition-colors">(120 đánh giá)</span>
+            <span class="font-bold text-gray-900">{{ averageRating > 0 ? averageRating : 'Chưa có' }}</span>
+            <span class="underline cursor-pointer hover:text-[#4A7055] transition-colors">({{ reviewCount }} đánh giá)</span>
           </div>
           <div class="flex items-center gap-1">
             <MapPin class="w-4 h-4" />
@@ -183,25 +183,69 @@
 
           <section>
             <h2 class="text-2xl font-bold text-gray-900 mb-6 font-['Playfair_Display']">Đánh giá</h2>
-            <div class="space-y-6">
-              <div v-for="i in 4" :key="i" class="pb-6 border-b border-gray-100 last:border-0">
+            
+            <div v-if="canReview" class="mb-10 bg-white p-6 rounded-2xl border border-[#4A7055]/30 shadow-sm">
+              <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Star class="w-5 h-5 text-[#4A7055]" /> Gửi đánh giá chuyến đi của bạn
+              </h3>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Đánh giá sao</label>
+                  <div class="flex gap-2">
+                    <button 
+                      v-for="star in 5" 
+                      :key="star"
+                      @click="reviewRating = star"
+                      class="text-2xl outline-none transition-transform hover:scale-110"
+                      :class="star <= reviewRating ? 'text-amber-400' : 'text-gray-300'"
+                    >
+                      ★
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Nhận xét của bạn</label>
+                  <textarea 
+                    v-model="reviewComment" 
+                    rows="4" 
+                    placeholder="Chia sẻ trải nghiệm của bạn về phòng này..."
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-[#4A7055] resize-none"
+                  ></textarea>
+                </div>
+                <button 
+                  @click="submitReview"
+                  :disabled="submittingReview"
+                  class="bg-[#4A7055] text-white px-6 py-2.5 rounded-xl font-medium hover:bg-[#3b5a44] transition-colors disabled:opacity-50 flex items-center gap-2"
+                >
+                  <span v-if="submittingReview" class="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+                  Gửi đánh giá
+                </button>
+              </div>
+            </div>
+
+            <div v-if="reviews.length > 0" class="space-y-6">
+              <div v-for="review in reviews" :key="review.id" class="pb-6 border-b border-gray-100 last:border-0">
                 <div class="flex items-center gap-4 mb-4">
-                  <div class="w-12 h-12 rounded-full bg-[#4A7055]/10 flex items-center justify-center text-[#4A7055] font-bold text-lg">
-                    U
+                  <div class="w-12 h-12 rounded-full bg-[#4A7055]/10 flex items-center justify-center text-[#4A7055] font-bold text-lg uppercase">
+                    {{ review.user_name.charAt(0) }}
                   </div>
                   <div>
-                    <div class="font-bold text-gray-900 font-['Inter']">User {{ i }}</div>
-                    <div class="text-sm text-gray-500 font-['Inter']">Tháng 10 năm 2023</div>
+                    <div class="font-bold text-gray-900 font-['Inter']">{{ review.user_name }}</div>
+                    <div class="text-sm text-gray-500 font-['Inter']">{{ review.created_at }}</div>
+                  </div>
+                  <div class="ml-auto flex text-amber-400 text-sm">
+                    <span v-for="s in review.rating" :key="'s'+s">★</span>
+                    <span v-for="e in (5 - review.rating)" :key="'e'+e" class="text-gray-300">★</span>
                   </div>
                 </div>
                 <p class="text-gray-700 italic font-['Inter'] leading-relaxed">
-                  "Mình ở một tuần, trải nghiệm cực kì tốt, 100% sẽ giới thiệu cho bạn mình. Phòng đẹp hơn cả mình kỳ vọng mà giá cả phải chăng."
+                  "{{ review.comment }}"
                 </p>
               </div>
             </div>
-            <button class="mt-6 border-2 border-gray-900 text-gray-900 px-8 py-3 rounded-full font-bold font-['Inter'] hover:bg-gray-900 hover:text-white transition-colors">
-              Hiển thị tất cả 120 đánh giá
-            </button>
+            <div v-else class="text-gray-500 italic py-8 border border-dashed border-gray-200 rounded-xl text-center">
+              Chưa có đánh giá nào cho phòng này.
+            </div>
           </section>
 
         </div>
@@ -304,6 +348,14 @@ interface RoomData {
   amenity_list?: any[]; 
 }
 
+interface ReviewData {
+  id: number;
+  rating: number;
+  comment: string;
+  created_at: string;
+  user_name: string;
+}
+
 const route = useRoute();
 const router = useRouter();
 
@@ -325,6 +377,87 @@ const errorMessage = ref('');
 
 const todayObj = new Date();
 const minDate = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, '0')}-${String(todayObj.getDate()).padStart(2, '0')}`;
+
+// State cho Đánh giá (Reviews)
+const reviews = ref<ReviewData[]>([]);
+const averageRating = ref(0);
+const reviewCount = ref(0);
+
+const canReview = ref(false);
+const reviewBookingId = ref<number | null>(null);
+const reviewRating = ref(5);
+const reviewComment = ref('');
+const submittingReview = ref(false);
+
+const checkCanReview = async (roomId: string | number) => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) return;
+  try {
+    const response = await fetch(`/api/rooms/${roomId}/can-review`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (response.ok) {
+      const data = await response.json();
+      canReview.value = data.can_review;
+      if (data.can_review) {
+        reviewBookingId.value = data.booking_id;
+      }
+    }
+  } catch (err) {
+    console.error('Error checking review status', err);
+  }
+};
+
+const fetchReviews = async (roomId: string | number) => {
+  try {
+    const response = await fetch(`/api/rooms/${roomId}/reviews`);
+    if (response.ok) {
+      const data = await response.json();
+      reviews.value = data.reviews;
+      averageRating.value = data.average;
+      reviewCount.value = data.count;
+    }
+  } catch (err) {
+    console.error('Error fetching reviews', err);
+  }
+};
+
+const submitReview = async () => {
+  if (!reviewBookingId.value || !reviewRating.value) return;
+  
+  submittingReview.value = true;
+  const token = localStorage.getItem('auth_token');
+  try {
+    const response = await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        booking_id: reviewBookingId.value,
+        rating: reviewRating.value,
+        comment: reviewComment.value
+      })
+    });
+    
+    const data = await response.json();
+    if (response.ok) {
+      alert('Cảm ơn bạn đã đánh giá!');
+      canReview.value = false;
+      reviewComment.value = '';
+      fetchReviews(route.params.id as string);
+    } else {
+      alert(data.message || 'Có lỗi xảy ra khi gửi đánh giá.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Đã có lỗi kết nối, vui lòng thử lại.');
+  } finally {
+    submittingReview.value = false;
+  }
+};
 
 // --- CÁC HÀM ĐIỀU KHIỂN GALLERY ---
 const openGallery = (index: number) => {
@@ -401,6 +534,9 @@ onMounted(async () => {
         'https://picsum.photos/seed/fallback4/600/400'
       ];
     }
+
+    await fetchReviews(roomId);
+    await checkCanReview(roomId);
   } catch (error) {
     console.error(error);
   } finally {

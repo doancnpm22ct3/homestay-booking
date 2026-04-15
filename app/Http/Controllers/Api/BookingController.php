@@ -6,6 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\Room;
+<<<<<<< Updated upstream
+=======
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BookingConfirmed;
+use App\Models\PointHistory;
+>>>>>>> Stashed changes
 
 class BookingController extends Controller
 {
@@ -69,6 +75,14 @@ class BookingController extends Controller
             $earnedPoints = floor($request->total_price / 100000);
             if ($earnedPoints > 0) {
                 $user->increment('points', $earnedPoints);
+
+                // Ghi lịch sử điểm
+                PointHistory::create([
+                    'user_id'     => $user->id,
+                    'points'      => $earnedPoints,
+                    'action'      => 'earn',
+                    'description' => 'Tích điểm từ booking #' . $booking->booking_code . ' (' . number_format($request->total_price) . 'đ)',
+                ]);
             }
         }
 
