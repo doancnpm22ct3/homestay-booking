@@ -1,60 +1,134 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏡 Homestay Booking
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Ứng dụng đặt phòng homestay xây dựng bằng **Laravel** + **Vue 3** + **Tailwind CSS v4** + **Vite 6**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## ⚙️ Yêu cầu cài đặt
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Trước khi bắt đầu, đảm bảo máy bạn đã cài:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Công cụ | Phiên bản tối thiểu | Link tải |
+|---------|---------------------|----------|
+| PHP | >= 8.1 | https://www.php.net/downloads |
+| Composer | >= 2.x | https://getcomposer.org |
+| Node.js | >= 18.x | https://nodejs.org |
+| MySQL | >= 8.0 | https://dev.mysql.com/downloads |
+| Git | Bất kỳ | https://git-scm.com |
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🚀 Hướng dẫn setup
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Clone repository
 
-## Laravel Sponsors
+```bash
+git clone https://github.com/doancnpm22ct3/homestay-booking.git
+cd homestay-booking
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 2. Cài đặt PHP dependencies
 
-### Premium Partners
+```bash
+composer install
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 3. Tạo file cấu hình môi trường
 
-## Contributing
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 4. Cấu hình database
 
-## Code of Conduct
+Mở file `.env` và chỉnh sửa thông tin database:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=homestay_booking   # Tên database bạn tạo
+DB_USERNAME=root                # Username MySQL của bạn
+DB_PASSWORD=                    # Password MySQL của bạn
+```
 
-## Security Vulnerabilities
+> ⚠️ Tạo database trước trong MySQL: `CREATE DATABASE homestay_booking;`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 5. Chạy migration
 
-## License
+```bash
+php artisan migrate
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-"# homestay-booking" 
+> Nếu có seeder: `php artisan migrate --seed`
+
+### 6. Cài đặt Node.js dependencies
+
+```bash
+npm install
+```
+
+### 7. Chạy ứng dụng
+
+Mở **2 terminal** và chạy song song:
+
+**Terminal 1 – Backend (Laravel):**
+```bash
+php artisan serve
+```
+
+**Terminal 2 – Frontend (Vite):**
+```bash
+npm run dev
+```
+
+### 8. Truy cập
+
+Mở trình duyệt và vào: **http://localhost:8000**
+
+---
+
+## 📁 Cấu trúc thư mục chính
+
+```
+homestay-booking/
+├── app/                # Logic backend (Controllers, Models...)
+├── resources/
+│   ├── ts/             # Source frontend Vue 3 + TypeScript
+│   │   ├── main.ts     # Entry point
+│   │   └── index.css   # Global CSS (Tailwind)
+│   └── views/
+│       └── welcome.blade.php  # HTML shell cho Vue app
+├── routes/
+│   └── web.php         # Định nghĩa routes
+├── vite.config.js      # Cấu hình Vite
+└── .env                # Biến môi trường (KHÔNG commit file này)
+```
+
+---
+
+## 🌿 Quy trình làm việc với Git
+
+```bash
+# Tạo branch mới cho tính năng của bạn
+git checkout -b feature/ten-tinh-nang
+
+# Sau khi code xong, commit
+git add .
+git commit -m "feat: mô tả tính năng"
+
+# Push lên GitHub
+git push origin feature/ten-tinh-nang
+```
+
+> Tạo **Pull Request** để merge vào `develop`, không push thẳng vào `main`.
+
+---
+
+## ❓ Gặp lỗi?
+
+- **`php artisan` không chạy** → Kiểm tra PHP đã cài và thêm vào PATH
+- **Lỗi database** → Kiểm tra thông tin `.env` và đảm bảo MySQL đang chạy
+- **`npm install` lỗi** → Thử `npm install --legacy-peer-deps`
+- **Vite không start** → Kiểm tra Node.js phiên bản >= 18

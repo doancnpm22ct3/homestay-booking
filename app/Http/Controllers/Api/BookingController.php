@@ -1,0 +1,91 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Booking;
+use App\Models\Room;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BookingConfirmed;
+use App\Models\PointHistory;
+
+class BookingController extends Controller
+{
+    // HÀM LƯU ĐƠN ĐẶT PHÒNG TỪ KHÁCH
+    public function store(Request $request)
+    {
+        $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'room_id' => 'required|exists:rooms,id',
+            'check_in_date' => 'required|date|after_or_equal:today',
+            'check_out_date' => 'required|date|after:check_in_date',
+        ], [
+            'check_in_date.after_or_equal' => 'Ngày nhận phòng không thể chọn ở trong quá khứ.',
+            'check_out_date.after' => 'Ngày trả phòng phải sau ngày nhận phòng.'
+        ]);
+
+        $booking = Booking::create([
+            'booking_code' => 'HD-' . strtoupper(uniqid()), // Tạo mã hóa đơn ngẫu nhiên (VD: HD-64A1B...)
+            'customer_name' => $request->customer_name,
+            'customer_email' => $request->customer_email,
+            'customer_phone' => $request->customer_phone,
+            'room_name' => $request->room_name,
+            'total_price' => $request->total_price,
+            'deposit_amount' => $request->deposit_amount,
+            'payment_status' => 'deposited', // Mặc định là đã cọc
+            // Dữ liệu cho Module Quản Lý Booking:
+            'customer_id' => auth()->id() ?? null,
+            'room_id' => $request->room_id,
+            'voucher_id' => $request->voucher_id ?? null, // Thêm voucher_id
+            'check_in_date' => $request->check_in_date,
+            'check_out_date' => $request->check_out_date,
+            'adults' => $request->adults ?? 1,
+            'children' => $request->children ?? 0,
+            'status' => 'pending', 
+            'source' => 'website',
+            'subtotal' => $request->subtotal ?? $request->total_price,
+            'total_amount' => $request->total_price,
+            'paid_amount' => $request->deposit_amount
+        ]);
+
+        // 2. Tự động đổi trạng thái phòng thành "Đã đặt cọc" (booked)
+        $room = Room::find($request->room_id);
+        if ($room) {
+            $room->status = 'booked';
+            $room->save();
+        }
+
+        // 3. Xử lý Voucher và Điểm thưởng nếu đã đăng nhập
+        $user = auth()->user();
+        if ($user) {
+            // Đánh dấu voucher đã sử dụng trong bảng pivot
+            if ($request->voucher_id) {
+                $user->vouchers()->updateExistingPivot($request->voucher_id, [
+                    'is_used' => true,
+                    'used_at' => now()
+                ]);
+            }
+
+            // Cộng điểm thưởng: 100.000 VNĐ = 1 điểm
+            // Giả sử cộng điểm dựa trên tổng giá trị đơn hàng (total_price)
+            $earnedPoints = floor($request->total_price / 100000);
+            if ($earnedPoints > 0) {
+                $user->increment('points', $earnedPoints);
+
+                // Ghi lịch sử điểm
+                PointHistory::create([
+                    'user_id'     => $user->id,
+                    'points'      => $earnedPoints,
+                    'action'      => 'earn',
+                    'description' => 'Tích điểm từ booking #' . $booking->booking_code . ' (' . number_format($request->total_price) . 'đ)',
+                ]);
+            }
+        }
+
+        return response()->json([
+            'message' => '🎉 Đặt phòng và thanh toán cọc thành công!',
+            'booking' => $booking
+        ], 201);
+    }
+}
