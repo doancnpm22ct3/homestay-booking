@@ -17,7 +17,7 @@ class AuthController extends Controller
     {
         // Thêm "Bộ lọc thép" Regex và tùy chỉnh câu báo lỗi bằng tiếng Việt
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',   
+            'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/i'],
             'phone' => ['required', 'string', 'unique:users', 'regex:/^(0|\+84)[3|5|7|8|9][0-9]{8}$/'],
             'password' => 'required|string|min:6',
@@ -28,7 +28,7 @@ class AuthController extends Controller
             'email.unique' => 'Email này đã có người sử dụng!',
             'phone.unique' => 'Số điện thoại này đã có người sử dụng!',
         ]);
-// kiểm tra xem có lỗi không
+        // kiểm tra xem có lỗi không
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
@@ -106,12 +106,12 @@ class AuthController extends Controller
     public function checkStatus(Request $request)
     {
         $user = User::where('email', $request->email)->first();
-        
+
         // Nếu không tìm thấy user hoặc user đã bị khóa
         if (!$user || $user->status === 'blocked') {
             return response()->json(['message' => 'Bị khóa'], 401);
         }
-        
+
         // TRẢ VỀ THÊM THÔNG TIN USER MỚI NHẤT ĐỂ VUE ĐỐI CHIẾU
         return response()->json([
             'message' => 'An toàn',

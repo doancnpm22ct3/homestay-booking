@@ -26,19 +26,19 @@ Route::get('/rooms', function (Request $request) {
     // Nếu không có param ?all=true (tức là người dùng thường) thì mới ẩn đi
     if (!$request->query('all')) {
         $query->where('is_visible', 1)
-              ->where('status', '!=', 'hidden')
-              ->where('rent_type', '!=', 'room_based');
+            ->where('status', '!=', 'hidden')
+            ->where('rent_type', '!=', 'room_based');
     }
 
-    $rooms = $query->orderBy('id', 'desc')->get()->map(function($room) {
+    $rooms = $query->orderBy('id', 'desc')->get()->map(function ($room) {
         // Ưu tiên hình ảnh của chính phòng đó
-        $primaryImage = $room->images->where('is_primary', true)->first() 
-                        ?? $room->images->first();
-        
+        $primaryImage = $room->images->where('is_primary', true)->first()
+            ?? $room->images->first();
+
         // Nếu không có ảnh, lấy ảnh của Homestay cha (nếu là phòng riêng)
         if (!$primaryImage && $room->parentHomestay) {
             $primaryImage = $room->parentHomestay->images->where('is_primary', true)->first()
-                           ?? $room->parentHomestay->images->first();
+                ?? $room->parentHomestay->images->first();
         }
 
         return [
@@ -150,43 +150,43 @@ Route::middleware('auth:sanctum')->group(function () {
 // ══════════════════════════════════════════
 // ĐÃ SỬA: Thêm middleware auth:sanctum để bảo vệ toàn bộ các route admin trong này
 Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
-    
+
     // MỚI: API Thống kê đã được chuyển vào đây và được bảo vệ an toàn
     Route::get('/dashboard/statistics', [DashboardController::class, 'getStatistics']);
 
     // Stats & calendar
-    Route::get('/bookings/stats',    [BookingController::class, 'stats']);
+    Route::get('/bookings/stats', [BookingController::class, 'stats']);
     Route::get('/bookings/calendar', [BookingController::class, 'calendar']);
 
     // CRUD
-    Route::get('/bookings',               [BookingController::class, 'index']);
-    Route::post('/bookings',              [BookingController::class, 'store']);
-    Route::get('/bookings/{id}',          [BookingController::class, 'show']);
-    Route::put('/bookings/{id}',          [BookingController::class, 'update']);
+    Route::get('/bookings', [BookingController::class, 'index']);
+    Route::post('/bookings', [BookingController::class, 'store']);
+    Route::get('/bookings/{id}', [BookingController::class, 'show']);
+    Route::put('/bookings/{id}', [BookingController::class, 'update']);
     Route::patch('/bookings/{id}/status', [BookingController::class, 'changeStatus']);
     Route::post('/bookings/{id}/checkin', [BookingController::class, 'checkin']);
-    Route::post('/bookings/{id}/checkout',[BookingController::class, 'checkout']);
-    Route::post('/bookings/{id}/cancel',  [BookingController::class, 'cancel']);
+    Route::post('/bookings/{id}/checkout', [BookingController::class, 'checkout']);
+    Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
     Route::post('/bookings/{id}/transfer-room', [BookingController::class, 'transferRoom']);
 
     // Services
-    Route::post('/bookings/{id}/services',         [BookingServiceController::class, 'store']);
+    Route::post('/bookings/{id}/services', [BookingServiceController::class, 'store']);
     Route::delete('/bookings/{id}/services/{sid}', [BookingServiceController::class, 'destroy']);
 
     // Payments
-    Route::get('/bookings/{id}/payments',  [BookingPaymentController::class, 'index']);
+    Route::get('/bookings/{id}/payments', [BookingPaymentController::class, 'index']);
     Route::post('/bookings/{id}/payments', [BookingPaymentController::class, 'store']);
 
     // Room availability & status
-    Route::get('/rooms/available',     [RoomAvailabilityController::class, 'available']);
-    Route::get('/rooms/all-status',    [RoomAvailabilityController::class, 'allRooms']);
+    Route::get('/rooms/available', [RoomAvailabilityController::class, 'available']);
+    Route::get('/rooms/all-status', [RoomAvailabilityController::class, 'allRooms']);
     Route::patch('/rooms/{id}/status', [RoomAvailabilityController::class, 'updateStatus']);
     Route::patch('/rooms/{id}/toggle-maintenance', [RoomAvailabilityController::class, 'toggleMaintenance']);
 
     // Lấy danh sách homestay và chuyển đổi mô hình
     Route::get('/rooms/homestays', [RoomController::class, 'getHomestays']);
     Route::post('/rooms/{id}/convert-to-room-based', [RoomController::class, 'convertToRoomBased']);
-    
+
     // Danh sách hiển thị riêng cho Admin (có phân cấp)
     Route::get('/rooms', [RoomController::class, 'adminIndex']);
 
