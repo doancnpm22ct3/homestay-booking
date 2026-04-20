@@ -145,6 +145,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/vouchers/spin', [VoucherController::class, 'spin']);
 });
 
+
 // ══════════════════════════════════════════
 // QUẢN LÝ BOOKING – ADMIN
 // ══════════════════════════════════════════
