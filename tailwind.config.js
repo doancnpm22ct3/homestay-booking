@@ -1,39 +1,27 @@
-import defaultTheme from 'tailwindcss/defaultTheme';
-
 /** @type {import('tailwindcss').Config} */
-export default {
-
-    theme: {
+module.exports = {
+  content: [
+    "./resources/**/*.blade.php",
+    "./resources/**/*.js",
+    "./resources/**/*.ts",
+    "./resources/**/*.vue",
+  ],
+  theme: {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#4A7055', // Xanh chủ đạo
-          hover: '#3b5a44',   // Xanh khi hover
-          light: '#4A705533', // Xanh nhạt (opacity 20%)
+          DEFAULT: '#4A7055',
+          10: 'rgba(74, 112, 85, 0.1)',
         },
-        background: '#FAF9F5', // Màu nền tổng thể
+        background: {
+          DEFAULT: '#FAF9F5',
+        }
       },
       fontFamily: {
-        heading: ['"Playfair Display"', 'serif'],
         sans: ['"Inter"', 'sans-serif'],
+        serif: ['"Lora"', 'serif'],
       }
     },
   },
   plugins: [],
-
-    content: [
-        './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
-        './storage/framework/views/*.php',
-        './resources/views/**/*.blade.php',
-        './resources/js/**/*.vue', // Đảm bảo dòng này có mặt để Tailwind quét file Vue
-    ],
-    theme: {
-        extend: {
-            colors: {
-                'brand-green': '#4A7055',
-                'brand-green-dark': '#3a5944',
-            },
-        },
-    },
-    plugins: [],
-};
+}
