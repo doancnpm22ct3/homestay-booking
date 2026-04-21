@@ -39,8 +39,8 @@
             <h3 class="font-bold text-sm text-gray-500 uppercase tracking-widest mb-3 border-l-4 border-emerald-500 pl-2">Phần 1: Thông tin lưu trú</h3>
             <div class="grid grid-cols-2 gap-y-2 text-sm pl-3">
               <div class="col-span-2"><span class="text-gray-500 w-24 inline-block">Khách hàng:</span> <span class="font-semibold text-base">{{ customerName }} (Phòng {{ roomName }})</span></div>
-              <div><span class="text-gray-500 w-24 inline-block">Giờ vào:</span> <span class="font-medium">{{ fmtDateTime(booking.check_in_date) }}</span></div>
-              <div><span class="text-gray-500 w-24 inline-block">Giờ ra:</span> <span class="font-medium">{{ isEarlyWarning ? todayStr : fmtDateTime(booking.check_out_date) }}</span></div>
+              <div><span class="text-gray-500 w-24 inline-block">Giờ vào:</span> <span class="font-medium">{{ fmtCombined(booking.check_in_date, booking.check_in_time) }}</span></div>
+              <div><span class="text-gray-500 w-24 inline-block">Giờ ra:</span> <span class="font-medium">{{ isEarlyWarning ? todayStr : fmtCombined(booking.check_out_date, booking.check_out_time) }}</span></div>
             </div>
           </section>
 
@@ -176,6 +176,12 @@ function fmtDateTime(d: string) {
 function fmtShortDate(d: string) {
   if(!d) return '—';
   return new Date(d).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+}
+function fmtCombined(date: string, time: string) {
+  if (!date) return '—';
+  const [y, m, d] = date.slice(0, 10).split('-');
+  const t = time ? time.slice(0, 5) : '00:00';
+  return `${t} ${d}/${m}/${y}`;
 }
 function fmtMoney(n:number){ return new Intl.NumberFormat('vi-VN').format(n??0)+'đ'; }
 

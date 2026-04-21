@@ -503,16 +503,16 @@ const fetchRooms = async (page = 1) => {
       let thumb = 'https://picsum.photos/seed/room/600/400';
       if (room.images && room.images.length > 0) {
         thumb = room.images[0].image_url;
-      } else if (room.image_url) {
-        thumb = room.image_url;
+      } else if (room.image) {
+        thumb = room.image;
       }
       return { ...room, image: formatUrl(thumb) };
     });
 
     pagination.value = {
-      current_page: data.current_page,
-      last_page: data.last_page,
-      total: data.total
+      current_page: data.meta.current_page,
+      last_page: data.meta.last_page,
+      total: data.meta.total
     };
   } catch (error) {
     console.error('Lỗi khi tải danh sách phòng:', error);
@@ -548,7 +548,8 @@ const openRoomDetail = async (id: number) => {
     // Gọi API lấy dữ liệu chi tiết của đúng phòng này (bao gồm cả mảng images và amenity_list)
     const response = await fetch(`/api/rooms/${id}`);
     if (response.ok) {
-      selectedRoom.value = await response.json();
+      const data = await response.json();
+      selectedRoom.value = data.data || data;
     } else {
       alert('Không thể tải chi tiết phòng!');
       showDetailModal.value = false;

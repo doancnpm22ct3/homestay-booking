@@ -41,8 +41,8 @@
               <div class="grid grid-cols-2 gap-3 text-sm">
                 <div><span class="text-gray-400">Phòng:</span> <span class="font-semibold text-emerald-700 ml-1">{{ booking.room?.room_number }} – {{ booking.room?.title }}</span></div>
                 <div><span class="text-gray-400">Loại:</span> <span class="ml-1">{{ booking.room?.type }}</span></div>
-                <div><span class="text-gray-400">Check-in:</span> <span class="font-medium ml-1">{{ fmtDate(booking.check_in_date) }}</span></div>
-                <div><span class="text-gray-400">Check-out:</span> <span class="font-medium ml-1">{{ fmtDate(booking.check_out_date) }}</span></div>
+                <div><span class="text-gray-400">Check-in:</span> <span class="font-medium ml-1">{{ fmtCombined(booking.check_in_date, booking.check_in_time) }}</span></div>
+                <div><span class="text-gray-400">Check-out:</span> <span class="font-medium ml-1">{{ fmtCombined(booking.check_out_date, booking.check_out_time) }}</span></div>
                 <div><span class="text-gray-400">Số đêm:</span> <span class="ml-1">{{ booking.nights_count ?? nightsCount(booking.check_in_date, booking.check_out_date) }} đêm</span></div>
                 <div><span class="text-gray-400">Số người:</span> <span class="ml-1">{{ booking.adults }} lớn, {{ booking.children }} trẻ em</span></div>
               </div>
@@ -255,7 +255,11 @@ async function refetch() {
   loading.value = true;
   const res = await fetch(`${API}/bookings/${props.bookingId}`, { headers: { Authorization:`Bearer ${token()}` } });
   if (res.ok) {
-    booking.value = await res.json();
+    const data = await res.json();
+    const b = data.data;
+    if (b.room && b.room.data) b.room = b.room.data;
+    if (b.customer && b.customer.data) b.customer = b.customer.data;
+    booking.value = b;
     internalNote.value = booking.value.internal_note || '';
     guestNote.value    = booking.value.guest_note || '';
   }
@@ -308,6 +312,12 @@ async function removeService(sid: number) {
 
 // Helpers
 function fmtDate(d: string)     { if(!d) return '—'; const [y,m,day]=d.slice(0, 10).split('-'); return `${day}/${m}/${y}`; }
+function fmtCombined(date: string, time: string) {
+  if (!date) return '—';
+  const [y, m, d] = date.slice(0, 10).split('-');
+  const t = time ? time.slice(0, 5) : '00:00';
+  return `${t} ${d}/${m}/${y}`;
+}
 function fmtDateTime(d: string) { if(!d) return '—'; return new Date(d).toLocaleString('vi-VN'); }
 function fmtMoney(n: number)    { return new Intl.NumberFormat('vi-VN').format(n??0)+'đ'; }
 function nightsCount(ci:string,co:string){

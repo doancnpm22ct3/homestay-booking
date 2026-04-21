@@ -75,6 +75,7 @@ class BookingStatusUpdated extends Notification
             'message' => $this->message,
             'status' => $this->booking->status,
             'title' => 'Cập nhật trạng thái đơn hàng',
+            'action_url' => '/profile?tab=history',
         ];
     }
 }

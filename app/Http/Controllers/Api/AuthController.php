@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Voucher;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -99,7 +100,7 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Đăng nhập thành công',
             'access_token' => $token,
-            'user' => $user
+            'user' => new UserResource($user)
         ]);
     }
     // HÀM KIỂM TRA TRẠNG THÁI NGẦM
@@ -115,7 +116,7 @@ class AuthController extends Controller
         // TRẢ VỀ THÊM THÔNG TIN USER MỚI NHẤT ĐỂ VUE ĐỐI CHIẾU
         return response()->json([
             'message' => 'An toàn',
-            'user' => $user
+            'user' => new UserResource($user)
         ]);
     }
     // HÀM CẬP NHẬT PROFILE
@@ -145,7 +146,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Cập nhật tên thành công!',
-            'user' => $user
+            'user' => new UserResource($user)
         ]);
     }
 

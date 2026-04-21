@@ -288,10 +288,14 @@ async function fetchBookings() {
   const res = await fetch(`${API}/bookings?${params}`, { headers: { Authorization: `Bearer ${token()}` } });
   if (res.ok) {
     const data = await res.json();
-    bookings.value = data.data;
-    pagination.currentPage = data.current_page;
-    pagination.lastPage    = data.last_page;
-    pagination.total       = data.total;
+    bookings.value = data.data.map((b: any) => {
+      if (b.room && b.room.data) b.room = b.room.data;
+      if (b.customer && b.customer.data) b.customer = b.customer.data;
+      return b;
+    });
+    pagination.currentPage = data.meta.current_page;
+    pagination.lastPage    = data.meta.last_page;
+    pagination.total       = data.meta.total;
   }
   loading.value = false;
 }

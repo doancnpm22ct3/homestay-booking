@@ -30,7 +30,17 @@ Route::get('/rooms', function (Request $request) {
             ->where('rent_type', '!=', 'room_based');
     }
 
-    $rooms = $query->orderBy('id', 'desc')->get()->map(function ($room) {
+    // GỢI Ý THEO ĐÁNH GIÁ (Nếu có param ?sort=rating)
+    if ($request->query('sort') === 'rating') {
+        $query->withAvg(['reviews' => function($q) {
+            $q->where('is_hidden', false);
+        }], 'rating')
+        ->orderBy('reviews_avg_rating', 'desc');
+    } else {
+        $query->orderBy('id', 'desc');
+    }
+
+    $rooms = $query->get()->map(function ($room) {
         // Ưu tiên hình ảnh của chính phòng đó
         $primaryImage = $room->images->where('is_primary', true)->first()
             ?? $room->images->first();
@@ -95,8 +105,8 @@ Route::put('/admin/rooms/{id}', [RoomController::class, 'update']);
 Route::delete('/admin/rooms/{id}', [RoomController::class, 'destroy']);
 
 // --- AUTH & PROFILE ---
-Route::post('/register', [App\Http\Controllers\Api\AuthController::class, 'register']);
-Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login']);
+Route::post('/register', [App\Http\Controllers\Api\AuthController::class, 'register'])->middleware('throttle:register');
+Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login'])->middleware('throttle:login');
 Route::post('/profile/update', [App\Http\Controllers\Api\AuthController::class, 'updateProfile']);
 Route::post('/check-status', [App\Http\Controllers\Api\AuthController::class, 'checkStatus']);
 Route::middleware('auth:sanctum')->post('/logout', [App\Http\Controllers\Api\AuthController::class, 'logout']);
@@ -127,12 +137,18 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::get('/my-bookings', [App\Http\Controllers\Api\BookingController::class, 'myHistory']);
     Route::post('/bookings', [App\Http\Controllers\Api\BookingController::class, 'store']);
+    Route::post('/bookings/{id}/cancel', [App\Http\Controllers\Api\BookingController::class, 'cancel']);
     Route::get('/notifications', function (Request $request) {
-        return $request->user()->unreadNotifications;
+        return $request->user()->notifications()->latest()->limit(20)->get();
     });
     Route::post('/notifications/mark-as-read', function (Request $request) {
         $request->user()->unreadNotifications->markAsRead();
         return response()->json(['message' => 'Đã đánh dấu tất cả là đã đọc']);
+    });
+    Route::post('/notifications/{id}/mark-as-read', function (Request $request, $id) {
+        $notification = $request->user()->notifications()->findOrFail($id);
+        $notification->markAsRead();
+        return response()->json(['message' => 'Đã đánh dấu thông báo là đã đọc']);
     });
 });
 

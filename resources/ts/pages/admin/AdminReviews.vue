@@ -100,9 +100,9 @@ const fetchReviews = async (page = 1) => {
     const data = await res.json();
     reviews.value = data.data;
     pagination.value = {
-      total: data.total,
-      current_page: data.current_page,
-      last_page: data.last_page
+      total: data.meta.total,
+      current_page: data.meta.current_page,
+      last_page: data.meta.last_page
     };
   } catch (e) {
     console.error('Lỗi tải đánh giá:', e);

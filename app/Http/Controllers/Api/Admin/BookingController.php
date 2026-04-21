@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 use App\Notifications\BookingStatusUpdated;
 use App\Notifications\ReviewRequest;
 use App\Models\Review;
+use App\Http\Resources\BookingResource;
 
 class BookingController extends Controller
 {
@@ -59,15 +60,7 @@ class BookingController extends Controller
 
         $bookings = $query->paginate($request->per_page ?? 15);
         
-        $bookings->getCollection()->transform(function ($booking) {
-            $booking->customer_name = $booking->customer->name ?? $booking->customer_name ?? 'Khách vãng lai';
-            $booking->customer_phone = $booking->customer->phone ?? $booking->customer_phone ?? '';
-            $booking->customer_email = $booking->customer->email ?? $booking->customer_email ?? '';
-            $booking->room_name = $booking->room->title ?? $booking->room_name ?? 'Không rõ';
-            return $booking;
-        });
-
-        return response()->json($bookings);
+        return BookingResource::collection($bookings);
     }
 
     // GET /api/admin/bookings/stats
@@ -113,14 +106,9 @@ class BookingController extends Controller
 
     public function show($id)
     {
-        $b = Booking::with(['customer','room','room.images','services','payments.recordedBy','activities','createdBy'])->findOrFail($id);
+        $b = Booking::with(['customer', 'room.images', 'services', 'payments.recordedBy', 'activities', 'createdBy'])->findOrFail($id);
         
-        $b->customer_name = $b->customer->name ?? $b->customer_name ?? 'Khách vãng lai';
-        $b->customer_phone = $b->customer->phone ?? $b->customer_phone ?? '';
-        $b->customer_email = $b->customer->email ?? $b->customer_email ?? '';
-        $b->room_name = $b->room->title ?? $b->room_name ?? 'Không rõ';
-
-        return response()->json($b);
+        return new BookingResource($b);
     }
 
     // POST /api/admin/bookings
@@ -378,6 +366,10 @@ class BookingController extends Controller
             if ($booking->customer) {
                 $booking->customer->notify(new BookingStatusUpdated($booking, "Đơn đặt phòng #{$booking->booking_code} của bạn đã bị hủy. Lý do: {$request->cancel_reason}"));
             }
+
+            // Notify All Admins
+            $adminUsers = \App\Models\User::where('role', 'admin')->get();
+            \Illuminate\Support\Facades\Notification::send($adminUsers, new \App\Notifications\BookingCancelledAdmin($booking));
 
             DB::commit();
             return response()->json(['message'=>'Hủy thành công','booking'=>$booking->fresh()]);

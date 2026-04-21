@@ -235,8 +235,8 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-end mb-10">
           <div>
-            <h2 class="text-3xl font-bold text-gray-900 mb-2 font-['Playfair_Display']">Được tìm kiếm nhiều nhất</h2>
-            <p class="text-gray-600">Khám phá những chỗ nghỉ phổ biến nhất hiện nay</p>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2 font-['Playfair_Display']">Gợi ý phòng tốt nhất</h2>
+            <p class="text-gray-600">Những chỗ nghỉ có điểm đánh giá cao nhất từ khách hàng</p>
           </div>
           <router-link to="/listing" class="text-[#4A7055] font-medium hover:text-[#3b5a44] hidden sm:block">
             Xem tất cả &rarr;
@@ -258,6 +258,7 @@
             :rent_type="room.rent_type"
             :max_guests="room.max_guests"
             :max_children="room.max_children"
+            :average_rating="room.average_rating"
           />
         </div>
         <div class="mt-8 text-center sm:hidden">
@@ -572,7 +573,7 @@ onMounted(async () => {
   fetchAvailableLocations();
 
   try {
-    const response = await fetch('/api/rooms');
+    const response = await fetch('/api/rooms?sort=rating');
     const data = await response.json();
     
     // Lọc: Chỉ lấy những phòng đang TRỐNG và ĐƯỢC HIỆN THỊ
@@ -600,7 +601,8 @@ onMounted(async () => {
         parentId: room.parent_id,
         rent_type: room.rent_type,
         max_guests: room.max_guests,
-        max_children: room.max_children
+        max_children: room.max_children,
+        average_rating: room.average_rating
       };
     }).slice(0, 6); 
     

@@ -31,7 +31,7 @@
           
           <!-- Nút In hóa đơn -->
           <div class="p-6 border-b border-gray-100 flex justify-between items-center print:hidden">
-             <router-link to="/profile" class="flex items-center gap-2 text-gray-500 hover:text-[#4A7055] transition-colors font-bold">
+             <router-link to="/profile?tab=history" class="flex items-center gap-2 text-gray-500 hover:text-[#4A7055] transition-colors font-bold">
               <ChevronLeft class="w-5 h-5" />
               Quay lại lịch sử
             </router-link>
@@ -150,7 +150,19 @@ const isLoading = ref(true);
 const errorMessage = ref('');
 
 const roomImage = computed(() => {
-  return 'https://picsum.photos/seed/room/800/600';
+  if (!booking.value || !booking.value.room || !booking.value.room.images || booking.value.room.images.length === 0) {
+    return 'https://picsum.photos/seed/room/800/600';
+  }
+  
+  const images = booking.value.room.images;
+  const pImg = images.find((img: any) => img.is_primary) || images[0];
+  let url = pImg.image_url;
+  
+  if (url && !url.startsWith('http') && !url.startsWith('/storage/')) {
+    url = url.startsWith('/') ? `/storage${url}` : `/storage/${url}`;
+  }
+  
+  return url;
 });
 
 const formatMoney = (amount: number | string) => {
@@ -212,7 +224,8 @@ onMounted(async () => {
       throw new Error('Không thể tải thông tin đặt phòng');
     }
 
-    booking.value = await response.json();
+    const data = await response.json();
+    booking.value = data.data;
   } catch (error) {
     console.error("Lỗi fetch booking:", error);
     errorMessage.value = "Lỗi khi tải dữ liệu đơn hàng. Vui lòng kiểm tra lại trong mục Lịch sử đặt phòng.";
