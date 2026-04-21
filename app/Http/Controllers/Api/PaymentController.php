@@ -118,13 +118,14 @@ class PaymentController extends Controller
                     // CHUYỂN HƯỚNG VỀ VUE KÈM TRẠNG THÁI SUCCESS
                     return redirect($frontendUrl . '?status=success&booking_id=' . $bookingId);
                 } else {
-                    // CẬP NHẬT TRẠNG THÁI THẤT BẠI (Khách hủy hoặc thẻ hết tiền)
-                    $booking->status = 'FAILED'; 
-                    $booking->save();
-                    
-                    // CHUYỂN HƯỚNG VỀ VUE KÈM TRẠNG THÁI FAILED
-                    return redirect($frontendUrl . '?status=failed&booking_id=' . $bookingId);
-                }
+    // CẬP NHẬT TRẠNG THÁI THẤT BẠI (Khách hủy hoặc thẻ hết tiền)
+    // Sửa chữ 'FAILED' thành một con số (ví dụ số 2 tượng trưng cho trạng thái Hủy)
+    $booking->status = 2; 
+    $booking->save();
+
+    // CHUYỂN HƯỚNG VỀ VUE KÈM TRẠNG THÁI FAILED
+    return redirect($frontendUrl . '?status=failed&booking_id=' . $bookingId);
+}
             } else {
                  return redirect($frontendUrl . '?status=error&message=BookingNotFound');
             }
