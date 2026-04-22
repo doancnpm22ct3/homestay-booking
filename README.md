@@ -1,60 +1,90 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Homestay Booking System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A modern homestay and room booking management system built with Laravel, Vue 3, and Vite. This project provides a seamless experience for both administrators managing their properties and customers looking for high-quality stays.
 
-## About Laravel
+## 🚀 Key Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Dynamic Room Management**: Administrators can manage homestays, buildings, and individual rooms with ease.
+- **Advanced Booking System**: Real-time room status tracking (available, booked, in-use, maintenance).
+- **Voucher & Reward Points**: integrated voucher loyalty system and gamified reward points for customers.
+- **Reviews & Ratings**: Secure customer feedback system with admin moderation.
+- **Automated Notifications**: Database-driven notifications for new bookings, reviews, and status updates.
+- **Performance Optimized**: Database indexing, eager loading, and API Resources for fast responses.
+- **Security Hardened**: Rate limiting on sensitive routes, input sanitization, and strict CORS configuration.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠️ Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Backend**: Laravel 10
+- **Frontend**: Vue 3 + Vite + Tailwind CSS 4
+- **Database**: MySQL / MariaDB
+- **Icons**: Lucide Vue Next
+- **Charts**: Chart.js / Vue-Chartjs
+- **Animations**: Motion
 
-## Learning Laravel
+## 📦 Installation & Setup
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 1. Prerequisites
+- PHP >= 8.1
+- Composer
+- Node.js & NPM
+- MySQL / MariaDB
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Clone the Repository
+```bash
+git clone <repository-url>
+cd homestay-booking
+```
 
-## Laravel Sponsors
+### 3. Backend Setup
+```bash
+composer install
+cp .env.example .env
+# Update .env with your database credentials
+php artisan key:generate
+php artisan migrate --seed
+php artisan storage:link
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 4. Frontend Setup
+```bash
+npm install
+```
 
-### Premium Partners
+### 5. Start the Project
+In two separate terminals:
+```bash
+# Terminal 1: Laravel Server
+php artisan serve
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Terminal 2: Vite Dev Server
+npm run dev
+```
 
-## Contributing
+## 🔐 Security Configuration
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### API Rate Limiting
+The system implements strict rate limiting:
+- **Login**: 5 attempts per minute per IP.
+- **Register**: 3 attempts per minute per IP.
+- **General API**: 100 requests per minute.
 
-## Code of Conduct
+### Production CORS
+Update your `.env` file to include the allowed frontend URL:
+```env
+FRONTEND_URL=https://your-domain.com
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 📄 API Documentation
 
-## Security Vulnerabilities
+Comprehensive API documentation is available in the `docs/` directory.
+- **Postman Collection**: [docs/api_collection.json](./docs/api_collection.json)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 👤 Guides
 
-## License
+- [Admin Management Guide](./docs/ADMIN_GUIDE.md)
+- [Customer User Guide](./docs/USER_GUIDE.md)
+- [Project Presentation Summary](./docs/PROJECT_SUMMARY.md)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-"# homestay-booking" 
+## 📝 License
+
+This project is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
