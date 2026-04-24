@@ -6,8 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\Room;
+use App\Http\Resources\BookingResource;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BookingConfirmed;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Notification;
 
 class BookingController extends Controller
 {
@@ -73,16 +77,24 @@ class BookingController extends Controller
             }
         }
 
-        // 4. Gửi email xác nhận đặt phòng
+        // 4. Thông báo cho Admin (Database)
+        try {
+            $adminUsers = \App\Models\User::where('role', 'admin')->get();
+            \Illuminate\Support\Facades\Notification::send($adminUsers, new \App\Notifications\NewBookingAdmin($booking));
+        } catch (\Exception $e) {
+            \Log::error("Thông báo Admin thất bại: " . $e->getMessage());
+        }
+
+        // 5. Gửi email xác nhận đặt phòng cho khách
         try {
             Mail::to($booking->customer_email)->send(new BookingConfirmed($booking));
         } catch (\Exception $e) {
-            \Log::error("Gửi mail thất bại: " . $e->getMessage());
+            \Log::error("Gửi mail cho khách thất bại (Có thể do chưa cấu hình SMTP): " . $e->getMessage());
         }
 
         return response()->json([
             'message' => '🎉 Đặt phòng và thanh toán cọc thành công! Email xác nhận đã được gửi.',
-            'booking' => $booking
+            'booking' => new BookingResource($booking)
         ], 201);
     }
 
@@ -97,20 +109,87 @@ class BookingController extends Controller
         $bookings = Booking::where('customer_id', $user->id)
             ->with(['room.images', 'payments'])
             ->latest()
-            ->get()
-            ->map(function($booking) {
-                $booking->time_vn = $booking->created_at->format('d/m/Y');
-                $booking->status_label = match($booking->status) {
-                    'pending' => 'Chờ xác nhận',
-                    'confirmed' => 'Đã xác nhận',
-                    'checked_in' => 'Đang ở',
-                    'checked_out' => 'Đã trả phòng',
-                    'cancelled' => 'Đã hủy',
-                    default => $booking->status
-                };
-                return $booking;
-            });
+            ->get();
 
-        return response()->json($bookings);
+        return BookingResource::collection($bookings);
+    }
+
+    // KHÁCH HÀNG TỰ HỦY ĐẶT PHÒNG
+    public function cancel(Request $request, $id)
+    {
+        $user = auth()->user();
+        $booking = Booking::where('id', $id)
+            ->where('customer_id', $user->id)
+            ->firstOrFail();
+
+        // Chỉ cho hủy khi chưa check-in
+        if (!in_array($booking->status, ['pending', 'confirmed', 'deposited', 'booked'])) {
+            return response()->json(['message' => 'Đơn hàng hiện tại không thể hủy. Vui lòng liên hệ Admin.'], 422);
+        }
+
+        $now = Carbon::now();
+        $checkInDate = Carbon::parse($booking->check_in_date);
+        $createdAt = Carbon::parse($booking->created_at);
+        $daysToCheckIn = $now->diffInDays($checkInDate, false);
+        $minutesSinceBooking = $now->diffInMinutes($createdAt);
+
+        $refundPercent = 0;
+
+        // Chính sách hủy phòng
+        if ($minutesSinceBooking <= 30 || $daysToCheckIn >= 3) {
+            $refundPercent = 1; // Hoàn 100%
+        } elseif ($daysToCheckIn >= 1) {
+            $refundPercent = 0.5; // Hoàn 50%
+        } else {
+            $refundPercent = 0; // Không hoàn tiền
+        }
+
+        $paidAmount = (int)$booking->paid_amount;
+        $refundAmount = (int)($paidAmount * $refundPercent);
+
+        DB::beginTransaction();
+        try {
+            $booking->update([
+                'status' => 'cancelled',
+                'cancel_reason' => $request->reason ?? 'Khách hàng tự hủy trên hệ thống',
+                'cancelled_at' => $now,
+                'refund_amount' => $refundAmount
+            ]);
+
+            // Ghi nhận giao dịch hoàn tiền nếu có
+            if ($refundAmount > 0) {
+                $booking->payments()->create([
+                    'amount' => $refundAmount,
+                    'payment_method' => 'transfer',
+                    'payment_type' => 'refund',
+                    'note' => 'Hoàn tiền tự động (chính sách hủy phòng)',
+                    'recorded_by' => null // Tự động hệ thống
+                ]);
+            }
+
+            // Giải phóng trạng thái phòng
+            if ($booking->room) {
+                $booking->room->update([
+                    'status' => 'available',
+                    'room_status' => 'available'
+                ]);
+            }
+
+            $booking->logActivity('cancelled', "Khách hàng tự hủy. Hoàn tiền: " . number_format($refundAmount) . "đ");
+
+            // Thông báo cho Admin
+            $adminUsers = \App\Models\User::where('role', 'admin')->get();
+            Notification::send($adminUsers, new \App\Notifications\BookingCancelledAdmin($booking));
+
+            DB::commit();
+            return response()->json([
+                'message' => 'Hủy đặt phòng thành công!',
+                'refund_amount' => $refundAmount,
+                'booking' => new BookingResource($booking)
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Có lỗi xảy ra: ' . $e->getMessage()], 500);
+        }
     }
 }

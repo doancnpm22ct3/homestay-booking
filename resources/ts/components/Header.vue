@@ -34,32 +34,36 @@
           <img src="https://i.pravatar.cc/150?img=11" alt="Avatar" class="w-10 h-10 rounded-full border border-[#4A7055] object-cover" />
         </div>
         
-        <div class="relative">
-          <button @click="showNotifications = !showNotifications" class="relative text-[#4A7055] hover:text-[#3b5a44] transition-colors flex items-center justify-center mt-1">
-            <Bell class="w-6 h-6 fill-current" />
-            <span v-if="notifications.length > 0" class="absolute -top-0.5 -right-0.5 flex h-3 w-3">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-            </span>
-          </button>
+        <div class="flex items-center gap-4">
+          <div class="relative">
+            <button @click="showNotifications = !showNotifications" class="relative text-[#4A7055] hover:text-[#3b5a44] transition-colors flex items-center justify-center mt-1">
+              <Bell class="w-6 h-6 fill-current" />
+              <span v-if="hasUnreadNotifications" class="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+              </span>
+            </button>
 
-          <div v-if="showNotifications" class="absolute right-0 mt-6 w-[450px] bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-            <div class="px-6 py-5 border-b border-gray-100 bg-white flex justify-between items-center">
-              <h3 class="text-lg font-bold text-gray-900">Thông báo</h3>
-              <button v-if="notifications.length > 0" @click="markAsRead" class="text-xs text-[#4A7055] hover:underline font-medium">Đánh dấu tất cả là đã đọc</button>
-            </div>
-            <div class="max-h-[400px] overflow-y-auto">
-              <div v-if="notifications.length === 0" class="p-10 text-center">
-                <p class="text-gray-400 text-sm">Bạn không có thông báo mới.</p>
+            <div v-if="showNotifications" class="absolute right-0 mt-6 w-[450px] bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div class="px-6 py-5 border-b border-gray-100 bg-white flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-900">Thông báo</h3>
+                <button v-if="displayNotifications.some(n => !n.read_at)" @click="markAsRead" class="text-xs text-[#4A7055] hover:underline font-medium">Đánh dấu tất cả là đã đọc</button>
               </div>
-              <div v-else v-for="notif in notifications" :key="notif.id" @click="handleNotificationClick(notif)" class="p-5 flex gap-4 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-50 last:border-0">
-                <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center shrink-0">
-                  <component :is="getIcon(notif.data.status, notif.data.type)" :class="['w-5 h-5', getIconColor(notif.data.status, notif.data.type)]" />
+              <div class="max-h-[400px] overflow-y-auto">
+                <div v-if="displayNotifications.length === 0" class="p-10 text-center">
+                  <p class="text-gray-400 text-sm">Bạn không có thông báo mới.</p>
                 </div>
-                <div class="flex-1">
-                  <p class="text-sm font-bold text-gray-900 mb-0.5">{{ notif.data.title || 'Thông báo mới' }}</p>
-                  <p class="text-xs text-gray-600 leading-relaxed">{{ notif.data.message }}</p>
-                  <p class="text-[10px] text-gray-400 mt-2 font-medium">{{ new Date(notif.created_at).toLocaleString('vi-VN') }}</p>
+                <div v-else v-for="notif in displayNotifications" :key="notif.id" @click="handleNotificationClick(notif)" :class="['p-5 flex gap-4 transition-colors cursor-pointer border-b border-gray-50 last:border-0', !notif.read_at ? (isAdmin && notif.data.action_url?.startsWith('/admin') ? 'bg-emerald-500/5 hover:bg-emerald-500/10' : 'bg-[#4A7055]/5 hover:bg-[#4A7055]/10') : 'hover:bg-gray-50']">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" :class="isAdmin && notif.data.action_url?.startsWith('/admin') ? 'bg-emerald-50' : 'bg-gray-50'">
+                    <component :is="getIcon(notif)" :class="['w-5 h-5', getIconColor(notif)]" />
+                  </div>
+                  <div class="flex-1">
+                    <p class="text-sm font-bold text-gray-900 mb-0.5 flex items-center gap-2">
+                       {{ notif.data.title || 'Thông báo mới' }}
+                    </p>
+                    <p class="text-xs text-gray-600 leading-relaxed">{{ notif.data.message }}</p>
+                    <p class="text-[10px] text-gray-400 mt-2 font-medium">{{ new Date(notif.created_at).toLocaleString('vi-VN') }}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -81,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { Bell, LogOut, Menu, Info, CheckCircle, XCircle, Clock, Star } from 'lucide-vue-next';
@@ -89,9 +93,28 @@ import { Bell, LogOut, Menu, Info, CheckCircle, XCircle, Clock, Star } from 'luc
 const router = useRouter();
 
 const user = ref<any>(null);
-const showNotifications = ref(false);
 const isAdmin = ref(false);
 const notifications = ref<any[]>([]);
+
+const showNotifications = ref(false);
+
+const displayNotifications = computed(() => {
+  if (isAdmin.value) {
+    // Admin thấy tất cả, sắp xếp thông báo admin lên đầu
+    return [...notifications.value].sort((a, b) => {
+      const aIsAdmin = a.data.action_url?.startsWith('/admin') ? 1 : 0;
+      const bIsAdmin = b.data.action_url?.startsWith('/admin') ? 1 : 0;
+      if (aIsAdmin !== bIsAdmin) return bIsAdmin - aIsAdmin;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }
+  // User chỉ thấy thông báo không thuộc admin
+  return notifications.value.filter(n => !n.data.action_url || !n.data.action_url.startsWith('/admin'));
+});
+
+const hasUnreadNotifications = computed(() => {
+  return displayNotifications.value.some(n => !n.read_at);
+});
 
 const fetchNotifications = async () => {
   if (!user.value) return;
@@ -114,14 +137,19 @@ const markAsRead = async () => {
         'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
       }
     });
-    notifications.value = [];
+    await fetchNotifications();
   } catch (err) {
     console.error('Failed to mark as read:', err);
   }
 };
 
-const getIcon = (status: string, type: string) => {
+const getIcon = (notif: any) => {
+  const { status, type } = notif.data;
+  const isAdminNotif = notif.data.action_url?.startsWith('/admin');
+  
+  if (isAdminNotif) return Info;
   if (type === 'review_request') return Star;
+  
   switch (status) {
     case 'confirmed': return CheckCircle;
     case 'cancelled': return XCircle;
@@ -131,8 +159,13 @@ const getIcon = (status: string, type: string) => {
   }
 };
 
-const getIconColor = (status: string, type: string) => {
+const getIconColor = (notif: any) => {
+  const { status, type } = notif.data;
+  const isAdminNotif = notif.data.action_url?.startsWith('/admin');
+  
+  if (isAdminNotif) return 'text-emerald-600';
   if (type === 'review_request') return 'text-amber-500';
+  
   switch (status) {
     case 'confirmed': return 'text-green-500';
     case 'cancelled': return 'text-red-500';
@@ -142,7 +175,18 @@ const getIconColor = (status: string, type: string) => {
   }
 };
 
-const handleNotificationClick = (notif: any) => {
+const handleNotificationClick = async (notif: any) => {
+  if (!notif.read_at) {
+    try {
+      await axios.post(`/api/notifications/${notif.id}/mark-as-read`, {}, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+      });
+      await fetchNotifications();
+    } catch (err) {
+      console.error('Lỗi khi đánh dấu đã đọc:', err);
+    }
+  }
+
   if (notif.data.action_url) {
     router.push(notif.data.action_url);
   } else {
@@ -160,7 +204,6 @@ onMounted(() => {
         isAdmin.value = true;
       }
       fetchNotifications();
-      // Polling notifications every 60s
       setInterval(fetchNotifications, 60000);
     }
   } catch (error) {
@@ -172,13 +215,10 @@ watch(showNotifications, (val) => {
   if (val) fetchNotifications();
 });
 
-// Hàm xử lý luồng đi khi bấm vào Avatar
 const handleAvatarClick = () => {
   if (isAdmin.value) {
-    // Nếu là admin thì bay thẳng vào trang quản trị
     router.push('/admin/rooms'); 
   } else {
-    // Khách bình thường thì vào trang thông tin cá nhân
     router.push('/profile');
   }
 };
@@ -187,7 +227,6 @@ const handleLogout = async () => {
   try {
     const token = localStorage.getItem('auth_token');
     if (token) {
-      // Gọi API logout để hủy token ở server
       await fetch('/api/logout', {
         method: 'POST',
         headers: {
@@ -199,19 +238,13 @@ const handleLogout = async () => {
   } catch (error) {
     console.error('Lỗi link logout:', error);
   } finally {
-    // Xóa token và thông tin user khỏi localStorage
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_info');
-
-    // Reset state
     user.value = null;
     isAdmin.value = false; 
     showNotifications.value = false;
-
     alert('Đăng xuất thành công!');
     router.push('/');
-    
-    // Force reload để xóa triệt để cache/state cũ
     setTimeout(() => {
         window.location.reload();
     }, 100);

@@ -260,6 +260,7 @@
             :rent_type="room.rent_type"
             :max_guests="room.max_guests"
             :max_children="room.max_children"
+            :average_rating="room.average_rating"
             @filterByParent="setParentFilter"
           />
         </div>
@@ -286,6 +287,7 @@
               :status="room.status"
               :parentTitle="room.parentTitle"
               :parentId="room.parentId"
+              :average_rating="room.average_rating"
               @filterByParent="setParentFilter"
             />
           </div>
@@ -311,6 +313,7 @@
               :status="room.status"
               :parentTitle="room.parentTitle"
               :parentId="room.parentId"
+              :average_rating="room.average_rating"
               @filterByParent="setParentFilter"
             />
           </div>
@@ -557,7 +560,8 @@ onMounted(async () => {
         parentId: room.parent_id,
         rent_type: rawType,
         max_guests: room.max_guests,
-        max_children: room.max_children
+        max_children: room.max_children,
+        average_rating: room.average_rating
       };
     });
 

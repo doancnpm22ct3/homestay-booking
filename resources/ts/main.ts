@@ -57,6 +57,9 @@ const router = createRouter({
         { path: 'rooms/create', component: AdminRoomForm },
         { path: 'rooms/edit/:id', component: AdminRoomForm },
         { path: 'booking-management', component: AdminBookings },
+        // Fallback cho các thông báo cũ
+        { path: 'booking-details/:id', redirect: '/admin/booking-management' },
+        { path: 'bookings', redirect: '/admin/booking-management' },
         { path: 'invoices', component: AdminInvoices },
         { path: 'vouchers', component: AdminVouchers },
         { path: 'reviews', component: AdminReviews },

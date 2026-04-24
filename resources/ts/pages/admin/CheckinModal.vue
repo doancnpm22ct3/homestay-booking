@@ -1,6 +1,6 @@
 <template>
   <div class="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4" @click.self="$emit('close')">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 overflow-y-auto max-h-[90vh]">
       <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">✅ Xác nhận Check-in</h3>
       <div class="space-y-4">
         <div>
@@ -10,6 +10,22 @@
             <option v-for="r in cleanRooms" :key="r.id" :value="r.id">{{ r.room_number }} – {{ r.title }} ({{ r.type }})</option>
           </select>
         </div>
+
+        <div>
+          <label class="label-sm">Hình ảnh căn cước (Bắt buộc)</label>
+          <div class="mt-1 flex flex-col items-center p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-emerald-500 transition-colors cursor-pointer bg-gray-50" @click="$refs.fileInput.click()">
+            <input type="file" ref="fileInput" class="hidden" accept="image/*" @change="handleFileChange">
+            
+            <div v-if="!previewUrl" class="text-center">
+              <span class="text-3xl mb-2 block">📸</span>
+              <p class="text-xs text-gray-500">Chụp hoặc chọn ảnh CCCD</p>
+            </div>
+            <img v-else :src="previewUrl" class="w-full h-44 object-contain rounded-lg shadow-sm" />
+            
+            <button v-if="previewUrl" type="button" @click.stop="clearFile" class="mt-2 text-xs text-red-600 font-semibold underline">Chọn lại</button>
+          </div>
+        </div>
+
         <div>
           <label class="label-sm">Ghi chú đặc biệt (nội bộ)</label>
           <textarea v-model="internalNote" rows="2" class="input-sm w-full resize-none" placeholder="VIP, dị ứng, yêu cầu đặc biệt..."></textarea>
@@ -20,7 +36,7 @@
       </div>
       <div class="flex gap-3 mt-6">
         <button @click="$emit('close')" class="flex-1 px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 text-sm transition-colors">Hủy</button>
-        <button @click="submit" :disabled="loading" class="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium transition-colors disabled:opacity-50">
+        <button @click="submit" :disabled="loading || !selectedFile" class="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium transition-colors disabled:opacity-50">
           {{ loading ? 'Đang xử lý...' : '✅ Hoàn tất Check-in' }}
         </button>
       </div>
@@ -39,16 +55,43 @@ const cleanRooms = ref<any[]>([]);
 const selectedRoomId = ref(props.booking.room_id);
 const internalNote   = ref('');
 
+const fileInput    = ref<any>(null);
+const selectedFile = ref<File | null>(null);
+const previewUrl   = ref('');
+
+function handleFileChange(e: any) {
+  const file = e.target.files[0];
+  if (!file) return;
+  selectedFile.value = file;
+  previewUrl.value   = URL.createObjectURL(file);
+}
+function clearFile() {
+  selectedFile.value = null;
+  previewUrl.value   = '';
+}
+
 async function fetchCleanRooms() {
   const res = await fetch(`/api/admin/rooms/available?check_in=${props.booking.check_in_date}&check_out=${props.booking.check_out_date}`, { headers:{Authorization:`Bearer ${token()}`} });
   if (res.ok) cleanRooms.value = (await res.json()).filter((r:any) => r.id !== props.booking.room_id);
 }
 async function submit() {
+  if (!selectedFile.value) {
+    alert('Vui lòng chụp/tải lên ảnh CCCD');
+    return;
+  }
   loading.value = true;
+
+  const fd = new FormData();
+  fd.append('room_id', (selectedRoomId.value || '').toString());
+  fd.append('internal_note', internalNote.value);
+  fd.append('id_card_image', selectedFile.value);
+
   const res = await fetch(`/api/admin/bookings/${props.booking.id}/checkin`, {
-    method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token()}`},
-    body: JSON.stringify({ room_id: selectedRoomId.value, internal_note: internalNote.value }),
+    method:'POST', 
+    headers:{ Authorization:`Bearer ${token()}` },
+    body: fd,
   });
+  
   loading.value = false;
   if (res.ok) { emit('done'); emit('close'); }
   else { const d = await res.json(); alert(d.message || 'Lỗi check-in'); }

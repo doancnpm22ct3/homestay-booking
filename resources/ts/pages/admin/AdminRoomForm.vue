@@ -428,9 +428,9 @@ const handleSubmit = async () => {
     selectedFiles.value.forEach(file => formData.append('images[]', file));
     imagePreviews.value.filter(img => !img.isNew).forEach(img => formData.append('retained_images[]', img.url));
 
-    let url = '/api/rooms';
+    let url = '/api/admin/rooms';
     if (isEdit.value) {
-      url = `/api/rooms/${route.params.id}`;
+      url = `/api/admin/rooms/${route.params.id}`;
       formData.append('_method', 'PUT'); 
     }
 

@@ -1,134 +1,90 @@
-# 🏡 Homestay Booking
+# Homestay Booking System
 
-Ứng dụng đặt phòng homestay xây dựng bằng **Laravel** + **Vue 3** + **Tailwind CSS v4** + **Vite 6**.
+A modern homestay and room booking management system built with Laravel, Vue 3, and Vite. This project provides a seamless experience for both administrators managing their properties and customers looking for high-quality stays.
 
----
+## 🚀 Key Features
 
-## ⚙️ Yêu cầu cài đặt
+- **Dynamic Room Management**: Administrators can manage homestays, buildings, and individual rooms with ease.
+- **Advanced Booking System**: Real-time room status tracking (available, booked, in-use, maintenance).
+- **Voucher & Reward Points**: integrated voucher loyalty system and gamified reward points for customers.
+- **Reviews & Ratings**: Secure customer feedback system with admin moderation.
+- **Automated Notifications**: Database-driven notifications for new bookings, reviews, and status updates.
+- **Performance Optimized**: Database indexing, eager loading, and API Resources for fast responses.
+- **Security Hardened**: Rate limiting on sensitive routes, input sanitization, and strict CORS configuration.
 
-Trước khi bắt đầu, đảm bảo máy bạn đã cài:
+## 🛠️ Tech Stack
 
-| Công cụ | Phiên bản tối thiểu | Link tải |
-|---------|---------------------|----------|
-| PHP | >= 8.1 | https://www.php.net/downloads |
-| Composer | >= 2.x | https://getcomposer.org |
-| Node.js | >= 18.x | https://nodejs.org |
-| MySQL | >= 8.0 | https://dev.mysql.com/downloads |
-| Git | Bất kỳ | https://git-scm.com |
+- **Backend**: Laravel 10
+- **Frontend**: Vue 3 + Vite + Tailwind CSS 4
+- **Database**: MySQL / MariaDB
+- **Icons**: Lucide Vue Next
+- **Charts**: Chart.js / Vue-Chartjs
+- **Animations**: Motion
 
----
+## 📦 Installation & Setup
 
-## 🚀 Hướng dẫn setup
+### 1. Prerequisites
+- PHP >= 8.1
+- Composer
+- Node.js & NPM
+- MySQL / MariaDB
 
-### 1. Clone repository
-
+### 2. Clone the Repository
 ```bash
-git clone https://github.com/doancnpm22ct3/homestay-booking.git
+git clone <repository-url>
 cd homestay-booking
 ```
 
-### 2. Cài đặt PHP dependencies
-
+### 3. Backend Setup
 ```bash
 composer install
-```
-
-### 3. Tạo file cấu hình môi trường
-
-```bash
 cp .env.example .env
+# Update .env with your database credentials
 php artisan key:generate
+php artisan migrate --seed
+php artisan storage:link
 ```
 
-### 4. Cấu hình database
-
-Mở file `.env` và chỉnh sửa thông tin database:
-
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=homestay_booking   # Tên database bạn tạo
-DB_USERNAME=root                # Username MySQL của bạn
-DB_PASSWORD=                    # Password MySQL của bạn
-```
-
-> ⚠️ Tạo database trước trong MySQL: `CREATE DATABASE homestay_booking;`
-
-### 5. Chạy migration
-
-```bash
-php artisan migrate
-```
-
-> Nếu có seeder: `php artisan migrate --seed`
-
-### 6. Cài đặt Node.js dependencies
-
+### 4. Frontend Setup
 ```bash
 npm install
 ```
 
-### 7. Chạy ứng dụng
-
-Mở **2 terminal** và chạy song song:
-
-**Terminal 1 – Backend (Laravel):**
+### 5. Start the Project
+In two separate terminals:
 ```bash
+# Terminal 1: Laravel Server
 php artisan serve
-```
 
-**Terminal 2 – Frontend (Vite):**
-```bash
+# Terminal 2: Vite Dev Server
 npm run dev
 ```
 
-### 8. Truy cập
+## 🔐 Security Configuration
 
-Mở trình duyệt và vào: **http://localhost:8000**
+### API Rate Limiting
+The system implements strict rate limiting:
+- **Login**: 5 attempts per minute per IP.
+- **Register**: 3 attempts per minute per IP.
+- **General API**: 100 requests per minute.
 
----
-
-## 📁 Cấu trúc thư mục chính
-
-```
-homestay-booking/
-├── app/                # Logic backend (Controllers, Models...)
-├── resources/
-│   ├── ts/             # Source frontend Vue 3 + TypeScript
-│   │   ├── main.ts     # Entry point
-│   │   └── index.css   # Global CSS (Tailwind)
-│   └── views/
-│       └── welcome.blade.php  # HTML shell cho Vue app
-├── routes/
-│   └── web.php         # Định nghĩa routes
-├── vite.config.js      # Cấu hình Vite
-└── .env                # Biến môi trường (KHÔNG commit file này)
+### Production CORS
+Update your `.env` file to include the allowed frontend URL:
+```env
+FRONTEND_URL=https://your-domain.com
 ```
 
----
+## 📄 API Documentation
 
-## 🌿 Quy trình làm việc với Git
+Comprehensive API documentation is available in the `docs/` directory.
+- **Postman Collection**: [docs/api_collection.json](./docs/api_collection.json)
 
-```bash
-# Tạo branch mới cho tính năng của bạn
-git checkout -b feature/ten-tinh-nang
+## 👤 Guides
 
-# Sau khi code xong, commit
-git add .
-git commit -m "feat: mô tả tính năng"
+- [Admin Management Guide](./docs/ADMIN_GUIDE.md)
+- [Customer User Guide](./docs/USER_GUIDE.md)
+- [Project Presentation Summary](./docs/PROJECT_SUMMARY.md)
 
-# Push lên GitHub
-git push origin feature/ten-tinh-nang
-```
+## 📝 License
 
-> Tạo **Pull Request** để merge vào `develop`, không push thẳng vào `main`.
-
----
-
-## ❓ Gặp lỗi?
-
-- **`php artisan` không chạy** → Kiểm tra PHP đã cài và thêm vào PATH
-- **Lỗi database** → Kiểm tra thông tin `.env` và đảm bảo MySQL đang chạy
-- **`npm install` lỗi** → Thử `npm install --legacy-peer-deps`
-- **Vite không start** → Kiểm tra Node.js phiên bản >= 18
+This project is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).

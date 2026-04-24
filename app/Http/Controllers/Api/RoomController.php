@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Room;
 use App\Models\RoomImage;
+use App\Http\Resources\RoomResource;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage; // Đã thêm thư viện này để hỗ trợ xóa file ảnh
+use Illuminate\Support\Facades\Storage;
 
 class RoomController extends Controller
 {
@@ -41,88 +42,26 @@ class RoomController extends Controller
 
         $rooms = $query->orderBy('id', 'desc')->paginate($request->input('per_page', 10));
 
-        $rooms->getCollection()->transform(function($room) {
-                // Formatting for admin list
-                $primaryImage = $room->images->where('is_primary', true)->first() 
-                                ?? $room->images->first();
-                
-                $room->image = $primaryImage ? $primaryImage->image_url : 'https://picsum.photos/seed/fallback/100/100';
-
-                // Label hiển thị
-                if ($room->rent_type === 'whole_house') {
-                    $room->type_label = 'Nguyên căn';
-                } elseif ($room->rent_type === 'home') {
-                    $room->type_label = 'Phòng Home';
-                } elseif ($room->rent_type === 'room_based') {
-                    $room->type_label = 'Tòa nhà/Cơ sở';
-                } else {
-                    $room->type_label = 'Phòng riêng (Độc lập)';
-                }
-
-                // Format child rooms if any (for room_based)
-                if ($room->childRooms) {
-                    $room->child_rooms = $room->childRooms->map(function($child) {
-                        $pImg = $child->images->where('is_primary', true)->first() 
-                                ?? $child->images->first();
-                        $child->image = $pImg ? $pImg->image_url : null;
-                        return $child;
-                    });
-                }
-                
-                return $room;
-            });
-
-        return response()->json($rooms);
+        return RoomResource::collection($rooms);
     }
 
     public function index()
     {
         // Lấy tất cả phòng, sắp xếp mới nhất lên đầu, kèm theo hình ảnh
-        $rooms = Room::with(['images', 'parent'])->orderBy('id', 'desc')->get()->map(function($room) {
-            
-            // Tìm ảnh bìa (is_primary = 1), nếu không có thì lấy tạm ảnh đầu tiên
-            $primaryImage = $room->images->where('is_primary', true)->first() 
-                            ?? $room->images->first();
+        $rooms = Room::with(['images', 'parentHomestay'])->orderBy('id', 'desc')->get();
 
-            // Trả về dữ liệu đúng chuẩn mà Vue đang cần
-            return [
-                'id' => $room->id,
-                'title' => $room->title,
-                'location' => $room->location,
-                'rent_type' => $room->rent_type,
-                'type' => $room->type,
-                'price' => $room->price,
-                'status' => $room->status,
-                'is_visible' => $room->is_visible,
-                'max_guests' => $room->max_guests,
-                'max_children' => $room->max_children,
-                'parent_id' => $room->parent_id,
-                'parent_title' => $room->parent ? $room->parent->title : null,
-                'image' => $primaryImage ? $primaryImage->image_url : 'https://picsum.photos/seed/fallback/100/100'
-            ];
-        });
-
-        return response()->json($rooms);
+        return RoomResource::collection($rooms);
     }
 
     public function show($id)
     {
-        $room = Room::with(['images', 'childRooms.images'])->find($id);
-
-        if ($room && $room->rent_type === 'room_based') {
-            // Include formatted child rooms for homestay
-            $room->child_rooms = $room->childRooms->map(function($child) {
-                $primaryImage = $child->images->where('is_primary', true)->first() 
-                                ?? $child->images->first();
-                $child->image = $primaryImage ? $primaryImage->image_url : null;
-                return $child;
-            });
-        }
+        $room = Room::with(['images', 'childRooms.images', 'parentHomestay'])->find($id);
 
         if (!$room) {
             return response()->json(['message' => 'Không tìm thấy phòng'], 404);
         }
 
+        // Lấy tiện nghi thủ công (vì bảng trung gian không có model riêng dễ dùng)
         $amenities = DB::table('amenities')
             ->join('room_amenities', 'amenities.id', '=', 'room_amenities.amenity_id')
             ->where('room_amenities.room_id', $id)
@@ -131,7 +70,7 @@ class RoomController extends Controller
 
         $room->amenity_list = $amenities;
 
-        return response()->json($room);
+        return new RoomResource($room);
     }
 
     public function update(Request $request, $id)

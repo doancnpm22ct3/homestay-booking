@@ -452,23 +452,36 @@ const checkReviewPermission = async () => {
     const token = localStorage.getItem('auth_token');
     if (!token) return;
 
+    // Ưu tiên lấy booking_id từ query param (từ thông báo nhảy vào)
+    const urlBookingId = route.query.booking_id ? Number(route.query.booking_id) : null;
+
     const res = await fetch('/api/my-bookings', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const bookings = await res.json();
     
-    // Tìm đơn đặt phòng này: đã hoàn thành và chưa được review
     const roomId = Number(route.params.id);
-    const eligible = bookings.find((b: any) => 
-      Number(b.room_id) === roomId && 
-      b.status === 'checked_out'
-      // Note: Backend sẽ validate kỹ hơn việc đã review hay chưa
-    );
+    let eligible = null;
+
+    if (urlBookingId) {
+      // Tìm đúng booking được chỉ định trong thông báo
+      eligible = bookings.find((b: any) => 
+        Number(b.id) === urlBookingId && 
+        Number(b.room_id) === roomId && 
+        b.status === 'checked_out'
+      );
+    }
+
+    // Nếu không có booking_id trong URL hoặc không tìm thấy cái cụ thể đó, 
+    // mới tìm booking "đã trả phòng" bất kỳ của phòng này
+    if (!eligible) {
+      eligible = bookings.find((b: any) => 
+        Number(b.room_id) === roomId && 
+        b.status === 'checked_out'
+      );
+    }
     
     if (eligible) {
-      // Kiểm tra xem thực sự đã review chưa bằng cách gọi API (hoặc backend trả về flag)
-      // Để tối ưu, em sẽ để user bấm gửi rồi backend báo lỗi nếu đã review,
-      // nhưng ở đây ta check sơ bộ.
       canReviewBooking.value = eligible;
     }
   } catch (e) {

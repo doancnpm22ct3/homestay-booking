@@ -220,7 +220,7 @@ const router = useRouter();
 const loading = ref(true);
 const isSubmitting = ref(false);
 const room = ref<RoomData | null>(null);
-const primaryImage = ref('https://picsum.photos/seed/roommain/200/200');
+const primaryImage = ref('https://picsum.photos/seed/room/800/600');
 
 // Lấy thông tin từ URL Query
 const roomId = route.query.roomId as string;

@@ -124,10 +124,20 @@
                     Thời gian: {{ formatDate(booking.check_in_date) }} đến {{ formatDate(booking.check_out_date) }} | Tổng: {{ formatMoney(booking.total_amount) }}
                   </p>
                 </div>
-                <router-link :to="`/payment-success?id=${booking.id}`" class="text-[#4A7055] font-bold text-sm hover:text-[#3b5a44] self-start underline transition-colors flex items-center gap-1">
-                  Xem hóa đơn chi tiết
-                  <ChevronRight class="w-4 h-4" />
-                </router-link>
+                <div class="flex items-center gap-4">
+                  <router-link :to="`/payment-success?id=${booking.id}`" class="text-[#4A7055] font-bold text-sm hover:text-[#3b5a44] self-start underline transition-colors flex items-center gap-1">
+                    Xem hóa đơn chi tiết
+                    <ChevronRight class="w-4 h-4" />
+                  </router-link>
+                  
+                  <button 
+                    v-if="['pending', 'confirmed', 'deposited', 'booked'].includes(booking.status)"
+                    @click="handleCancel(booking)"
+                    class="text-red-500 font-bold text-sm hover:text-red-700 transition-colors flex items-center gap-1 ml-auto"
+                  >
+                    Hủy đặt phòng
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -148,7 +158,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 import RoomCard from '../components/RoomCard.vue';
 import { ChevronRight } from 'lucide-vue-next';
@@ -164,6 +174,7 @@ interface User {
 }
 
 const router = useRouter();
+const route = useRoute();
 
 // State
 const activeTab = ref('account');
@@ -190,7 +201,7 @@ const fetchHistory = async () => {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
         }
       });
-      bookings.value = response.data;
+      bookings.value = response.data.data;
     } catch (err) {
       console.error('Failed to fetch bookings:', err);
     } finally {
@@ -240,6 +251,48 @@ const handleLogout = () => {
   }
 };
 
+// Hàm Hủy đặt phòng
+const handleCancel = async (booking: any) => {
+  const policyMessage = `
+CHÍNH SÁCH HỦY PHÒNG:
+- Hủy trước 3 ngày: Hoàn 100% tiền cọc.
+- Hủy từ 1-3 ngày: Hoàn 50% tiền cọc.
+- Hủy dưới 24h: Không hoàn cọc.
+
+Bạn có chắc chắn muốn hủy đơn đặt phòng #${booking.booking_code}?
+  `;
+
+  if (!confirm(policyMessage)) return;
+
+  const reason = prompt('Vui lòng nhập lý do hủy (không bắt buộc):') || 'Khách hàng tự hủy';
+
+  try {
+    const response = await fetch(`/api/bookings/${booking.id}/cancel`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+      },
+      body: JSON.stringify({ reason })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert(`Hủy phòng thành công! Số tiền hoàn lại dự kiến: ${formatMoney(data.refund_amount)}`);
+      // Cập nhật lại danh sách local thay vì fetch hết
+      booking.status = 'cancelled';
+      booking.status_label = 'Đã hủy';
+    } else {
+      alert('Lỗi: ' + data.message);
+    }
+  } catch (error) {
+    console.error('Lỗi khi hủy phòng:', error);
+    alert('Không thể kết nối đến máy chủ!');
+  }
+};
+
 // Cập nhật thông tin
 const handleUpdateAccount = async () => {
   if (!accountInfo.value.name.trim()) {
@@ -285,6 +338,12 @@ onMounted(() => {
     accountInfo.value.name = user.value.name;
     accountInfo.value.email = user.value.email;
     accountInfo.value.phone = user.value.phone || '';
+    
+    // Kiểm tra query parameter để chuyển tab (Hỗ trợ deep-linking)
+    const tabParam = route.query.tab as string;
+    if (tabParam && ['saved', 'history', 'account'].includes(tabParam)) {
+      activeTab.value = tabParam;
+    }
   } else {
     router.push('/login');
     return;

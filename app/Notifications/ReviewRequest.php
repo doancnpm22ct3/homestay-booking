@@ -30,7 +30,7 @@ class ReviewRequest extends Notification
             'title'       => 'Để lại đánh giá ⭐',
             'message'     => "Kỳ nghỉ của bạn tại {$roomTitle} đã kết thúc. Hãy chia sẻ cảm nhận của bạn nhé!",
             'type'        => 'review_request',
-            'action_url'  => "/room/{$this->booking->room_id}?review=true"
+            'action_url'  => "/room/{$this->booking->room_id}?booking_id={$this->booking->id}&review=true"
         ];
     }
 }

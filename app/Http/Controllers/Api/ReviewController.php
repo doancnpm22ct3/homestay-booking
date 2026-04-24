@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Models\Booking;
+use App\Http\Resources\ReviewResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -18,11 +19,11 @@ class ReviewController extends Controller
     {
         $reviews = Review::where('room_id', $roomId)
             ->where('is_hidden', false)
-            ->with('user:id,name')
+            ->with(['user:id,name', 'room'])
             ->latest()
             ->paginate(10);
 
-        return response()->json($reviews);
+        return ReviewResource::collection($reviews);
     }
 
     /**
@@ -70,9 +71,18 @@ class ReviewController extends Controller
             'is_hidden' => false,
         ]);
 
+        // Thông báo cho tất cả Admin
+        try {
+            $adminUsers = \App\Models\User::where('role', 'admin')->get();
+            $review->load(['user', 'room']);
+            \Illuminate\Support\Facades\Notification::send($adminUsers, new \App\Notifications\NewReviewAdmin($review));
+        } catch (\Exception $e) {
+            \Log::error("Thông báo admin về review mới thất bại: " . $e->getMessage());
+        }
+
         return response()->json([
             'message' => 'Cảm ơn bạn đã gửi đánh giá!',
-            'review' => $review
+            'review' => new ReviewResource($review)
         ], 201);
     }
 
@@ -85,7 +95,7 @@ class ReviewController extends Controller
             ->latest()
             ->paginate(20);
 
-        return response()->json($reviews);
+        return ReviewResource::collection($reviews);
     }
 
     /**
@@ -99,7 +109,7 @@ class ReviewController extends Controller
 
         return response()->json([
             'message' => $review->is_hidden ? 'Đã ẩn đánh giá.' : 'Đã hiển thị đánh giá.',
-            'review' => $review
+            'review' => new ReviewResource($review)
         ]);
     }
 
