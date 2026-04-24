@@ -12,6 +12,9 @@ use App\Notifications\BookingStatusUpdated;
 use App\Notifications\ReviewRequest;
 use App\Models\Review;
 use App\Http\Resources\BookingResource;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
+
 
 class BookingController extends Controller
 {
@@ -225,6 +228,11 @@ class BookingController extends Controller
     public function checkin(Request $request, $id)
     {
         $booking = Booking::findOrFail($id);
+        
+        $request->validate([
+            'id_card_image' => 'required|image|max:10240', // Max 10MB
+        ]);
+
         // Chấp nhận check-in từ trạng thái deposited hoặc confirmed/pending (tùy existing logic)
         if (!in_array($booking->status,['deposited','confirmed','pending'])) return response()->json(['message'=>'Không thể check-in'],422);
         DB::beginTransaction();
@@ -234,10 +242,23 @@ class BookingController extends Controller
                 $booking->update(['room_id'=>$request->room_id]);
                 $booking->logActivity('room_changed','Đổi phòng khi check-in',['room_id'=>$old],['room_id'=>$request->room_id]);
             }
-            $booking->update(['status'=>'checked_in','checked_in_by'=>auth('sanctum')->id()]);
+
+            // Mã hóa và lưu CCCD
+            if ($request->hasFile('id_card_image')) {
+                $file = $request->file('id_card_image');
+                $encryptedContent = Crypt::encrypt(file_get_contents($file->getRealPath()));
+                $filename = 'id_card_' . $booking->id . '_' . time() . '.dat';
+                Storage::put('id_cards/' . $filename, $encryptedContent);
+                $booking->id_card_image = $filename;
+            }
+
+            $booking->status = 'checked_in';
+            $booking->checked_in_by = auth('sanctum')->id();
+            $booking->save();
+
             // Theo yêu cầu: cập nhật trạng thái Room thành in_use
             $booking->room()->update(['status'=>'in_use','room_status'=>'occupied','room_status_updated_by'=>auth('sanctum')->id()]);
-            $booking->logActivity('checkin','Khách đã check-in thành công');
+            $booking->logActivity('checkin','Khách đã check-in thành công (đã lưu CCCD mã hóa)');
             
             // Notify Customer
             if ($booking->customer) {
@@ -248,6 +269,30 @@ class BookingController extends Controller
             return response()->json(['message'=>'Check-in thành công','booking'=>$booking->fresh(['customer','room'])]);
         } catch (\Exception $e) { DB::rollBack(); return response()->json(['message'=>$e->getMessage()],500); }
     }
+
+    // GET /api/admin/bookings/{id}/id-card
+    public function viewIdCard($id)
+    {
+        $booking = Booking::findOrFail($id);
+        if (!$booking->id_card_image) {
+            return response()->json(['message' => 'Không có hình ảnh CCCD'], 404);
+        }
+
+        $path = 'id_cards/' . $booking->id_card_image;
+        if (!Storage::exists($path)) {
+            return response()->json(['message' => 'Tệp không tồn tại'], 404);
+        }
+
+        try {
+            $encryptedContent = Storage::get($path);
+            $decryptedContent = Crypt::decrypt($encryptedContent);
+            
+            return response($decryptedContent)->header('Content-Type', 'image/jpeg');
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Lỗi khi giải mã hình ảnh: ' . $e->getMessage()], 500);
+        }
+    }
+
 
     // POST /api/admin/bookings/{id}/checkout
     public function checkout(Request $request, $id)
