@@ -50,6 +50,7 @@ class BookingResource extends JsonResource
             'remaining_amount' => (float) $this->remaining_amount,
             'internal_note' => $this->internal_note,
             'guest_note' => $this->guest_note,
+            'id_card_image' => $this->id_card_image,
             
             'created_at' => $this->created_at ? (is_string($this->created_at) ? $this->created_at : $this->created_at->format('d/m/Y H:i')) : null,
         ];

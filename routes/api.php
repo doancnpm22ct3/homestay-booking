@@ -161,6 +161,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/vouchers/spin', [VoucherController::class, 'spin']);
 });
 
+
 // ══════════════════════════════════════════
 // QUẢN LÝ BOOKING – ADMIN
 // ══════════════════════════════════════════
@@ -181,6 +182,7 @@ Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
     Route::put('/bookings/{id}', [BookingController::class, 'update']);
     Route::patch('/bookings/{id}/status', [BookingController::class, 'changeStatus']);
     Route::post('/bookings/{id}/checkin', [BookingController::class, 'checkin']);
+    Route::get('/bookings/{id}/id-card', [BookingController::class, 'viewIdCard']);
     Route::post('/bookings/{id}/checkout', [BookingController::class, 'checkout']);
     Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
     Route::post('/bookings/{id}/transfer-room', [BookingController::class, 'transferRoom']);

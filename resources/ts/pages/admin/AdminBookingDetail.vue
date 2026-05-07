@@ -133,6 +133,19 @@
               </div>
             </section>
 
+            <!-- ID Card Section -->
+            <section v-if="booking.id_card_image">
+              <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">🪪 Hình ảnh CCCD</h3>
+              <div v-if="idCardUrl" class="relative group w-64 h-40 bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+                <img :src="idCardUrl" class="w-full h-full object-cover" />
+                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <button @click="viewFullIdCard" class="text-white text-xs font-medium bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/30 hover:bg-white/40">Xem ảnh lớn</button>
+                </div>
+              </div>
+              <div v-else class="text-xs text-gray-400 italic">Đang tải ảnh...</div>
+            </section>
+
+
             <!-- Action buttons -->
             <section class="flex flex-wrap gap-2 pt-2">
               <button v-if="booking.status === 'confirmed' || booking.status === 'pending'"
@@ -228,6 +241,8 @@ const internalNote = ref('');
 const guestNote    = ref('');
 const newSvc       = ref({ service_name:'', unit_price:0, quantity:1, is_paid: false });
 const selectedPreset = ref('');
+const idCardUrl    = ref('');
+
 
 const presetServices = [
   { name: 'Giặt ủi', price: 60000 },
@@ -262,10 +277,29 @@ async function refetch() {
     booking.value = b;
     internalNote.value = booking.value.internal_note || '';
     guestNote.value    = booking.value.guest_note || '';
+    if (b.id_card_image) fetchIdCard();
   }
   loading.value = false;
   emit('updated');
 }
+
+async function fetchIdCard() {
+  try {
+    const res = await fetch(`${API}/bookings/${props.bookingId}/id-card`, {
+      headers: { Authorization:`Bearer ${token()}` }
+    });
+    if (res.ok) {
+      const blob = await res.blob();
+      if (idCardUrl.value) URL.revokeObjectURL(idCardUrl.value);
+      idCardUrl.value = URL.createObjectURL(blob);
+    }
+  } catch (e) { console.error("Error fetching ID card", e); }
+}
+
+function viewFullIdCard() {
+  if (idCardUrl.value) window.open(idCardUrl.value, '_blank');
+}
+
 
 async function saveNotes() {
   await fetch(`${API}/bookings/${props.bookingId}`, {

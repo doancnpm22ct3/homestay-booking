@@ -14,7 +14,7 @@ class Booking extends Model
         // My fields
         'booking_code','customer_id','room_id',
         'check_in_date','check_out_date','check_in_time','check_out_time',
-        'adults','children','status','source',
+        'adults','children','status','source','id_card_image',
         'subtotal','discount_amount','discount_type','discount_reason',
         'total_amount','paid_amount',
         'guest_note','internal_note',

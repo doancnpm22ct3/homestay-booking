@@ -1,13 +1,13 @@
 <template>
-  <div class="bg-[#FAF9F5] min-h-screen pb-24 pt-10">
+  <div class="bg-[#FAF9F5] min-h-screen pb-24 pt-10 font-sans">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <section class="mb-24">
         <div class="text-center max-w-3xl mx-auto mb-12">
-          <h1 class="text-4xl md:text-5xl font-bold text-[#4A7055] mb-6 font-['Playfair_Display']">
-            Về chúng tôi
-          </h1>
-          <p class="text-lg text-gray-600 leading-relaxed font-['Inter']">
+         <h1 class="text-4xl md:text-5xl font-bold font-Lora text-[#4A7055] mb-6 tracking-normal">
+  Về chúng tôi
+</h1>
+          <p class="text-lg text-gray-600 leading-relaxed">
             Chào mừng bạn đến với hệ thống Homestay của chúng tôi. Với mong muốn mang lại một không gian lưu trú ấm cúng, tiện nghi và đậm chất bản địa, chúng tôi luôn nỗ lực không ngừng để mỗi kỳ nghỉ của bạn tại Đà Nẵng đều trở thành một kỷ niệm khó quên.
           </p>
         </div>
@@ -23,44 +23,44 @@
       </section>
 
       <section class="mb-24">
-        <h2 class="text-3xl font-bold text-gray-900 mb-10 text-center font-['Playfair_Display']">
+        <h2 class="text-3xl font-bold text-gray-900 mb-10 text-center font-serif">
           Chính sách của chúng tôi
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           
           <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="w-14 h-14 bg-[#4A7055]/10 rounded-2xl flex items-center justify-center mb-6 text-[#4A7055]">
+            <div class="w-14 h-14 bg-primary-10 rounded-2xl flex items-center justify-center mb-6 text-primary">
               <Clock class="w-7 h-7" />
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-3 font-['Playfair_Display']">Thời gian</h3>
+            <h3 class="text-xl font-bold text-gray-900 mb-3 font-serif">Thời gian</h3>
             <ul class="space-y-2 text-gray-600 text-sm">
-              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Nhận phòng: Có thể chủ động theo khách hàng</li>
-              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Trả phòng: Trước 15 phút giờ đã hẹn</li>
-              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Hỗ trợ nhận phòng sớm (Tùy tình trạng trống)</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Nhận phòng: Có thể chủ động theo khách hàng</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Trả phòng: Trước 15 phút giờ đã hẹn</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Hỗ trợ nhận phòng sớm (Tùy tình trạng trống)</li>
             </ul>
           </div>
 
           <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="w-14 h-14 bg-[#4A7055]/10 rounded-2xl flex items-center justify-center mb-6 text-[#4A7055]">
+            <div class="w-14 h-14 bg-primary-10 rounded-2xl flex items-center justify-center mb-6 text-primary">
               <CreditCard class="w-7 h-7" />
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-3 font-['Playfair_Display']">Thanh toán</h3>
+            <h3 class="text-xl font-bold text-gray-900 mb-3 font-serif">Thanh toán</h3>
             <ul class="space-y-2 text-gray-600 text-sm">
-              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Cọc trước 30% khi đặt phòng</li>
-              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Thanh toán 50% còn lại khi nhận phòng</li>
-              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Chấp nhận chuyển khoản & tiền mặt</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Cọc trước 30% khi đặt phòng</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Thanh toán 50% còn lại khi nhận phòng</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Chấp nhận chuyển khoản & tiền mặt</li>
             </ul>
           </div>
 
           <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="w-14 h-14 bg-[#4A7055]/10 rounded-2xl flex items-center justify-center mb-6 text-[#4A7055]">
+            <div class="w-14 h-14 bg-primary-10 rounded-2xl flex items-center justify-center mb-6 text-primary">
               <ShieldCheck class="w-7 h-7" />
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-3 font-['Playfair_Display']">Hủy phòng</h3>
+            <h3 class="text-xl font-bold text-gray-900 mb-3 font-serif">Hủy phòng</h3>
             <ul class="space-y-2 text-gray-600 text-sm">
-              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Hủy trước 3 ngày: Hoàn 100% cọc</li>
-              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Hủy trước 1 ngày: Hoàn 50% cọc</li>
-              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#4A7055]"></span> Hủy trong ngày: Không hoàn cọc</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Hủy trước 3 ngày: Hoàn 100% cọc</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Hủy trước 1 ngày: Hoàn 50% cọc</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Hủy trong ngày: Không hoàn cọc</li>
             </ul>
           </div>
 
@@ -70,10 +70,10 @@
       <section class="mb-24 bg-white rounded-[3rem] shadow-sm border border-gray-100 p-10 md:p-16">
         <div class="flex flex-col md:flex-row gap-12 items-center">
           <div class="md:w-1/3">
-            <h2 class="text-3xl font-bold text-gray-900 mb-4 font-['Playfair_Display']">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4 font-serif">
               Quy định của Homestay
             </h2>
-            <p class="text-gray-600 font-['Inter']">
+            <p class="text-gray-600">
               Để đảm bảo trải nghiệm tốt nhất cho tất cả khách hàng lưu trú, mong quý khách lưu ý thực hiện các quy định sau.
             </p>
           </div>
@@ -88,23 +88,23 @@
             </div>
             
             <div class="flex items-start gap-4">
-              <VolumeX class="w-6 h-6 text-[#4A7055] shrink-0 mt-1" />
+              <VolumeX class="w-6 h-6 text-primary shrink-0 mt-1" />
               <div>
                 <h4 class="font-bold text-gray-900 mb-1">Giữ yên tĩnh</h4>
-                <p class="text-sm text-gray-500">Vui lòng hạn chế tiếng ồn lớn sau 22:00 để tránh ảnh hưởng xung quanh.</p>
+                <p class="text-sm text-gray-500">Vui lòng hạn chế tiếng ồn lớn sau 22:00 để tránh ảnh hưởng.</p>
               </div>
             </div>
 
             <div class="flex items-start gap-4">
-              <Dog class="w-6 h-6 text-[#4A7055] shrink-0 mt-1" />
+              <Dog class="w-6 h-6 text-primary shrink-0 mt-1" />
               <div>
                 <h4 class="font-bold text-gray-900 mb-1">Thú cưng</h4>
-                <p class="text-sm text-gray-500">Chúng tôi rất tiếc chưa thể hỗ trợ mang theo thú cưng vào khu vực phòng nghỉ.</p>
+                <p class="text-sm text-gray-500">Chúng tôi rất tiếc chưa thể hỗ trợ mang theo thú cưng.</p>
               </div>
             </div>
 
             <div class="flex items-start gap-4">
-              <Users class="w-6 h-6 text-[#4A7055] shrink-0 mt-1" />
+              <Users class="w-6 h-6 text-primary shrink-0 mt-1" />
               <div>
                 <h4 class="font-bold text-gray-900 mb-1">Đúng số lượng</h4>
                 <p class="text-sm text-gray-500">Vui lòng lưu trú đúng số lượng người đã đăng ký lúc đặt phòng.</p>
@@ -121,7 +121,7 @@
 
           <div class="relative z-10 flex flex-col md:flex-row items-center justify-between p-12 md:p-16 gap-8 text-white">
             <div class="md:w-1/2">
-              <h2 class="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display']">
+              <h2 class="text-3xl md:text-4xl font-bold mb-4">
                 Bạn cần hỗ trợ?
               </h2>
               <p class="text-white/80 text-lg mb-8">

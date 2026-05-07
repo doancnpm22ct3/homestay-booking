@@ -1,20 +1,27 @@
-import defaultTheme from 'tailwindcss/defaultTheme';
-
 /** @type {import('tailwindcss').Config} */
-export default {
-    content: [
-        './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
-        './storage/framework/views/*.php',
-        './resources/views/**/*.blade.php',
-        './resources/js/**/*.vue', // Đảm bảo dòng này có mặt để Tailwind quét file Vue
-    ],
-    theme: {
-        extend: {
-            colors: {
-                'brand-green': '#4A7055',
-                'brand-green-dark': '#3a5944',
-            },
+module.exports = {
+  content: [
+    "./resources/**/*.blade.php",
+    "./resources/**/*.js",
+    "./resources/**/*.ts",
+    "./resources/**/*.vue",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          DEFAULT: '#4A7055',
+          10: 'rgba(74, 112, 85, 0.1)',
         },
+        background: {
+          DEFAULT: '#FAF9F5',
+        }
+      },
+      fontFamily: {
+        sans: ['"Inter"', 'sans-serif'],
+        serif: ['"Lora"', 'serif'],
+      }
     },
-    plugins: [],
-};
+  },
+  plugins: [],
+}

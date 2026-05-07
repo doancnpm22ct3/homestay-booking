@@ -35,25 +35,15 @@
             <div class="pt-8 border-t border-gray-100">
               <h2 class="text-xl font-bold text-gray-900 mb-6">Phương thức thanh toán</h2>
               <div class="space-y-4">
-                <label :class="`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-colors ${paymentMethod === 'bank' ? 'border-[#4A7055] bg-[#4A7055]/5' : 'border-gray-100 hover:bg-gray-50'}`">
+                <label :class="`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-colors ${paymentMethod === 'vnpay' ? 'border-[#4A7055] bg-[#4A7055]/5' : 'border-gray-100 hover:bg-gray-50'}`">
                   <input 
                     type="radio" 
                     name="payment" 
-                    value="bank" 
+                    value="vnpay" 
                     v-model="paymentMethod"
                     class="w-5 h-5 text-[#4A7055] focus:ring-[#4A7055]"
                   />
-                  <span class="ml-3 font-medium text-gray-900">Chuyển khoản ngân hàng</span>
-                </label>
-                <label :class="`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-colors ${paymentMethod === 'ewallet' ? 'border-[#4A7055] bg-[#4A7055]/5' : 'border-gray-100 hover:bg-gray-50'}`">
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    value="ewallet" 
-                    v-model="paymentMethod"
-                    class="w-5 h-5 text-[#4A7055] focus:ring-[#4A7055]"
-                  />
-                  <span class="ml-3 font-medium text-gray-900">Ví điện tử (Momo, ZaloPay, VNPay)</span>
+                  <span class="ml-3 font-medium text-gray-900">Thanh toán VNPay hoặc Ngân Hàng</span>
                 </label>
               </div>
             </div>
@@ -239,7 +229,7 @@ const checkOut = ref(route.query.checkOut as string);
 const adults = ref(Number(route.query.adults) || 1);
 const children = ref(Number(route.query.children) || 0);
 
-const paymentMethod = ref('bank');
+const paymentMethod = ref('vnpay');
 const customerInfo = ref({
   name: '',
   email: '',
@@ -434,7 +424,7 @@ const handlePayment = async () => {
       const newBookingId = resData.booking ? resData.booking.id : (resData.data ? resData.data.id : resData.id);
       
       // BƯỚC 2: KIỂM TRA PHƯƠNG THỨC THANH TOÁN
-      if (paymentMethod.value === 'ewallet') {
+      if (paymentMethod.value === 'vnpay') {
         // NẾU CHỌN VNPAY (Ví điện tử): Gọi API tạo link thanh toán
         try {
             const vnpayResponse = await fetch('/api/payment/create', {
